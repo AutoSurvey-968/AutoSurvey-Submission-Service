@@ -9,6 +9,9 @@
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<sonar.projectKey>AutoSurvey-968_AutoSurvey-Submission-Service</sonar.projectKey>
+		<sonar.organization>autosurvey-968</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<parent>
