@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissionservice.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,11 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/submission")
 public class ResponseController {
 	private ResponseService responseService;
+	
+	@Autowired
+	public void setResponceService(ResponseService responseService) {
+		this.responseService = responseService;
+	}
 	
 	@GetMapping
 	public Flux<Object> getResponses(){
