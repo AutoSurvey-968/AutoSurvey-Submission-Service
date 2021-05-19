@@ -1,4 +1,4 @@
-package com.revature.autosurvey.submissionservice.beans;
+package com.revature.autosurvey.submissions.beans;
 
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
