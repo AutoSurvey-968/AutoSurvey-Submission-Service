@@ -1,14 +1,17 @@
 package com.revature.autosurvey.submissions.beans;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
+@Table("response")
 public class Response {
-	@PrimaryKey private ResponsePrimaryKey key;
+	@PrimaryKey private UUID id;
+	@Column private String week;
+	@Column private int batch;
 	@Column private Timestamp timestamp;
 	@Column private String name;
 	@Column private String email;
