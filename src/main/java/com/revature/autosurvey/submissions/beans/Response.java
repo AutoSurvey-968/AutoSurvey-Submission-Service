@@ -8,16 +8,14 @@ import org.springframework.data.cassandra.core.mapping.Table;
 
 @Table
 public class Response {
-	@PrimaryKey private int id;
+	@PrimaryKey private ResponsePrimaryKey key;
 	@Column private Timestamp timestamp;
 	@Column private String name;
 	@Column private String email;
-	@Column private String week;
 	@Column private int satisfaction;
 	@Column private String overallFeedback;
 	@Column private String trainingIssues;
 	@Column private String location;
-	@Column private int batch;
 	@Column private String requirementClarity;
 	@Column private int projectPreparedness;
 	@Column private String projectFeedback;
