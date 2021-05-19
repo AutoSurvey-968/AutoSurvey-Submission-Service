@@ -1,4 +1,4 @@
-package com.revature.autosurvey.submissions.repositories;
+package com.revature.autosurvey.submissions.data;
 
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 import org.springframework.stereotype.Repository;
