@@ -7,5 +7,5 @@ import com.revature.autosurvey.submissions.beans.Response;
 
 @Repository
 public interface ResponseRepository extends ReactiveCassandraRepository<Response, Integer>{
-
+//We might have to change this primary key
 }
