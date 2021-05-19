@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
 
 import reactor.core.publisher.Flux;
@@ -25,22 +26,22 @@ public class ResponseController {
 	}
 	
 	@GetMapping
-	public Flux<Object> getResponses(){
+	public Flux<Response> getResponses(){
 		return null;
 	}
 	
 	@GetMapping("/{id}")
-	public Mono<ResponseEntity<Object>> getResponse(){
+	public Mono<ResponseEntity<Response>> getResponse(){
 		return null;
 	}
 	
 	@PostMapping("/{id}")
-	public Mono<ResponseEntity<Object>> addedResponse(){
+	public Mono<ResponseEntity<Response>> addedResponse(){
 		return null;	
 	}
 	
 	@PutMapping("/{id}")
-	public Mono<ResponseEntity<Object>> updateResponse(){
+	public Mono<ResponseEntity<Response>> updateResponse(){
 		return null;	
 	}
 	
