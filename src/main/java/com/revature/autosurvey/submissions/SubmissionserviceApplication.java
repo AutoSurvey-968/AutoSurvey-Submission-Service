@@ -1,4 +1,4 @@
-package com.revature.autosurvey.submissionservice;
+package com.revature.autosurvey.submissions;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
