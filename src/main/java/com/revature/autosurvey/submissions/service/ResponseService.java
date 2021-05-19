@@ -1,5 +1,11 @@
 package com.revature.autosurvey.submissions.service;
 
-public class ResponseService {
+import com.revature.autosurvey.submissions.data.ResponseRepository;
 
+public class ResponseService {
+private ResponseRepository responseRepository;
+	
+	public void setResponseRepository(ResponseRepository responseRepository) {
+		this.responseRepository = responseRepository;
+	}
 }
