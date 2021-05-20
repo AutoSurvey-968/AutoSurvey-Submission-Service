@@ -44,6 +44,7 @@ public class ResponseServiceTest {
 	
 	@Autowired
 	private ResponseService responseService;
+
 	@Autowired
 	private ResponseRepository responseRepository;
 	
@@ -104,5 +105,6 @@ public class ResponseServiceTest {
 			//.expectComplete()
 			.verify();
 	}
+
 
 }
