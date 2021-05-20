@@ -2,12 +2,15 @@ package com.revature.autosurvey.submissions.service;
 
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Service
 public class ResponseServiceImpl implements ResponseService{
 	private ResponseRepository responseRepository;
 	

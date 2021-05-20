@@ -10,7 +10,6 @@ import com.revature.autosurvey.submissions.data.ResponseRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@Service
 public interface ResponseService {
 	
 	public void setResponseRepository(ResponseRepository responseRepository);
