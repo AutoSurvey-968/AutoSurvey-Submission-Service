@@ -32,9 +32,10 @@ public class ResponseServiceImpl implements ResponseService {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	public Mono<Response> getResponase(UUID id) {
-		return null;
+	
+	public Mono<Response> getResponse(UUID id){
+		System.out.println(3);
+		return responseRepository.findById(id).switchIfEmpty(Mono.error(new Exception()));
 	}
 
 	// needs arguments
