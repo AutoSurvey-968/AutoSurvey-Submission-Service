@@ -2,12 +2,16 @@ package com.revature.autosurvey.submissions.service;
 
 import java.util.UUID;
 
+import org.springframework.stereotype.Service;
+
+import com.github.andrewoma.dexx.collection.List;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Service
 public class ResponseServiceImpl implements ResponseService{
 	private ResponseRepository responseRepository;
 	
@@ -22,7 +26,7 @@ public class ResponseServiceImpl implements ResponseService{
 	
 	//needs arguments
 	@Override
-	public Flux<Response> addResponses() {
+	public Flux<Response> addResponses(List<Response> responses) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -45,7 +49,7 @@ public class ResponseServiceImpl implements ResponseService{
 	}
 
 	@Override
-	public Mono<Void> deleteResponse(Response response) {
+	public Mono<Void> deleteResponse(UUID id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
