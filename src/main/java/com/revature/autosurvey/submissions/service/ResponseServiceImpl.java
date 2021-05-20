@@ -35,16 +35,7 @@ public class ResponseServiceImpl implements ResponseService {
 	
 	public Mono<Response> getResponse(UUID id){
 		System.out.println(3);
-		return responseRepository.findById(id).map(response -> {
-			System.out.println(0);
-			if(response != null) {
-				System.out.println("4");
-				return response;
-			} else {
-				System.out.println("5");
-				throw new RuntimeException();
-			}
-		}).or(Mono.error(new Exception()));
+		return responseRepository.findById(id).switchIfEmpty(Mono.error(new Exception()));
 	}
 
 	// needs arguments
