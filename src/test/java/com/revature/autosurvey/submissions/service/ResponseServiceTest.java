@@ -1,6 +1,7 @@
 package com.revature.autosurvey.submissions.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 public class ResponseServiceTest {
@@ -77,5 +79,30 @@ public class ResponseServiceTest {
 //	public void buildResponseFromCsvLineReturnsResponse() {
 //		
 //	}
+	@Test
+	public void sanityCheck() {
+		assertTrue(true);
+	}
+	
+	@Test
+	public void testGetResponse() {
+		UUID id = UUID.randomUUID();
+		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
+		StepVerifier.create(responseService.getResponse(id))
+			.expectNext(new Response())
+			.expectComplete()
+			.verify();
+	}
+	
+	@Test
+	public void testGetResponseNoResponse() {
+		UUID id = UUID.randomUUID();
+		when(responseRepository.findById(id)).thenReturn(Mono.empty());
+		StepVerifier.create(responseService.getResponse(id))
+			.expectError() //Matches(throwable -> throwable instanceof RuntimeException)
+			//.expectNext(new RuntimeException())
+			//.expectComplete()
+			.verify();
+	}
 
 }

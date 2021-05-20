@@ -1,14 +1,25 @@
 package com.revature.autosurvey.submissions.controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
+import java.util.UUID;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.intuit.karate.junit5.Karate.Test;
+
+import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
+
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 public class ResponseControllerTest {
@@ -34,8 +45,27 @@ public class ResponseControllerTest {
 	private ResponseService responseService;
 	
 	@Test
-	public void testGetResponse() {
-		
+	public void sanityCheck() {
+		assertTrue(true);
 	}
-
+	
+	@Test
+	public void testGetResponse() {
+		UUID id = UUID.randomUUID();
+		when(responseService.getResponse(id)).thenReturn(Mono.just(new Response()));
+		StepVerifier.create(responseController.getResponse(id))
+			.expectNext(ResponseEntity.ok().body(new Response()))
+			.expectComplete()
+			.verify();
+	}
+	
+	@Test
+	public void testGetErrorResponse() {
+		UUID id = UUID.randomUUID();
+		when(responseService.getResponse(id)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.getResponse(id))
+			.expectNext(ResponseEntity.badRequest().body(new Response()))
+			.expectComplete()
+			.verify();
+	}
 }
