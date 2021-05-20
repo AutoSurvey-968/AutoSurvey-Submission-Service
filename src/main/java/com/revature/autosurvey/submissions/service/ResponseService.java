@@ -1,10 +1,8 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.util.List;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
-
-import com.github.andrewoma.dexx.collection.List;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
