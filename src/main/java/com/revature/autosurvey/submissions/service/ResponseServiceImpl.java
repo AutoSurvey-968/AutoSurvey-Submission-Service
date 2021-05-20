@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import reactor.core.publisher.Mono;
 
 @Service
 public class ResponseServiceImpl implements ResponseService {
-
 	private ResponseRepository responseRepository;
 
 	@Autowired
@@ -28,7 +28,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	// needs arguments
 	@Override
-	public Flux<Response> addResponses() {
+	public Flux<Response> addResponses(List<Response> responses) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -51,7 +51,7 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Mono<Void> deleteResponse(Response response) {
+	public Mono<Void> deleteResponse(UUID id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
