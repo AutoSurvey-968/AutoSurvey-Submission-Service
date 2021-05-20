@@ -17,7 +17,7 @@ public interface ResponseService {
 	
 	public Mono<Response> addResponse(Response response);
 	public Flux<Response> addResponses(List<Response> responses);
-	public Mono<Response> getResponase(UUID id);
+	public Mono<Response> getResponse(UUID id);
 	public Flux<Response> getResponses();
 	public Mono<Response> updateResponse(Response response);
 	public Mono<Void> deleteResponse(UUID id);
