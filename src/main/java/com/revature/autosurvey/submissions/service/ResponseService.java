@@ -19,8 +19,8 @@ public interface ResponseService {
 	public Flux<Response> addResponses(List<Response> responses);
 	public Mono<Response> getResponse(UUID id);
 	public Flux<Response> getResponses();
+	public Mono<Response> updateResponse(UUID id, Response response);
 	public Flux<Response> getResponsesByBatch(String batchName);
-	public Mono<Response> updateResponse(Response response);
 	public Mono<Void> deleteResponse(UUID id);
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
 	public Flux<Response> addResponsesFromFile (Flux<FilePart> fileFlux, UUID surveyId);

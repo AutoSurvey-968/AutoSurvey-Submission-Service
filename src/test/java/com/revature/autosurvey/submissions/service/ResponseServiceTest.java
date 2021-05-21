@@ -126,9 +126,30 @@ public class ResponseServiceTest {
 		UUID id = UUID.randomUUID();
 		when(responseRepository.findById(id)).thenReturn(Mono.empty());
 		StepVerifier.create(responseService.getResponse(id))
-			.expectError() //Matches(throwable -> throwable instanceof RuntimeException)
-			//.expectNext(new RuntimeException())
-			//.expectComplete()
+			.expectError()
+			.verify();
+	}
+	
+	@Test
+	public void testUpdateResponseDoesNotExist() {
+		UUID id = UUID.randomUUID();
+		Response response = new Response();
+		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
+		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
+		StepVerifier.create(responseService.getResponse(id))
+			.expectNext(new Response())
+			.expectComplete()
+			.verify();
+	}
+	
+	@Test
+	public void testUpdateResponseExists() {
+		UUID id = UUID.randomUUID();
+		Response response = new Response();
+		when(responseRepository.findById(id)).thenReturn(Mono.empty());
+		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
+		StepVerifier.create(responseService.getResponse(id))
+			.expectError()
 			.verify();
 	}
 	
