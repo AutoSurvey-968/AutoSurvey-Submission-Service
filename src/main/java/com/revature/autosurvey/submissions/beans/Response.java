@@ -13,9 +13,17 @@ import lombok.Data;
 @Data
 public class Response {
 	@PrimaryKey private UUID id;
+	
+//	 responseId
+//	    surveyId
+//	    weekEnum
+//	    batchString
+//	    map<text,text>
+//	        questionId -> answer
+	
 	@Column private String week;
-	@Column private int batch;
 	@Column private Timestamp timestamp;
+	@Column private int batch;
 	@Column private String name;
 	@Column private String email;
 	@Column private int satisfaction;
@@ -35,5 +43,6 @@ public class Response {
 	@Column private String questionsEncouraged; //agreeance
 	@Column private Boolean trainingMetExpectations;
 	@Column private Boolean assessmentLastWeek;
+	
 
 }

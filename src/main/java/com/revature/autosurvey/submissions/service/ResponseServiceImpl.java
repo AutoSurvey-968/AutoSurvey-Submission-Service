@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import com.revature.autosurvey.submissions.beans.Response;
@@ -28,8 +30,8 @@ public class ResponseServiceImpl implements ResponseService {
 
 	// needs arguments
 	@Override
-	public Flux<Response> addResponses(List<Response> responses) {
-		// TODO Auto-generated method stub
+	public Flux<Response> addResponses(List<Response> responses, UUID surveyId) {
+		
 		return null;
 	}
 	
@@ -54,6 +56,20 @@ public class ResponseServiceImpl implements ResponseService {
 	@Override
 	public Mono<Void> deleteResponse(UUID id) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private Flux<String> readStringFromFile(FilePart file){
+		return file.content().map(buffer -> {
+			byte[] bytes = new byte[buffer.readableByteCount()];
+             buffer.read(bytes);
+             DataBufferUtils.release(buffer);
+
+             return new String(bytes);
+		});
+	}
+	
+	private Response buildResponseFromCsvLine(String csvLine) {
 		return null;
 	}
 

@@ -1,10 +1,14 @@
 package com.revature.autosurvey.submissions.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -16,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -43,6 +48,38 @@ public class ResponseServiceTest {
 	@Autowired
 	private ResponseRepository responseRepository;
 	
+	private static List<Response> responses;
+	
+	@BeforeAll
+	public static void mockResponses() {
+		responses = new ArrayList<>();
+		Response response1 = new Response();
+		response1.setBatch(1);
+		response1.setWeek("Week 1");
+		response1.setId(UUID.fromString("59bb76e5-a16a-4edd-b674-e6075efa8334"));
+		responses.add(response1);
+		Response response2 = new Response();
+		response1.setBatch(2);
+		response1.setWeek("Week 2");
+		response1.setId(UUID.fromString("59bb76e5-a16a-4edd-b674-e6075efa8335"));
+		responses.add(response2);
+		}
+	
+	@Test
+	public void addResponsesReturnsFluxResponses() {
+		Response response = responses.get(0);
+		Mono<Response> responseMono = Mono.just(response);
+		Flux<Response> responseFlux = responseMono.flux();
+		
+		when(responseRepository.saveAll(responseMono)).thenReturn(responseFlux);
+		
+		assertEquals(responseFlux, responseService.addResponses(responses, UUID.fromString("11111111-1111-1111-1111-111111111111")));
+	}
+	
+//	@Test
+//	public void buildResponseFromCsvLineReturnsResponse() {
+//		
+//	}
 	@Test
 	public void sanityCheck() {
 		assertTrue(true);
