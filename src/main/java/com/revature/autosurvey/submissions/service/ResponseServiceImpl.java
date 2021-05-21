@@ -74,4 +74,10 @@ public class ResponseServiceImpl implements ResponseService {
 		return null;
 	}
 
+	@Override
+	public Flux<Response> getResponsesByBatch(String batchName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
