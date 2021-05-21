@@ -61,8 +61,18 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Mono<Void> deleteResponse(UUID id) {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("hi");
+		return responseRepository.findById(id).flatMap(foundResponse -> {
+			System.out.println(0);
+			if(foundResponse != null) {
+				System.out.println(2);
+				return responseRepository.deleteById(id);
+			} else {
+				System.out.println(1);
+				return Mono.error(new Exception());
+			}
+		});
+			
 	}
 	
 	private Flux<String> readStringFromFile(FilePart file){
@@ -91,6 +101,7 @@ public class ResponseServiceImpl implements ResponseService {
 		
 		response.setWeek(null);
 		}
+		return null;
 	}
 
 	@Override

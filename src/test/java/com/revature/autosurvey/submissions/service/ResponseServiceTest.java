@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.Response.WeekNum;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
@@ -132,7 +131,7 @@ public class ResponseServiceTest {
 	}
 	
 	@Test
-	public void testUpdateResponseDoesNotExist() {
+	public void testUpdateResponseExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
@@ -144,12 +143,32 @@ public class ResponseServiceTest {
 	}
 	
 	@Test
-	public void testUpdateResponseExists() {
+	public void testUpdateResponseDoesNotExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseRepository.findById(id)).thenReturn(Mono.empty());
 		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseService.getResponse(id))
+			.expectError()
+			.verify();
+	}
+	
+	@Test
+	public void testDeleteResponseExists() {
+		UUID id = UUID.randomUUID();
+		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
+		when(responseRepository.deleteById(id)).thenReturn(Mono.empty());
+		StepVerifier.create(responseService.deleteResponse(id))
+			.expectComplete()
+			.verify();
+	}
+	
+	@Test
+	public void testDeleteResponseThatDoesNotExist() {
+		UUID id = UUID.randomUUID();
+		when(responseRepository.findById(id)).thenReturn(Mono.empty());
+		when(responseRepository.deleteById(id)).thenReturn(Mono.empty());
+		StepVerifier.create(responseService.deleteResponse(id))
 			.expectError()
 			.verify();
 	}
