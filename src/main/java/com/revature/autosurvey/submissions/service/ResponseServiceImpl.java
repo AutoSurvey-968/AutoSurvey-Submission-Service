@@ -1,6 +1,8 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +32,12 @@ public class ResponseServiceImpl implements ResponseService {
 
 	// needs arguments
 	@Override
-	public Flux<Response> addResponses(List<Response> responses, UUID surveyId) {
+	public Flux<Response> addResponses(List<Response> responses) {
 		
 		return null;
 	}
 	
 	public Mono<Response> getResponse(UUID id){
-		System.out.println(3);
 		return responseRepository.findById(id).switchIfEmpty(Mono.error(new Exception()));
 	}
 
@@ -48,9 +49,14 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Mono<Response> updateResponse(Response response) {
-		// TODO Auto-generated method stub
-		return null;
+	public Mono<Response> updateResponse(UUID id, Response response) {
+		return responseRepository.findById(id).flatMap(foundResponse -> {
+			if(foundResponse != null) {
+				return responseRepository.save(response);
+			} else {
+				return Mono.error(new Exception());
+			}
+		});
 	}
 
 	@Override
@@ -69,13 +75,32 @@ public class ResponseServiceImpl implements ResponseService {
 		});
 	}
 	
-	private Response buildResponseFromCsvLine(String csvLine) {
-		return null;
+	@Override
+	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId) {
+		Response response = new Response();
+		Map<String, String> responseMap = new HashMap<>();
+		String[] questions = questionLine.split(",");
+		String[] answers = csvLine.split(",");
+		for (int i = 0; i < answers.length; i++) {
+			if (!answers[i].equals("")) {
+				responseMap.put(questions[i], answers[i]);
+			}
+		response.setBatchName(responseMap.get("What batch are you in?"));
+		response.setSurveyId(surveyId);
+		String weekString = responseMap.get("What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)");
+		
+		response.setWeek(null);
+		}
 	}
 
 	@Override
 	public Flux<Response> getResponsesByBatch(String batchName) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId){
 		return null;
 	}
 

@@ -68,4 +68,26 @@ public class ResponseControllerTest {
 			.expectComplete()
 			.verify();
 	}
+	
+	@Test
+	public void testUpdateResponse() {
+		UUID id = UUID.randomUUID();
+		Response response = new Response();
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.just(new Response()));
+		StepVerifier.create(responseController.updateResponse(id, response))
+		.expectNext(ResponseEntity.ok().body(new Response()))
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	public void testUpdateResponseThatDoesNotExist() {
+		UUID id = UUID.randomUUID();
+		Response response = new Response();
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(id, response))
+		.expectNext(ResponseEntity.badRequest().body(new Response()))
+		.expectComplete()
+		.verify();
+	}
 }
