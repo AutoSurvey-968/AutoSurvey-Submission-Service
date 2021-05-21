@@ -1,6 +1,5 @@
 package com.revature.autosurvey.submissions.beans;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,15 +31,10 @@ public class Response {
 			ordinal=2,
 			type = PrimaryKeyType.CLUSTERED,
 			ordering = Ordering.DESCENDING) 
-	private WeekNum week;
+	private TrainingWeek week;
 	@Column 
 	private UUID surveyId;
 	@Column
 	private Map<String, String> surveyResponses;
-	
-	public enum WeekNum implements Serializable{
-		A, B, ONE, TWO, THREE, FOUR, FIVE, SIX,
-		SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE;
-	}
 
 }
