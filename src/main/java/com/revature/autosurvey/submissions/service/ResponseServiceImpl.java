@@ -36,7 +36,6 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 	
 	public Mono<Response> getResponse(UUID id){
-		System.out.println(3);
 		return responseRepository.findById(id).switchIfEmpty(Mono.error(new Exception()));
 	}
 
@@ -48,9 +47,14 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Mono<Response> updateResponse(Response response) {
-		// TODO Auto-generated method stub
-		return null;
+	public Mono<Response> updateResponse(UUID id, Response response) {
+		return responseRepository.findById(id).flatMap(foundResponse -> {
+			if(foundResponse != null) {
+				return responseRepository.save(response);
+			} else {
+				return Mono.error(new Exception());
+			}
+		});
 	}
 
 	@Override
