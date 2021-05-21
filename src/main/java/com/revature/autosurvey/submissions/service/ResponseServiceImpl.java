@@ -1,6 +1,8 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	// needs arguments
 	@Override
-	public Flux<Response> addResponses(List<Response> responses, UUID surveyId) {
+	public Flux<Response> addResponses(List<Response> responses) {
 		
 		return null;
 	}
@@ -71,12 +73,30 @@ public class ResponseServiceImpl implements ResponseService {
 	
 	@Override
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId) {
-		return null;
+		Response response = new Response();
+		Map<String, String> responseMap = new HashMap<>();
+		String[] questions = questionLine.split(",");
+		String[] answers = csvLine.split(",");
+		for (int i = 0; i < answers.length; i++) {
+			if (!answers[i].equals("")) {
+				responseMap.put(questions[i], answers[i]);
+			}
+		response.setBatchName(responseMap.get("What batch are you in?"));
+		response.setSurveyId(surveyId);
+		String weekString = responseMap.get("What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)");
+		
+		response.setWeek(null);
+		}
 	}
 
 	@Override
 	public Flux<Response> getResponsesByBatch(String batchName) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId){
 		return null;
 	}
 

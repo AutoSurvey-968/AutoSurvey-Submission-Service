@@ -59,12 +59,12 @@ public class ResponseServiceTest {
 		Response response1 = new Response();
 		response1.setBatchName("1");
 		response1.setWeek(WeekNum.ONE);
-		response1.setResponseId(UUID.fromString("59bb76e5-a16a-4edd-b674-e6075efa8334"));
+		response1.setResponseId(UUID.fromString("11111111-1111-1111-1111-111111111101"));
 		responses.add(response1);
 		Response response2 = new Response();
 		response1.setBatchName("2");
 		response1.setWeek(WeekNum.TWO);
-		response1.setResponseId(UUID.fromString("59bb76e5-a16a-4edd-b674-e6075efa8335"));
+		response1.setResponseId(UUID.fromString("11111111-1111-1111-1111-111111111102"));
 		responses.add(response2);
 		}
 	
@@ -76,11 +76,11 @@ public class ResponseServiceTest {
 		
 		when(responseRepository.saveAll(responseMono)).thenReturn(responseFlux);
 		
-		assertEquals(responseFlux, responseService.addResponses(responses, UUID.fromString("11111111-1111-1111-1111-111111111111")));
+		assertEquals(responseFlux, responseService.addResponses(responses));
 	}
 	
 	@Test
-	public void addResponseReturnsMonoResponses() {
+	public void addResponseReturnsMonoResponse() {
 		Response response = responses.get(0);
 		Mono<Response> responseMono = Mono.just(response);
 		
@@ -92,15 +92,18 @@ public class ResponseServiceTest {
 	@Test
 	public void buildResponseFromCsvLineReturnsResponse() {
 		Response res = new Response();
+		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 		Map<String,String> questions = new HashMap<>();
+		res.setSurveyResponses(questions);
+		res.setSurveyId(surveyId);
+		
 		questions.put("question1", "answer1");
 		questions.put("question2", "answer2");
 		questions.put("question4", "answer4");
 		String csvLine = "answer1,answer2,,answer4";
 		String questionLine = "question1, question 2, question 3, question 4";
-		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 		
-		assertEquals(res, responseServiceImpl.buildResponseFromCsvLine(csvLine, questionLine, surveyId)));
+		assertEquals(res, responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId));
 	}
 	
 	@Test
