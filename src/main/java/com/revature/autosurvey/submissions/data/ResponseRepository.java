@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.Response.trainingWeek;
+import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
 
@@ -15,6 +16,4 @@ import reactor.core.publisher.Flux;
 public interface ResponseRepository extends ReactiveCassandraRepository<Response, UUID>{
 	@AllowFiltering
 	public Flux<Response> findAllByBatch(String batch);
-	@AllowFiltering
-	public Flux<Response> findAllByWeek(trainingWeek week);
 }

@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -48,7 +49,7 @@ public class ResponseServiceTest {
 	@Autowired
 	private ResponseService responseService;
 
-	@Autowired
+	@MockBean
 	private ResponseRepository responseRepository;
 	
 	private static List<Response> responses;
@@ -154,12 +155,12 @@ public class ResponseServiceTest {
 	}
 	
 	@Test
-	public void testGetAllResponseByBatch() {
-		//Response testResponse = new Response();
-		//String batchName = new String("Batch 43");
-		//testResponse.setBatchName(batchName);
-		//Mockito.when(responseRepository.findAllByBatch(batchName)).thenReturn(Flux.fromIterable(new ArrayList<Response>()));
-		//StepVerifier.create(responseService.getResponsesByBatch(batchName)).expectNextMatches(name -> name.)
+	public void testGetAllResponsesByBatch() {
+		Response testResponse = new Response();
+		String batchName = new String("Batch 43");
+		testResponse.setBatchName(batchName);
+		Mockito.when(responseRepository.findAllByBatch(batchName)).thenReturn();
+		StepVerifier.create(responseService.getResponsesByBatch(batchName)).expectNextMatches()
 	}
 
 
