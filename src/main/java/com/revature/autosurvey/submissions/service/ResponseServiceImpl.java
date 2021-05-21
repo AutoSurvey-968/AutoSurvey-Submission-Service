@@ -59,21 +59,25 @@ public class ResponseServiceImpl implements ResponseService {
 		});
 	}
 
+//	@Override
+//	public Mono<Void> deleteResponse(UUID id) {
+//		System.out.println("hi");
+//		return responseRepository.findById(id).flatMap(foundResponse -> {
+//			System.out.println(0);
+//			if(foundResponse != null) {
+//				System.out.println(2);
+//				return responseRepository.deleteById(id);
+//			} else {
+//				System.out.println(1);
+//				return Mono.error(new Exception());
+//			}
+//		});
+//			
+//	}
 	@Override
-	public Mono<Void> deleteResponse(UUID id) {
-		System.out.println("hi");
-		return responseRepository.findById(id).flatMap(foundResponse -> {
-			System.out.println(0);
-			if(foundResponse != null) {
-				System.out.println(2);
-				return responseRepository.deleteById(id);
-			} else {
-				System.out.println(1);
-				return Mono.error(new Exception());
-			}
-		});
-			
-	}
+    public Mono<Response> deleteResponse(UUID uuid) {
+        return responseRepository.deleteByUuid(uuid);
+    }
 	
 	private Flux<String> readStringFromFile(FilePart file){
 		return file.content().map(buffer -> {
@@ -95,8 +99,8 @@ public class ResponseServiceImpl implements ResponseService {
 			if (!answers[i].equals("")) {
 				responseMap.put(questions[i], answers[i]);
 			}
-		response.setBatchName(responseMap.get("What batch are you in?"));
-		response.setSurveyId(surveyId);
+		response.setBatch(responseMap.get("What batch are you in?"));
+		response.setSurveyUuid(surveyId);
 		String weekString = responseMap.get("What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)");
 		
 		response.setWeek(null);

@@ -15,17 +15,17 @@ import lombok.Data;
 @Data
 public class Response {
 	@PrimaryKeyColumn(
-			name="responseId",
+			name="uuid",
 			ordinal=0,
 			type = PrimaryKeyType.PARTITIONED,
 			ordering = Ordering.DESCENDING) 
-	private UUID responseId;
+	private UUID uuid;
 	@PrimaryKeyColumn(
-			name="batchName",
+			name="batch",
 			ordinal=1,
 			type = PrimaryKeyType.CLUSTERED,
 			ordering = Ordering.DESCENDING)
-	private String batchName;
+	private String batch;
 	@PrimaryKeyColumn(
 			name="week",
 			ordinal=2,
@@ -33,8 +33,8 @@ public class Response {
 			ordering = Ordering.DESCENDING) 
 	private TrainingWeek week;
 	@Column 
-	private UUID surveyId;
+	private UUID surveyUuid;
 	@Column
-	private Map<String, String> surveyResponses;
+	private Map<String, String> responses;
 
 }

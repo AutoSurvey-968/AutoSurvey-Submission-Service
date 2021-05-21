@@ -1,7 +1,7 @@
 package com.revature.autosurvey.submissions.controller;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.util.UUID;
 
@@ -43,11 +43,6 @@ public class ResponseControllerTest {
 	private ResponseController responseController;
 	@Autowired
 	private ResponseService responseService;
-	
-	@Test
-	public void sanityCheck() {
-		assertTrue(true);
-	}
 	
 	@Test
 	public void testGetResponse() {
@@ -93,21 +88,14 @@ public class ResponseControllerTest {
 	
 	@Test
 	public void testDeleteResponse() {
-		UUID id = UUID.randomUUID();
-		when(responseService.deleteResponse(id)).thenReturn(Mono.empty());
-		StepVerifier.create(responseController.deleteResponse(id))
-		.expectNext(ResponseEntity.noContent().build())
-		.expectComplete()
-		.verify();
-	}
-	
-	@Test
-	public void testDeleteResponsethatDoesNotExist() {
-		UUID id = UUID.randomUUID();
-		when(responseService.deleteResponse(id)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.deleteResponse(id))
-		.expectNext(ResponseEntity.badRequest().build())
-		.expectComplete()
-		.verify();
+		Response response = new Response();
+		
+		when(responseService.deleteResponse(any())).thenReturn(Mono.just(response));
+		
+		Mono<ResponseEntity<Object>> result = responseController.deleteResponse(null);
+		
+		StepVerifier.create(result)
+				.expectNext(ResponseEntity.noContent().build())
+				.verifyComplete();
 	}
 }
