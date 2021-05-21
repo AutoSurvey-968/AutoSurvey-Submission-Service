@@ -32,13 +32,13 @@ public class Response {
 			ordinal=2,
 			type = PrimaryKeyType.CLUSTERED,
 			ordering = Ordering.DESCENDING) 
-	private WeekNum week;
+	private trainingWeek week;
 	@Column 
 	private UUID surveyId;
 	@Column
 	private Map<String, String> surveyResponses;
 	
-	public enum WeekNum implements Serializable{
+	public enum trainingWeek implements Serializable{
 		A, B, ONE, TWO, THREE, FOUR, FIVE, SIX,
 		SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE;
 	}

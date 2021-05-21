@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.Response.WeekNum;
+import com.revature.autosurvey.submissions.beans.Response.trainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
@@ -56,12 +56,12 @@ public class ResponseServiceTest {
 		responses = new ArrayList<>();
 		Response response1 = new Response();
 		response1.setBatchName("1");
-		response1.setWeek(WeekNum.ONE);
+		response1.setWeek(trainingWeek.ONE);
 		response1.setResponseId(UUID.fromString("59bb76e5-a16a-4edd-b674-e6075efa8334"));
 		responses.add(response1);
 		Response response2 = new Response();
 		response1.setBatchName("2");
-		response1.setWeek(WeekNum.TWO);
+		response1.setWeek(trainingWeek.TWO);
 		response1.setResponseId(UUID.fromString("59bb76e5-a16a-4edd-b674-e6075efa8335"));
 		responses.add(response2);
 		}
@@ -109,10 +109,10 @@ public class ResponseServiceTest {
 	
 	@Test
 	public void testGetAllResponseByBatch() {
-		Response testResponse = new Response();
-		String batchName = new String("Batch 43");
-		testResponse.setBatchName(batchName);
-		Mockito.when(responseRepository.findAllByBatch(batchName)).thenReturn(Flux.fromIterable(new ArrayList<Response>()));
+		//Response testResponse = new Response();
+		//String batchName = new String("Batch 43");
+		//testResponse.setBatchName(batchName);
+		//Mockito.when(responseRepository.findAllByBatch(batchName)).thenReturn(Flux.fromIterable(new ArrayList<Response>()));
 		//StepVerifier.create(responseService.getResponsesByBatch(batchName)).expectNextMatches(name -> name.)
 	}
 
