@@ -61,7 +61,6 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Mono<Void> deleteResponse(UUID id) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	

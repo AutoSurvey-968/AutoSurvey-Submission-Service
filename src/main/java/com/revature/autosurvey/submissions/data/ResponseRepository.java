@@ -7,8 +7,6 @@ import org.springframework.data.cassandra.repository.ReactiveCassandraRepository
 import org.springframework.stereotype.Repository;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.Response.trainingWeek;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
 

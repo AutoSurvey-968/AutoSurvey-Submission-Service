@@ -153,15 +153,4 @@ public class ResponseServiceTest {
 			.expectError()
 			.verify();
 	}
-	
-	@Test
-	public void testGetAllResponsesByBatch() {
-		Response testResponse = new Response();
-		String batchName = new String("Batch 43");
-		testResponse.setBatchName(batchName);
-		Mockito.when(responseRepository.findAllByBatch(batchName)).thenReturn();
-		StepVerifier.create(responseService.getResponsesByBatch(batchName)).expectNextMatches()
-	}
-
-
 }
