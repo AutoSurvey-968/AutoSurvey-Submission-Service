@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -76,10 +78,30 @@ public class ResponseServiceTest {
 		assertEquals(responseFlux, responseService.addResponses(responses, UUID.fromString("11111111-1111-1111-1111-111111111111")));
 	}
 	
-//	@Test
-//	public void buildResponseFromCsvLineReturnsResponse() {
-//		
-//	}
+	@Test
+	public void addResponseReturnsMonoResponses() {
+		Response response = responses.get(0);
+		Mono<Response> responseMono = Mono.just(response);
+		
+		when(responseRepository.save(response).thenReturn(responseMono));
+		
+		assertEquals(responseMono, responseService.addResponse(response));
+	}
+	
+	@Test
+	public void buildResponseFromCsvLineReturnsResponse() {
+		Response res = new Response();
+		Map<String,String> questions = new HashMap<>();
+		questions.put("question1", "answer1");
+		questions.put("question2", "answer2");
+		questions.put("question4", "answer4");
+		String csvLine = "answer1,answer2,,answer4";
+		String questionLine = "question1, question 2, question 3, question 4";
+		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+		
+		assertEquals(res, responseServiceImpl.buildResponseFromCsvLine(csvLine, questionLine, surveyId)));
+	}
+	
 	@Test
 	public void sanityCheck() {
 		assertTrue(true);

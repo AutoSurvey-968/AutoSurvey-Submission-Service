@@ -19,4 +19,5 @@ public interface ResponseService {
 	public Flux<Response> getResponses();
 	public Mono<Response> updateResponse(Response response);
 	public Mono<Void> deleteResponse(UUID id);
+	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
 }

@@ -69,7 +69,8 @@ public class ResponseServiceImpl implements ResponseService {
 		});
 	}
 	
-	private Response buildResponseFromCsvLine(String csvLine) {
+	@Override
+	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId) {
 		return null;
 	}
 
