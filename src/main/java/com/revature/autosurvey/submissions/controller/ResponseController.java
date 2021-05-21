@@ -52,7 +52,8 @@ public class ResponseController {
 	}
 	
 	@DeleteMapping("/{id}")
-	public Mono<ResponseEntity<Void>> deleteResponse(){
-		return null;	
+	public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable UUID id){
+		return responseService.deleteResponse(id).thenReturn(ResponseEntity.noContent().build())
+				.onErrorReturn(ResponseEntity.badRequest().build());
 	}
 }

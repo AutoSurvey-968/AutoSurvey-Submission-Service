@@ -90,4 +90,24 @@ public class ResponseControllerTest {
 		.expectComplete()
 		.verify();
 	}
+	
+	@Test
+	public void testDeleteResponse() {
+		UUID id = UUID.randomUUID();
+		when(responseService.deleteResponse(id)).thenReturn(Mono.empty());
+		StepVerifier.create(responseController.deleteResponse(id))
+		.expectNext(ResponseEntity.noContent().build())
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	public void testDeleteResponsethatDoesNotExist() {
+		UUID id = UUID.randomUUID();
+		when(responseService.deleteResponse(id)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.deleteResponse(id))
+		.expectNext(ResponseEntity.badRequest().build())
+		.expectComplete()
+		.verify();
+	}
 }
