@@ -14,9 +14,10 @@ public interface ResponseService {
 	public void setResponseRepository(ResponseRepository responseRepository);
 	
 	public Mono<Response> addResponse(Response response);
-	public Flux<Response> addResponses(List<Response> responses);
+	public Flux<Response> addResponses(List<Response> responses, UUID surveyId);
 	public Mono<Response> getResponse(UUID id);
 	public Flux<Response> getResponses();
 	public Mono<Response> updateResponse(UUID id, Response response);
+	public Flux<Response> getResponsesByBatch(String batchName);
 	public Mono<Void> deleteResponse(UUID id);
 }

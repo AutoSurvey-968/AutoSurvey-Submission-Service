@@ -1,10 +1,13 @@
 package com.revature.autosurvey.submissions.beans;
 
-import java.sql.Timestamp;
+import java.io.Serializable;
+import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.data.cassandra.core.cql.Ordering;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import lombok.Data;
@@ -12,28 +15,32 @@ import lombok.Data;
 @Table("response")
 @Data
 public class Response {
-	@PrimaryKey private UUID id;
-	@Column private String week;
-	@Column private int batch;
-	@Column private Timestamp timestamp;
-	@Column private String name;
-	@Column private String email;
-	@Column private int satisfaction;
-	@Column private String overallFeedback;
-	@Column private String trainingIssues;
-	@Column private String location;
-	@Column private String requirementClarity;
-	@Column private int projectPreparedness;
-	@Column private String projectFeedback;
-	@Column private String background;
-	@Column private int programmingExperience;
-	@Column private int understandingLastWeek;
-	@Column private String batchName;
-	@Column private String pacing; //toofast, good, tooslow
-	@Column private String materialHelpful; //agreenace
-	@Column private String trainingOrganization; //agreeance
-	@Column private String questionsEncouraged; //agreeance
-	@Column private Boolean trainingMetExpectations;
-	@Column private Boolean assessmentLastWeek;
+	@PrimaryKeyColumn(
+			name="responseId",
+			ordinal=0,
+			type = PrimaryKeyType.PARTITIONED,
+			ordering = Ordering.DESCENDING) 
+	private UUID responseId;
+	@PrimaryKeyColumn(
+			name="batchName",
+			ordinal=1,
+			type = PrimaryKeyType.CLUSTERED,
+			ordering = Ordering.DESCENDING)
+	private String batchName;
+	@PrimaryKeyColumn(
+			name="week",
+			ordinal=2,
+			type = PrimaryKeyType.CLUSTERED,
+			ordering = Ordering.DESCENDING) 
+	private WeekNum week;
+	@Column 
+	private UUID surveyId;
+	@Column
+	private Map<String, String> surveyResponses;
+	
+	public enum WeekNum implements Serializable{
+		A, B, ONE, TWO, THREE, FOUR, FIVE, SIX,
+		SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE;
+	}
 
 }
