@@ -21,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.Response.WeekNum;
+import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
@@ -58,12 +59,12 @@ public class ResponseServiceTest {
 		responses = new ArrayList<>();
 		Response response1 = new Response();
 		response1.setBatchName("1");
-		response1.setWeek(WeekNum.ONE);
+		response1.setWeek(TrainingWeek.ONE);
 		response1.setResponseId(UUID.fromString("11111111-1111-1111-1111-111111111101"));
 		responses.add(response1);
 		Response response2 = new Response();
 		response1.setBatchName("2");
-		response1.setWeek(WeekNum.TWO);
+		response1.setWeek(TrainingWeek.TWO);
 		response1.setResponseId(UUID.fromString("11111111-1111-1111-1111-111111111102"));
 		responses.add(response2);
 		}
