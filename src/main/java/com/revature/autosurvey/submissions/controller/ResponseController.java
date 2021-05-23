@@ -2,6 +2,7 @@ package com.revature.autosurvey.submissions.controller;
 
 import java.util.UUID;
 
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.revature.autosurvey.submissions.beans.Response;
@@ -30,14 +32,17 @@ public class ResponseController {
 	}
 	
 	@GetMapping
-	public Flux<Response> getResponses(){
-		return null;
-	}
-	
-	@GetMapping("/{id}")
-	public Mono<ResponseEntity<Response>> getResponse(@PathVariable UUID id){
-		return responseService.getResponse(id).map(response -> ResponseEntity.ok().body(response))
-				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+	public Mono<ResponseEntity<Response>> getResponse(
+			@RequestParam(required = false) String batch,
+			@RequestParam(required = false) String week,
+			@RequestParam(required = false) UUID id){
+		if(id != null) {
+			return responseService.getResponse(id).map(response -> ResponseEntity.ok().body(response))
+					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+		}
+		else {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
 	}
 	
 	@PostMapping("/{id}")
@@ -51,8 +56,17 @@ public class ResponseController {
 				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 	}
 	
-	@DeleteMapping("/{id}")
-	public Mono<ResponseEntity<Void>> deleteResponse(){
-		return null;	
-	}
+//	@DeleteMapping("/{id}")
+//	public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable UUID id){
+//		return responseService.deleteResponse(id).thenReturn(ResponseEntity.noContent().build())
+//				.onErrorReturn(ResponseEntity.badRequest().build());
+//	}
+	
+	@DeleteMapping("{id}")
+    public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable("id") UUID uuid) {
+        return responseService.deleteResponse(uuid)
+                .map(response -> ResponseEntity.noContent().build())
+                .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
+    }
 }
+
