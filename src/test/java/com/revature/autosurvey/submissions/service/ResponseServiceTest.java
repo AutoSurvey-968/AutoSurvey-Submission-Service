@@ -70,44 +70,6 @@ public class ResponseServiceTest {
 		responses.add(response2);
 	}
 
-//	@Test
-//	public void addResponsesReturnsFluxResponses() {
-//		Response response = responses.get(0);
-//		Mono<Response> responseMono = Mono.just(response);
-//		Flux<Response> responseFlux = responseMono.flux();
-//		
-//		when(responseRepository.saveAll(responseMono)).thenReturn(responseFlux);
-//		
-//		assertEquals(responseFlux, responseService.addResponses(responses));
-//	}
-
-//	@Test
-//	public void addResponseReturnsMonoResponse() {
-//		Response response = responses.get(0);
-//		Mono<Response> responseMono = Mono.just(response);
-//		
-//		when(responseRepository.save(response).thenReturn(responseMono));
-//		
-//		assertEquals(responseMono, responseService.addResponse(response));
-//	}
-
-//	@Test
-//	public void buildResponseFromCsvLineReturnsResponse() {
-//		Response res = new Response();
-//		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-//		Map<String,String> questions = new HashMap<>();
-//		res.setResponses(questions);
-//		res.setSurveyUuid(surveyId);
-//		
-//		questions.put("question1", "answer1");
-//		questions.put("question2", "answer2");
-//		questions.put("question4", "answer4");
-//		String csvLine = "answer1,answer2,,answer4";
-//		String questionLine = "question1, question 2, question 3, question 4";
-//		
-//		assertEquals(res, responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId));
-//	}
-
 	@Test
 	public void testGetResponse() {
 		UUID id = UUID.randomUUID();
