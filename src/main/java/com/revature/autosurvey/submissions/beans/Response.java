@@ -11,24 +11,24 @@ import org.springframework.data.cassandra.core.mapping.Table;
 
 import lombok.Data;
 
-@Table("response")
 @Data
+@Table("response")
 public class Response {
 	@PrimaryKeyColumn(
 			name="uuid",
-			ordinal=0,
-			type = PrimaryKeyType.PARTITIONED,
+			ordinal=2,
+			type = PrimaryKeyType.CLUSTERED,
 			ordering = Ordering.DESCENDING) 
 	private UUID uuid;
 	@PrimaryKeyColumn(
 			name="batch",
-			ordinal=1,
-			type = PrimaryKeyType.CLUSTERED,
+			ordinal=0,
+			type = PrimaryKeyType.PARTITIONED,
 			ordering = Ordering.DESCENDING)
 	private String batch;
 	@PrimaryKeyColumn(
 			name="week",
-			ordinal=2,
+			ordinal=1,
 			type = PrimaryKeyType.CLUSTERED,
 			ordering = Ordering.DESCENDING) 
 	private TrainingWeek week;

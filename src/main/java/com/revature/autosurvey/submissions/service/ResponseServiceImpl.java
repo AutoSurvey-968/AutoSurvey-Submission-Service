@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,33 +26,14 @@ public class ResponseServiceImpl implements ResponseService {
 		this.responseRepository = responseRepository;
 	}
 
-	public Mono<Response> addResponse(Response response) {
-		return null;
-
-	}
-
-	// needs arguments
-	@Override
-	public Flux<Response> addResponses(List<Response> responses) {
-		
-		return null;
-	}
-	
-	public Mono<Response> getResponse(UUID id){
+	public Mono<Response> getResponse(UUID id) {
 		return responseRepository.findById(id).switchIfEmpty(Mono.error(new Exception()));
-	}
-
-	// needs arguments
-	@Override
-	public Flux<Response> getResponses() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
 	public Mono<Response> updateResponse(UUID id, Response response) {
 		return responseRepository.findById(id).flatMap(foundResponse -> {
-			if(foundResponse != null) {
+			if (foundResponse != null) {
 				return responseRepository.save(response);
 			} else {
 				return Mono.error(new Exception());
@@ -59,36 +41,37 @@ public class ResponseServiceImpl implements ResponseService {
 		});
 	}
 
-//	@Override
-//	public Mono<Void> deleteResponse(UUID id) {
-//		System.out.println("hi");
-//		return responseRepository.findById(id).flatMap(foundResponse -> {
-//			System.out.println(0);
-//			if(foundResponse != null) {
-//				System.out.println(2);
-//				return responseRepository.deleteById(id);
-//			} else {
-//				System.out.println(1);
-//				return Mono.error(new Exception());
-//			}
-//		});
-//			
-//	}
 	@Override
-    public Mono<Response> deleteResponse(UUID uuid) {
-        return responseRepository.deleteByUuid(uuid);
-    }
-	
-	private Flux<String> readStringFromFile(FilePart file){
+	public Mono<Void> deleteResponse(UUID id) {
+		System.out.println("hi");
+		return responseRepository.findById(id).flatMap(foundResponse -> {
+			System.out.println(0);
+			if (foundResponse != null) {
+				System.out.println(2);
+				return responseRepository.deleteById(id);
+			} else {
+				System.out.println(1);
+				return Mono.error(new Exception());
+			}
+		});
+
+	}
+
+	@Override
+	public Mono<Response> deleteResponse(UUID uuid) {
+		return responseRepository.deleteByUuid(uuid);
+	}
+
+	private Flux<String> readStringFromFile(FilePart file) {
 		return file.content().map(buffer -> {
 			byte[] bytes = new byte[buffer.readableByteCount()];
-             buffer.read(bytes);
-             DataBufferUtils.release(buffer);
+			buffer.read(bytes);
+			DataBufferUtils.release(buffer);
 
-             return new String(bytes);
+			return new String(bytes);
 		});
 	}
-	
+
 	@Override
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId) {
 		Response response = new Response();
@@ -99,23 +82,23 @@ public class ResponseServiceImpl implements ResponseService {
 			if (!answers[i].equals("")) {
 				responseMap.put(questions[i], answers[i]);
 			}
-		response.setBatch(responseMap.get("What batch are you in?"));
-		response.setSurveyUuid(surveyId);
-		String weekString = responseMap.get("What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)");
-		
-		response.setWeek(null);
+			response.setBatch(responseMap.get("What batch are you in?"));
+			response.setSurveyUuid(surveyId);
+			String weekString = responseMap.get(
+					"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)");
+
+			response.setWeek(null);
 		}
 		return null;
 	}
 
 	@Override
 	public Flux<Response> getResponsesByBatch(String batchName) {
-		// TODO Auto-generated method stub
-		return null;
+		return responseRepository.findAllByBatch(batchName);
 	}
-	
+
 	@Override
-	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId){
+	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId) {
 		return null;
 	}
 
