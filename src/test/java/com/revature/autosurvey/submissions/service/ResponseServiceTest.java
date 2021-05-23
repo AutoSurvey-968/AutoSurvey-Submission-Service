@@ -153,7 +153,7 @@ public class ResponseServiceTest {
 	}
 
 	@Test
-	public void testGetAllResponseByBatch() {
+	public void testGetAllResponsesByBatch() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		testResponse1.setBatch("Batch 23");
