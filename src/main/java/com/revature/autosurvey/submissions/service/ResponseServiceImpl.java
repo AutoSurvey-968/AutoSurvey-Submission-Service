@@ -41,21 +41,16 @@ public class ResponseServiceImpl implements ResponseService {
 		});
 	}
 
-	@Override
-	public Mono<Void> deleteResponse(UUID id) {
-		System.out.println("hi");
-		return responseRepository.findById(id).flatMap(foundResponse -> {
-			System.out.println(0);
-			if (foundResponse != null) {
-				System.out.println(2);
-				return responseRepository.deleteById(id);
-			} else {
-				System.out.println(1);
-				return Mono.error(new Exception());
-			}
-		});
-
-	}
+	/*
+	 * @Override public Mono<Void> deleteResponse(UUID id) {
+	 * System.out.println("hi"); return
+	 * responseRepository.findById(id).flatMap(foundResponse -> {
+	 * System.out.println(0); if (foundResponse != null) { System.out.println(2);
+	 * return responseRepository.deleteById(id); } else { System.out.println(1);
+	 * return Mono.error(new Exception()); } });
+	 * 
+	 * }
+	 */
 
 	@Override
 	public Mono<Response> deleteResponse(UUID uuid) {
@@ -98,8 +93,26 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId) {
+	public Mono<Response> addResponse(Response response) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
+	public Flux<Response> addResponses(List<Response> responses) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Flux<Response> getResponses() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyUuid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
