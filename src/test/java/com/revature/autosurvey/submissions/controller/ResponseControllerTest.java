@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -41,14 +42,14 @@ public class ResponseControllerTest {
 	
 	@Autowired
 	private ResponseController responseController;
-	@Autowired
+	@MockBean
 	private ResponseService responseService;
 	
 	@Test
 	public void testGetResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseController.getResponse(id))
+		StepVerifier.create(responseController.getResponse(null, null, id))
 			.expectNext(ResponseEntity.ok().body(new Response()))
 			.expectComplete()
 			.verify();
@@ -58,7 +59,7 @@ public class ResponseControllerTest {
 	public void testGetErrorResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.getResponse(id))
+		StepVerifier.create(responseController.getResponse(null, null, id))
 			.expectNext(ResponseEntity.badRequest().body(new Response()))
 			.expectComplete()
 			.verify();
@@ -97,5 +98,10 @@ public class ResponseControllerTest {
 		StepVerifier.create(result)
 				.expectNext(ResponseEntity.noContent().build())
 				.verifyComplete();
+	}
+	
+	@Test
+	public void testGetAllResponsesByBatch() {
+		StepVerifier.create(responseController.getResponse(null, null, null));
 	}
 }
