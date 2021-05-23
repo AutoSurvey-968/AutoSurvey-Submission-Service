@@ -90,4 +90,14 @@ public class ResponseControllerTest {
 		.expectComplete()
 		.verify();
 	}
+	
+	@Test
+	public void testAddedResponseWithSingleResponse() {
+		
+	}
+	
+	@Test
+	public void testAddedResponseWithCsv() {
+		
+	}
 }

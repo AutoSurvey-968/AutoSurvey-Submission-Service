@@ -7,7 +7,7 @@ import org.springframework.data.cassandra.repository.ReactiveCassandraRepository
 import org.springframework.stereotype.Repository;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.Response.WeekNum;
+import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
 
@@ -16,5 +16,5 @@ public interface ResponseRepository extends ReactiveCassandraRepository<Response
 	@AllowFiltering
 	public Flux<Response> findAllByBatch(String batch);
 	@AllowFiltering
-	public Flux<Response> findAllByWeek(WeekNum week);
+	public Flux<Response> findAllByWeek(TrainingWeek week);
 }

@@ -20,7 +20,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.Response.WeekNum;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
@@ -75,7 +74,7 @@ public class ResponseServiceTest {
 		Mono<Response> responseMono = Mono.just(response);
 		Flux<Response> responseFlux = responseMono.flux();
 		
-		when(responseRepository.saveAll(responseMono)).thenReturn(responseFlux);
+		when(responseRepository.saveAll(responses)).thenReturn(responseFlux);
 		
 		assertEquals(responseFlux, responseService.addResponses(responses));
 	}
@@ -85,7 +84,7 @@ public class ResponseServiceTest {
 		Response response = responses.get(0);
 		Mono<Response> responseMono = Mono.just(response);
 		
-		when(responseRepository.save(response).thenReturn(responseMono));
+		when(responseRepository.save(response)).thenReturn(responseMono);
 		
 		assertEquals(responseMono, responseService.addResponse(response));
 	}
@@ -95,16 +94,31 @@ public class ResponseServiceTest {
 		Response res = new Response();
 		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 		Map<String,String> questions = new HashMap<>();
-		res.setSurveyResponses(questions);
 		res.setSurveyId(surveyId);
-		
 		questions.put("question1", "answer1");
 		questions.put("question2", "answer2");
 		questions.put("question4", "answer4");
-		String csvLine = "answer1,answer2,,answer4";
-		String questionLine = "question1, question 2, question 3, question 4";
+		questions.put("What batch are you in?","Mock Batch 45");
+		questions.put("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"","Week A");
+		res.setSurveyResponses(questions);
+		res.setWeek(TrainingWeek.A);
+		res.setBatchName("Mock Batch 45");
+		
+		String csvLine = "answer1,answer2,,answer4,Mock Batch 45,Week A";
+		String questionLine = "question1,question2,question3,question4,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
 		
 		assertEquals(res, responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId));
+	}
+	
+	@Test
+	public void addResponsesFromFileReturns() {
+		//I do not know how to generate a Flux<FilePart> so I gotta figure that out to write this test
+	}
+	
+	@Test
+	public void getTrainingWeekFromStringReturnsTrainingWeekEnum() {
+		String weekString = "Week A";
+		assertEquals(TrainingWeek.A, responseService.getTrainingWeekFromString(weekString));
 	}
 	
 	@Test
