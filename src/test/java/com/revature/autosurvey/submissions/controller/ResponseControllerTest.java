@@ -47,7 +47,7 @@ public class ResponseControllerTest {
 	private ResponseService responseService;
 	
 	@Test
-	public void testGetResponse() {
+	void testGetResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseController.getResponses(null, null, id))
@@ -57,7 +57,17 @@ public class ResponseControllerTest {
 	}
 	
 	@Test
-	public void testGetErrorResponse() {
+	void testGetEmptyResponse() {
+		UUID id = UUID.randomUUID();
+		when(responseService.getResponse(id)).thenReturn(Mono.empty());
+		StepVerifier.create(responseController.getResponses(null, null, id))
+			.expectNext(ResponseEntity.notFound().build())
+			.expectComplete()
+			.verify();
+	}
+	
+	@Test
+	void testGetErrorResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseController.getResponses(null, null, id))
@@ -67,7 +77,7 @@ public class ResponseControllerTest {
 	}
 	
 	@Test
-	public void testUpdateResponse() {
+	void testUpdateResponse() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseService.updateResponse(id, response)).thenReturn(Mono.just(new Response()));
@@ -78,7 +88,7 @@ public class ResponseControllerTest {
 	}
 	
 	@Test
-	public void testUpdateResponseThatDoesNotExist() {
+	void testUpdateResponseThatDoesNotExist() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
@@ -89,7 +99,7 @@ public class ResponseControllerTest {
 	}
 	
 	@Test
-	public void testDeleteResponse() {
+	void testDeleteResponse() {
 		Response response = new Response();
 		
 		when(responseService.deleteResponse(any())).thenReturn(Mono.just(response));
@@ -102,7 +112,7 @@ public class ResponseControllerTest {
 	}
 	
 	@Test
-	public void testGetAllResponsesByBatch() {
+	void testGetAllResponsesByBatch() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		String testBatch = "Batch 23";
