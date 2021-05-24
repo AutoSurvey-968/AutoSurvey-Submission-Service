@@ -2,7 +2,6 @@ package com.revature.autosurvey.submissions.controller;
 
 import java.util.UUID;
 
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,16 +31,21 @@ public class ResponseController {
 	}
 	
 	@GetMapping
-	public Mono<ResponseEntity<Response>> getResponse(
+	public Flux<ResponseEntity<Response>> getResponses(
 			@RequestParam(required = false) String batch,
 			@RequestParam(required = false) String week,
 			@RequestParam(required = false) UUID id){
 		if(id != null) {
 			return responseService.getResponse(id).map(response -> ResponseEntity.ok().body(response))
-					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+					.onErrorReturn(ResponseEntity.badRequest().body(new Response())).flux();
+		}
+		if(batch != null) {
+			return responseService.getResponsesByBatch(batch).map(responses ->
+				ResponseEntity.ok().body(responses))
+					.onErrorReturn(ResponseEntity.badRequest().build());
 		}
 		else {
-			return Mono.just(ResponseEntity.badRequest().build());
+			return Flux.just(ResponseEntity.badRequest().build());
 		}
 	}
 	
