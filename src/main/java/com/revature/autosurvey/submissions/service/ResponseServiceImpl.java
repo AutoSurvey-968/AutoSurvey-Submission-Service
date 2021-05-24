@@ -130,7 +130,6 @@ public class ResponseServiceImpl implements ResponseService {
 		response.setWeek(getTrainingWeekFromString(weekString));
 		response.setResponses(responseMap);
 		String timeString = responseMap.get("Timestamp");
-		System.out.println(responseMap);
 		response.setUuid(Uuids.startOf(timeLongFromString(timeString)));
 		return response;
 	}
