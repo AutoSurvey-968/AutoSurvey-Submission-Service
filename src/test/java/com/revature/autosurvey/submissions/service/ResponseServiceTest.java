@@ -93,9 +93,11 @@ public class ResponseServiceTest {
 	public void testUpdateResponseExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		when(responseRepository.findByUUID(id)).thenReturn(Mono.just(new Response()));
+		response.setUuid(id);
+		Mono<Response> responseMono = Mono.just(response);
+		when(responseRepository.findByUUID(id)).thenReturn(responseMono);
 		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
+		StepVerifier.create(responseService.updateResponse(id, response)).expectNext(new Response()).expectComplete().verify();
 	}
 
 	@Test
@@ -104,7 +106,7 @@ public class ResponseServiceTest {
 		Response response = new Response();
 		when(responseRepository.findByUUID(id)).thenReturn(Mono.empty());
 		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
+		StepVerifier.create(responseService.updateResponse(id, response)).expectError().verify();
 	}
 
 	@Test
