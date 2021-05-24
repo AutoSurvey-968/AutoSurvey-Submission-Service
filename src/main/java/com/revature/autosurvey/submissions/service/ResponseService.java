@@ -29,6 +29,8 @@ public interface ResponseService {
 	public Flux<Response> addResponses(Flux<Response> responses);
 	public Flux<Response> addResponses(List<Response> responses);
 	
+	public List<String> bigSplit(String string);
+	
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
 	
 	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId);
