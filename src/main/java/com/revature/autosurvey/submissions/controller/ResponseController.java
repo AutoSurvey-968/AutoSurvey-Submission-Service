@@ -39,6 +39,7 @@ public class ResponseController {
 			@RequestParam(required = false) UUID id){
 		if(id != null) {
 			return responseService.getResponse(id).map(response -> ResponseEntity.ok().body(response))
+					.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
 					.onErrorReturn(ResponseEntity.badRequest().body(new Response())).flux();
 		}
 		if(batch != null) {
