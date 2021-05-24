@@ -110,7 +110,7 @@ public class ResponseServiceImpl implements ResponseService {
 		response.setBatch(responseMap.get("What batch are you in?"));
 		response.setSurveyUuid(surveyId);
 		String weekString = responseMap.get("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
-		response.setWeek(TrainingWeek.valueOf(weekString)); // "Week 7" TrainingWeek.SEVEN
+		response.setWeek(getTrainingWeekFromString(weekString)); // "Week 7" TrainingWeek.SEVEN
 		response.setResponses(responseMap);
 //		response.setUuid(UUID.randomUUID()); //Generates a random UUID, not one based on the timestamp associated with the entry
 		return response;
