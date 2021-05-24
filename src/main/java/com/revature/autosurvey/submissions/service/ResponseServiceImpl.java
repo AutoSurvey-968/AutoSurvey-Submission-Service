@@ -2,11 +2,15 @@ package com.revature.autosurvey.submissions.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -100,14 +104,19 @@ public class ResponseServiceImpl implements ResponseService {
 	
 	@Override
 	public Long timeLongFromString(String timeString) {
+		timeString = String.join(" ", timeString.split("\\s+"));
 		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("M/d/yyyy HH:mm:ss");
 		Date date = null;
+		LocalDateTime ldate = null;
 		try {
 			date = format.parse(timeString);
+			ldate = LocalDateTime.parse(timeString, dtf);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
 		Long timeMs = date.getTime();
+		timeMs = ldate.toInstant(ZoneOffset.ofHours(0)).toEpochMilli();
 		return timeMs;
 	}
 	
