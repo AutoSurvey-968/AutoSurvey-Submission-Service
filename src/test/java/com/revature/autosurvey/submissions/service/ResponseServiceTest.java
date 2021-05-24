@@ -6,7 +6,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -66,24 +68,77 @@ public class ResponseServiceTest {
 		response1.setWeek(TrainingWeek.TWO);
 		response1.setUuid(UUID.fromString("11111111-1111-1111-1111-111111111102"));
 		responses.add(response2);
+		}
+	
+	@Test
+	void addResponsesReturnsFluxResponses() {
+		Response response = responses.get(0);
+		Mono<Response> responseMono = Mono.just(response);
+		Flux<Response> responseFlux = responseMono.flux();
+		
+		when(responseRepository.saveAll(responses)).thenReturn(responseFlux);
+		
+		assertEquals(responseFlux, responseService.addResponses(responses));
+	}
+	
+	@Test
+	void addResponseReturnsMonoResponse() {
+		Response response = responses.get(0);
+		Mono<Response> responseMono = Mono.just(response);
+		
+		when(responseRepository.save(response)).thenReturn(responseMono);
+		
+		assertEquals(responseMono, responseService.addResponse(response));
+	}
+	
+	@Test
+	void buildResponseFromCsvLineReturnsResponse() {
+		Response res = new Response();
+		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
+		Map<String,String> questions = new HashMap<>();
+		res.setSurveyUuid(surveyId);
+		questions.put("question1", "answer1");
+		questions.put("question2", "answer2");
+		questions.put("question4", "answer4");
+		questions.put("What batch are you in?","Mock Batch 45");
+		questions.put("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"","Week A");
+		res.setResponses(questions);
+		res.setWeek(TrainingWeek.A);
+		res.setBatch("Mock Batch 45");
+		
+		String csvLine = "answer1,answer2,,answer4,Mock Batch 45,Week A";
+		String questionLine = "question1,question2,question3,question4,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
+		
+		assertEquals(res, responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId));
+	}
+	
+	@Test
+	void addResponsesFromFileReturns() {
+		//I do not know how to generate a Flux<FilePart> so I gotta figure that out to write this test
+	}
+	
+	@Test
+	void getTrainingWeekFromStringReturnsTrainingWeekEnum() {
+		String weekString = "Week A";
+		assertEquals(TrainingWeek.A, responseService.getTrainingWeekFromString(weekString));
 	}
 
 	@Test
-	public void testGetResponse() {
+	void testGetResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
 	}
 
 	@Test
-	public void testGetResponseNoResponse() {
+	void testGetResponseNoResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseRepository.findById(id)).thenReturn(Mono.empty());
 		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
 	}
 
 	@Test
-	public void testUpdateResponseExists() {
+	void testUpdateResponseExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
@@ -92,7 +147,7 @@ public class ResponseServiceTest {
 	}
 
 	@Test
-	public void testUpdateResponseDoesNotExists() {
+	void testUpdateResponseDoesNotExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseRepository.findById(id)).thenReturn(Mono.empty());
@@ -113,7 +168,7 @@ public class ResponseServiceTest {
 	}
 
 	@Test
-	public void testGetAllResponsesByBatch() {
+	void testGetAllResponsesByBatch() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		String testBatch = "Batch 23";
