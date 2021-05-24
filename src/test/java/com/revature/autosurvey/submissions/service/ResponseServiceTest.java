@@ -125,4 +125,17 @@ public class ResponseServiceTest {
 		.expectNextMatches(response -> response.getBatch().equals(testBatch))
 		.verifyComplete();
 	}
+	
+	/*
+	 * @Test public void testGetAllResponsesByWeek() { Response testResponse1 = new
+	 * Response(); Response testResponse2 = new Response();
+	 * testResponse1.setWeek(TrainingWeek.EIGHT);
+	 * testResponse2.setWeek(TrainingWeek.EIGHT);
+	 * when(responseRepository.findAllByWeek(TrainingWeek.EIGHT)).thenReturn(Flux.
+	 * just(testResponse1, testResponse2));
+	 * StepVerifier.create(responseService.getResponsesByWeek(TrainingWeek.EIGHT))
+	 * .expectNextMatches(response -> response.getWeek().equals(TrainingWeek.EIGHT))
+	 * .expectNextMatches(response -> response.getWeek().equals(TrainingWeek.EIGHT))
+	 * .verifyComplete(); }
+	 */
 }

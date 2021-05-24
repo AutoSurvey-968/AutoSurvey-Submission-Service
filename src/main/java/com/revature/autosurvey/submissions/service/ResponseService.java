@@ -2,7 +2,10 @@ package com.revature.autosurvey.submissions.service;
 
 import java.util.UUID;
 
+import org.reactivestreams.Publisher;
+
 import com.revature.autosurvey.submissions.beans.Response;
+import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
@@ -21,4 +24,6 @@ public interface ResponseService {
 	public Mono<Response> deleteResponse(UUID uuid);
 
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyUuid);
+
+	public Publisher getResponsesByWeek(TrainingWeek eight);
 }

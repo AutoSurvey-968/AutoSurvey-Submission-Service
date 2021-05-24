@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import com.revature.autosurvey.submissions.beans.Response;
+import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
@@ -78,6 +80,12 @@ public class ResponseServiceImpl implements ResponseService {
 	@Override
 	public Flux<Response> getResponsesByBatch(String batchName) {
 		return responseRepository.findAllByBatch(batchName);
+	}
+
+	@Override
+	public Flux<Response> getResponsesByWeek(TrainingWeek eight) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
