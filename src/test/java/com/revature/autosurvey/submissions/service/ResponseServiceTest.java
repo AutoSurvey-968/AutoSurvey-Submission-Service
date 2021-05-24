@@ -138,7 +138,7 @@ public class ResponseServiceTest {
 	}
 	
 	@Test
-	public void testGetResponseError() {
+	void testGetResponseError() {
 		UUID id = UUID.randomUUID();
 		when(responseRepository.findByUUID(id)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
