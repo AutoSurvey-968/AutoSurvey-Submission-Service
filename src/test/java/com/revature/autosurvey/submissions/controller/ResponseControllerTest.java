@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -46,27 +47,37 @@ public class ResponseControllerTest {
 	private ResponseService responseService;
 	
 	@Test
-	public void testGetResponse() {
+	void testGetResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseController.getResponse(null, null, id))
+		StepVerifier.create(responseController.getResponses(null, null, id))
 			.expectNext(ResponseEntity.ok().body(new Response()))
 			.expectComplete()
 			.verify();
 	}
 	
 	@Test
-	public void testGetErrorResponse() {
+	void testGetEmptyResponse() {
+		UUID id = UUID.randomUUID();
+		when(responseService.getResponse(id)).thenReturn(Mono.empty());
+		StepVerifier.create(responseController.getResponses(null, null, id))
+			.expectNext(ResponseEntity.notFound().build())
+			.expectComplete()
+			.verify();
+	}
+	
+	@Test
+	void testGetErrorResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.getResponse(null, null, id))
+		StepVerifier.create(responseController.getResponses(null, null, id))
 			.expectNext(ResponseEntity.badRequest().body(new Response()))
 			.expectComplete()
 			.verify();
 	}
 	
 	@Test
-	public void testUpdateResponse() {
+	void testUpdateResponse() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseService.updateResponse(id, response)).thenReturn(Mono.just(new Response()));
@@ -77,7 +88,7 @@ public class ResponseControllerTest {
 	}
 	
 	@Test
-	public void testUpdateResponseThatDoesNotExist() {
+	void testUpdateResponseThatDoesNotExist() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
@@ -88,7 +99,7 @@ public class ResponseControllerTest {
 	}
 	
 	@Test
-	public void testDeleteResponse() {
+	void testDeleteResponse() {
 		Response response = new Response();
 		
 		when(responseService.deleteResponse(any())).thenReturn(Mono.just(response));
@@ -101,7 +112,18 @@ public class ResponseControllerTest {
 	}
 	
 	@Test
-	public void testGetAllResponsesByBatch() {
-		StepVerifier.create(responseController.getResponse(null, null, null));
+	void testGetAllResponsesByBatch() {
+		Response testResponse1 = new Response();
+		Response testResponse2 = new Response();
+		String testBatch = "Batch 23";
+		testResponse1.setBatch(testBatch);
+		testResponse2.setBatch(testBatch);
+		String batch = "Batch 23";
+		when(responseService.getResponsesByBatch(batch)).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseController.getResponses(batch , null, null))
+		.expectNext(ResponseEntity.ok(testResponse1))
+		.expectNext(ResponseEntity.ok(testResponse2))
+		.verifyComplete();
 	}
+	
 }

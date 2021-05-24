@@ -2,9 +2,9 @@ package com.revature.autosurvey.submissions.controller;
 
 import java.util.UUID;
 
-import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.revature.autosurvey.submissions.beans.Response;
@@ -32,22 +33,38 @@ public class ResponseController {
 	}
 	
 	@GetMapping
-	public Mono<ResponseEntity<Response>> getResponse(
+	public Flux<ResponseEntity<Response>> getResponses(
 			@RequestParam(required = false) String batch,
 			@RequestParam(required = false) String week,
 			@RequestParam(required = false) UUID id){
 		if(id != null) {
 			return responseService.getResponse(id).map(response -> ResponseEntity.ok().body(response))
-					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+					.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
+					.onErrorReturn(ResponseEntity.badRequest().body(new Response())).flux();
+		}
+		if(batch != null) {
+			return responseService.getResponsesByBatch(batch).map(responses ->
+				ResponseEntity.ok().body(responses))
+					.onErrorReturn(ResponseEntity.badRequest().build());
 		}
 		else {
-			return Mono.just(ResponseEntity.badRequest().build());
+			return Flux.just(ResponseEntity.badRequest().build());
 		}
 	}
 	
-	@PostMapping("/{id}")
-	public Mono<ResponseEntity<Response>> addedResponse(){
-		return null;	
+	@PostMapping()
+	public Flux<ResponseEntity<Response>> addResponses(@RequestParam ("csv") Boolean csv, 
+			@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId, 
+			@RequestBody Flux<Response> responses) {
+		if (Boolean.TRUE.equals(csv)) {
+			return responseService.addResponsesFromFile(fileFlux, surveyId).map(
+					response -> ResponseEntity.ok().body(response))
+					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+		} else {
+			return responseService.addResponses(responses).map(
+					resp -> ResponseEntity.ok().body(resp))
+					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+		}
 	}
 	
 	@PutMapping("/{id}")
