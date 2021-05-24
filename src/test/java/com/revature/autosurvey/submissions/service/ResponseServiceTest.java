@@ -3,14 +3,12 @@ package com.revature.autosurvey.submissions.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -118,12 +116,13 @@ public class ResponseServiceTest {
 	public void testGetAllResponsesByBatch() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		testResponse1.setBatch("Batch 23");
-		testResponse2.setBatch("Batch 23");
-		Mockito.when(responseRepository.findAllByBatch("Batch 23")).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseService.getResponsesByBatch("Batch 23"))
-		.expectNext(testResponse1)
-		.expectNext(testResponse2)
+		String testBatch = "Batch 23";
+		testResponse1.setBatch(testBatch);
+		testResponse2.setBatch(testBatch);
+		when(responseRepository.findAllByBatch(testBatch)).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseService.getResponsesByBatch(testBatch))
+		.expectNextMatches(response -> response.getBatch().equals(testBatch))
+		.expectNextMatches(response -> response.getBatch().equals(testBatch))
 		.verifyComplete();
 	}
 }
