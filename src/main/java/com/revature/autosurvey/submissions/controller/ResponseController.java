@@ -47,27 +47,34 @@ public class ResponseController {
 	}
 	
 	@PostMapping()
-	public Mono<ResponseEntity<Response>> addResponses(@RequestParam ("csv") Boolean csv, 
+	public Flux<ResponseEntity<Response>> addResponses(@RequestParam ("csv") Boolean csv, 
 			@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId, 
 			@RequestBody Flux<Response> responses) {
 		if (csv == true) {
-			responseService.addResponsesFromFile(fileFlux, surveyId);
+			return responseService.addResponsesFromFile(fileFlux, surveyId).map(
+					response -> ResponseEntity.ok().body(response))
+					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 		} else {
-			responseService.addResponses(responses);
+			return responseService.addResponses(responses).map(
+					resp -> ResponseEntity.ok().body(resp))
+					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 		}
-		return null;
 	}
 	
 //	@PostMapping(params = {"csv"})
-//	public Mono<ResponseEntity<Response>> addedResponses(@RequestParam ("csv") String csv, 
+//	public Flux<ResponseEntity<Response>> addedResponses(@RequestParam ("csv") String csv, 
 //			@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId){
-//		return responseService.addResponsesFromFile(fileFlux, surveyId);	
+//		return responseService.addResponsesFromFile(fileFlux, surveyId).map(
+//				response -> ResponseEntity.ok().body(response))
+//				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 //	}
 //	
 //	@PostMapping(params = {"single"})
-//	public Mono<ResponseEntity<Response>> addedResponse(@RequestParam ("single") String single, 
+//	public Flux<ResponseEntity<Response>> addedResponse(@RequestParam ("single") String single, 
 //			@RequestBody Flux<Response> response){
-//		return responseService.addResponses(responses);	
+//		return responseService.addResponses(response).map(
+//				resp -> ResponseEntity.ok().body(resp))
+//				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));	
 //	}
 	
 	@PutMapping("/{id}")
