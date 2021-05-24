@@ -73,14 +73,21 @@ public class ResponseServiceTest {
 	@Test
 	public void testGetResponse() {
 		UUID id = UUID.randomUUID();
-		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
+		when(responseRepository.findByUUID(id)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
 	}
 
 	@Test
 	public void testGetResponseNoResponse() {
 		UUID id = UUID.randomUUID();
-		when(responseRepository.findById(id)).thenReturn(Mono.empty());
+		when(responseRepository.findByUUID(id)).thenReturn(Mono.empty());
+		StepVerifier.create(responseService.getResponse(id)).expectComplete().verify();
+	}
+	
+	@Test
+	public void testGetResponseError() {
+		UUID id = UUID.randomUUID();
+		when(responseRepository.findByUUID(id)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
 	}
 
@@ -88,7 +95,7 @@ public class ResponseServiceTest {
 	public void testUpdateResponseExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
+		when(responseRepository.findByUUID(id)).thenReturn(Mono.just(new Response()));
 		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
 	}
@@ -97,7 +104,7 @@ public class ResponseServiceTest {
 	public void testUpdateResponseDoesNotExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		when(responseRepository.findById(id)).thenReturn(Mono.empty());
+		when(responseRepository.findByUUID(id)).thenReturn(Mono.empty());
 		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
 	}

@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface ResponseRepository extends ReactiveCassandraRepository<Response, UUID>{
 	@AllowFiltering
+	public Mono<Response> findByUUID(UUID uuid);
 	public Flux<Response> findAllByBatch(String batch);
 	@AllowFiltering
 	public Flux<Response> findAllByWeek(TrainingWeek week);
