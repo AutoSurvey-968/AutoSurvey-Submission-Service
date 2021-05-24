@@ -47,12 +47,12 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Mono<Response> getResponse(UUID id) {
-		return responseRepository.findByUUID(id);
+		return responseRepository.findByUuid(id);
 	}
 
 	@Override
 	public Mono<Response> updateResponse(UUID id, Response response) {
-		return responseRepository.findByUUID(id).switchIfEmpty(Mono.just(new Response())).flatMap(foundResponse -> {
+		return responseRepository.findByUuid(id).switchIfEmpty(Mono.just(new Response())).flatMap(foundResponse -> {
 			if (foundResponse.getUuid() != null) {
 				return responseRepository.save(response);
 			} else {
@@ -110,7 +110,7 @@ public class ResponseServiceImpl implements ResponseService {
 		response.setBatch(responseMap.get("What batch are you in?"));
 		response.setSurveyUuid(surveyId);
 		String weekString = responseMap.get("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
-		response.setWeek(getTrainingWeekFromString(weekString));
+		response.setWeek(TrainingWeek.valueOf(weekString)); // "Week 7" TrainingWeek.SEVEN
 		response.setResponses(responseMap);
 //		response.setUuid(UUID.randomUUID()); //Generates a random UUID, not one based on the timestamp associated with the entry
 		return response;
@@ -160,9 +160,8 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> getResponsesByWeek(TrainingWeek eight) {
-		// TODO Auto-generated method stub
-		return null;
+	public Flux<Response> getResponsesByWeek(TrainingWeek tWeek) {
+		return responseRepository.findAllByWeek(tWeek);
 	}
 
 }
