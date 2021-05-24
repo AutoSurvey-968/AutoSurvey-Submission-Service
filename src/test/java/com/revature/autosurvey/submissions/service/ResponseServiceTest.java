@@ -1,7 +1,8 @@
 package com.revature.autosurvey.submissions.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -29,7 +31,7 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 public class ResponseServiceTest {
-	
+
 	@TestConfiguration
 	static class Configuration {
 		@Bean
@@ -38,33 +40,33 @@ public class ResponseServiceTest {
 			responseService.setResponseRepository(responseRepository);
 			return responseService;
 		}
-		
+
 		@Bean
 		public ResponseRepository getResponseRepository() {
 			return Mockito.mock(ResponseRepository.class);
 		}
 	}
-	
+
 	@Autowired
 	private ResponseService responseService;
 
-	@Autowired
+	@MockBean
 	private ResponseRepository responseRepository;
-	
+
 	private static List<Response> responses;
-	
+
 	@BeforeAll
 	public static void mockResponses() {
 		responses = new ArrayList<>();
 		Response response1 = new Response();
-		response1.setBatchName("1");
+		response1.setBatch("1");
 		response1.setWeek(TrainingWeek.ONE);
-		response1.setResponseId(UUID.fromString("11111111-1111-1111-1111-111111111101"));
+		response1.setUuid(UUID.fromString("11111111-1111-1111-1111-111111111101"));
 		responses.add(response1);
 		Response response2 = new Response();
-		response1.setBatchName("2");
+		response1.setBatch("2");
 		response1.setWeek(TrainingWeek.TWO);
-		response1.setResponseId(UUID.fromString("11111111-1111-1111-1111-111111111102"));
+		response1.setUuid(UUID.fromString("11111111-1111-1111-1111-111111111102"));
 		responses.add(response2);
 		}
 	
@@ -92,17 +94,17 @@ public class ResponseServiceTest {
 	@Test
 	public void buildResponseFromCsvLineReturnsResponse() {
 		Response res = new Response();
-		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
 		Map<String,String> questions = new HashMap<>();
-		res.setSurveyId(surveyId);
+		res.setSurveyUuid(surveyId);
 		questions.put("question1", "answer1");
 		questions.put("question2", "answer2");
 		questions.put("question4", "answer4");
 		questions.put("What batch are you in?","Mock Batch 45");
 		questions.put("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"","Week A");
-		res.setSurveyResponses(questions);
+		res.setResponses(questions);
 		res.setWeek(TrainingWeek.A);
-		res.setBatchName("Mock Batch 45");
+		res.setBatch("Mock Batch 45");
 		
 		String csvLine = "answer1,answer2,,answer4,Mock Batch 45,Week A";
 		String questionLine = "question1,question2,question3,question4,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
@@ -120,62 +122,61 @@ public class ResponseServiceTest {
 		String weekString = "Week A";
 		assertEquals(TrainingWeek.A, responseService.getTrainingWeekFromString(weekString));
 	}
-	
-	@Test
-	public void sanityCheck() {
-		assertTrue(true);
-	}
-	
+
 	@Test
 	public void testGetResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseService.getResponse(id))
-			.expectNext(new Response())
-			.expectComplete()
-			.verify();
+		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
 	}
-	
+
 	@Test
 	public void testGetResponseNoResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseRepository.findById(id)).thenReturn(Mono.empty());
-		StepVerifier.create(responseService.getResponse(id))
-			.expectError()
-			.verify();
+		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
 	}
-	
-	@Test
-	public void testUpdateResponseDoesNotExist() {
-		UUID id = UUID.randomUUID();
-		Response response = new Response();
-		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
-		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseService.getResponse(id))
-			.expectNext(new Response())
-			.expectComplete()
-			.verify();
-	}
-	
+
 	@Test
 	public void testUpdateResponseExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
+		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
+		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
+		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
+	}
+
+	@Test
+	public void testUpdateResponseDoesNotExists() {
+		UUID id = UUID.randomUUID();
+		Response response = new Response();
 		when(responseRepository.findById(id)).thenReturn(Mono.empty());
 		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseService.getResponse(id))
-			.expectError()
-			.verify();
+		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
 	}
-	
+
 	@Test
-	public void testGetAllResponseByBatch() {
-		Response testResponse = new Response();
-		String batchName = new String("Batch 43");
-		testResponse.setBatchName(batchName);
-		Mockito.when(responseRepository.findAllByBatch(batchName)).thenReturn(Flux.fromIterable(new ArrayList<Response>()));
-		//StepVerifier.create(responseService.getResponsesByBatch(batchName)).expectNextMatches(name -> name.)
+	void testDeleteByUuid() {
+		Response response = new Response();
+		UUID id = UUID.randomUUID();
+		response.setUuid(id);
+
+		doReturn(Mono.just(response)).when(responseRepository).deleteByUuid(any());
+
+		UUID idResult = responseService.deleteResponse(id).block().getUuid();
+		assertEquals(id, idResult);
 	}
 
-
+	@Test
+	public void testGetAllResponsesByBatch() {
+		Response testResponse1 = new Response();
+		Response testResponse2 = new Response();
+		testResponse1.setBatch("Batch 23");
+		testResponse2.setBatch("Batch 23");
+		Mockito.when(responseRepository.findAllByBatch("Batch 23")).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseService.getResponsesByBatch("Batch 23"))
+		.expectNext(testResponse1)
+		.expectNext(testResponse2)
+		.verifyComplete();
+	}
 }

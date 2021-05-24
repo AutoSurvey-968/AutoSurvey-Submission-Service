@@ -43,22 +43,16 @@ public class ResponseServiceImpl implements ResponseService {
 	public Flux<Response> addResponses(List<Response> responses) {
 		return responseRepository.saveAll(responses);
 	}
-	
-	public Mono<Response> getResponse(UUID id){
-		return responseRepository.findById(id).switchIfEmpty(Mono.error(new Exception()));
-	}
 
-	// needs arguments
 	@Override
-	public Flux<Response> getResponses() {
-		// TODO Auto-generated method stub
-		return null;
+	public Mono<Response> getResponse(UUID id) {
+		return responseRepository.findById(id).switchIfEmpty(Mono.error(new Exception()));
 	}
 
 	@Override
 	public Mono<Response> updateResponse(UUID id, Response response) {
 		return responseRepository.findById(id).flatMap(foundResponse -> {
-			if(foundResponse != null) {
+			if (foundResponse != null) {
 				return responseRepository.save(response);
 			} else {
 				return Mono.error(new Exception());
@@ -67,21 +61,20 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Mono<Void> deleteResponse(UUID id) {
-		// TODO Auto-generated method stub
-		return null;
+	public Mono<Response> deleteResponse(UUID uuid) {
+		return responseRepository.deleteByUuid(uuid);
 	}
-	
-	private Flux<String> readStringFromFile(FilePart file){
+
+	private Flux<String> readStringFromFile(FilePart file) {
 		return file.content().map(buffer -> {
 			byte[] bytes = new byte[buffer.readableByteCount()];
-             buffer.read(bytes);
-             DataBufferUtils.release(buffer);
+			buffer.read(bytes);
+			DataBufferUtils.release(buffer);
 
-             return new String(bytes);
+			return new String(bytes);
 		});
 	}
-	
+
 	@Override
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId) {
 		Response response = new Response();
@@ -121,19 +114,13 @@ public class ResponseServiceImpl implements ResponseService {
 				responseMap.put(questionsString.get(i), answersString.get(i));
 			}
 		}
-		response.setBatchName(responseMap.get("What batch are you in?"));
-		response.setSurveyId(surveyId);
+		response.setBatch(responseMap.get("What batch are you in?"));
+		response.setSurveyUuid(surveyId);
 		String weekString = responseMap.get("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
 		response.setWeek(getTrainingWeekFromString(weekString));
-		response.setSurveyResponses(responseMap);
-		response.setResponseId(UUID.randomUUID()); //Generates a random UUID, not one based on the timestamp associated with the entry
+		response.setResponses(responseMap);
+//		response.setUuid(UUID.randomUUID()); //Generates a random UUID, not one based on the timestamp associated with the entry
 		return response;
-	}
-
-	@Override
-	public Flux<Response> getResponsesByBatch(String batchName) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 	
 	@Override
@@ -172,6 +159,11 @@ public class ResponseServiceImpl implements ResponseService {
 		case "Week 10" : return TrainingWeek.TEN;
 		}
 		return null;
+	}
+		
+	@Override
+	public Flux<Response> getResponsesByBatch(String batchName) {		
+		return responseRepository.findAllByBatch(batchName);
 	}
 
 }
