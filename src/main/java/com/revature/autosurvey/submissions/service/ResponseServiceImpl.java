@@ -1,7 +1,10 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +16,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
+import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
@@ -95,6 +99,19 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 	
 	@Override
+	public Long timeLongFromString(String timeString) {
+		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		Date date = null;
+		try {
+			date = format.parse(timeString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		Long timeMs = date.getTime();
+		return timeMs;
+	}
+	
+	@Override
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId) {
 		Response response = new Response();
 		Map<String, String> responseMap = new HashMap<>();
@@ -112,7 +129,9 @@ public class ResponseServiceImpl implements ResponseService {
 		String weekString = responseMap.get("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
 		response.setWeek(getTrainingWeekFromString(weekString));
 		response.setResponses(responseMap);
-//		response.setUuid(UUID.randomUUID()); //Generates a random UUID, not one based on the timestamp associated with the entry
+		String timeString = responseMap.get("Timestamp");
+		System.out.println(responseMap);
+		response.setUuid(Uuids.startOf(timeLongFromString(timeString)));
 		return response;
 	}
 	

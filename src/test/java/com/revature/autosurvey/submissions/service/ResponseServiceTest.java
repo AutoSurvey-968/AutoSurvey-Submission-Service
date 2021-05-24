@@ -21,6 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
@@ -103,6 +104,14 @@ public class ResponseServiceTest {
 	}
 	
 	@Test
+	void timeLongFromStringReturnsTimeLong() {
+		String string = "3/3/2020  14:08:17";
+		Long timeLong = 1583273297000L;
+		
+		assertEquals(timeLong, responseService.timeLongFromString(string));
+	}
+	
+	@Test
 	void buildResponseFromCsvLineReturnsResponse() {
 		Response res = new Response();
 		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
@@ -110,16 +119,17 @@ public class ResponseServiceTest {
 		res.setSurveyUuid(surveyId);
 		questions.put("question1", "answer1");
 		questions.put("question2", "answer2");
-		questions.put("question4", "answer4");
+		questions.put("Timestamp", "3/3/2020  14:08:17");
 		questions.put("What batch are you in?","Mock Batch 45");
 		questions.put("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"","Week A");
 		res.setResponses(questions);
 		res.setWeek(TrainingWeek.A);
 		res.setBatch("Mock Batch 45");
+		res.setUuid(Uuids.startOf(1583273297000L));		
 		
-		String csvLine = "answer1,answer2,,answer4,Mock Batch 45,Week A";
-		String questionLine = "question1,question2,question3,question4,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
-		
+		String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A";
+		String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
+
 		assertEquals(res, responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId));
 	}
 	

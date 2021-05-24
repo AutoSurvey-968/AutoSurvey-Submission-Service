@@ -1,8 +1,7 @@
 package com.revature.autosurvey.submissions.controller;
 
-import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
@@ -14,11 +13,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
