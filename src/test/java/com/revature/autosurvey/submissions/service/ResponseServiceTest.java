@@ -171,12 +171,13 @@ public class ResponseServiceTest {
 	void testGetAllResponsesByBatch() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		testResponse1.setBatch("Batch 23");
-		testResponse2.setBatch("Batch 23");
-		Mockito.when(responseRepository.findAllByBatch("Batch 23")).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseService.getResponsesByBatch("Batch 23"))
-		.expectNext(testResponse1)
-		.expectNext(testResponse2)
+		String testBatch = "Batch 23";
+		testResponse1.setBatch(testBatch);
+		testResponse2.setBatch(testBatch);
+		when(responseRepository.findAllByBatch(testBatch)).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseService.getResponsesByBatch(testBatch))
+		.expectNextMatches(response -> response.getBatch().equals(testBatch))
+		.expectNextMatches(response -> response.getBatch().equals(testBatch))
 		.verifyComplete();
 	}
 }
