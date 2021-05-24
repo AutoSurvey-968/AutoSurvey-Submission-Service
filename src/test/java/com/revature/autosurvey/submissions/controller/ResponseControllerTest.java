@@ -60,7 +60,7 @@ public class ResponseControllerTest {
 	public void testGetEmptyResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.empty());
-		StepVerifier.create(responseController.getResponse(null, null, id))
+		StepVerifier.create(responseController.getResponses(null, null, id))
 			.expectNext(ResponseEntity.notFound().build())
 			.expectComplete()
 			.verify();
