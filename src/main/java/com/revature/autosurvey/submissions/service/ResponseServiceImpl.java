@@ -46,13 +46,13 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Mono<Response> getResponse(UUID id) {
-		return responseRepository.findById(id).switchIfEmpty(Mono.error(new Exception()));
+		return responseRepository.findByUuid(id);
 	}
 
 	@Override
 	public Mono<Response> updateResponse(UUID id, Response response) {
-		return responseRepository.findById(id).flatMap(foundResponse -> {
-			if (foundResponse != null) {
+		return responseRepository.findByUuid(id).switchIfEmpty(Mono.just(new Response())).flatMap(foundResponse -> {
+			if (foundResponse.getUuid() != null) {
 				return responseRepository.save(response);
 			} else {
 				return Mono.error(new Exception());

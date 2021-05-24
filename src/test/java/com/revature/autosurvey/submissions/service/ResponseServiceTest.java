@@ -209,14 +209,21 @@ public class ResponseServiceTest {
 	@Test
 	void testGetResponse() {
 		UUID id = UUID.randomUUID();
-		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
+		when(responseRepository.findByUuid(id)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
 	}
 
 	@Test
 	void testGetResponseNoResponse() {
 		UUID id = UUID.randomUUID();
-		when(responseRepository.findById(id)).thenReturn(Mono.empty());
+		when(responseRepository.findByUuid(id)).thenReturn(Mono.empty());
+		StepVerifier.create(responseService.getResponse(id)).expectComplete().verify();
+	}
+	
+	@Test
+	void testGetResponseError() {
+		UUID id = UUID.randomUUID();
+		when(responseRepository.findByUuid(id)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
 	}
 
@@ -224,18 +231,20 @@ public class ResponseServiceTest {
 	void testUpdateResponseExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
+		response.setUuid(id);
+		Mono<Response> responseMono = Mono.just(response);
+		when(responseRepository.findByUuid(id)).thenReturn(responseMono);
 		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
+		StepVerifier.create(responseService.updateResponse(id, response)).expectNext(new Response()).expectComplete().verify();
 	}
 
 	@Test
 	void testUpdateResponseDoesNotExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		when(responseRepository.findById(id)).thenReturn(Mono.empty());
+		when(responseRepository.findByUuid(id)).thenReturn(Mono.empty());
 		when(responseRepository.save(response)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
+		StepVerifier.create(responseService.updateResponse(id, response)).expectError().verify();
 	}
 
 	@Test
