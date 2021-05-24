@@ -50,7 +50,7 @@ public class ResponseController {
 	public Flux<ResponseEntity<Response>> addResponses(@RequestParam ("csv") Boolean csv, 
 			@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId, 
 			@RequestBody Flux<Response> responses) {
-		if (csv == true) {
+		if (Boolean.TRUE.equals(csv)) {
 			return responseService.addResponsesFromFile(fileFlux, surveyId).map(
 					response -> ResponseEntity.ok().body(response))
 					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
@@ -60,22 +60,6 @@ public class ResponseController {
 					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 		}
 	}
-	
-//	@PostMapping(params = {"csv"})
-//	public Flux<ResponseEntity<Response>> addedResponses(@RequestParam ("csv") String csv, 
-//			@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId){
-//		return responseService.addResponsesFromFile(fileFlux, surveyId).map(
-//				response -> ResponseEntity.ok().body(response))
-//				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
-//	}
-//	
-//	@PostMapping(params = {"single"})
-//	public Flux<ResponseEntity<Response>> addedResponse(@RequestParam ("single") String single, 
-//			@RequestBody Flux<Response> response){
-//		return responseService.addResponses(response).map(
-//				resp -> ResponseEntity.ok().body(resp))
-//				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));	
-//	}
 	
 	@PutMapping("/{id}")
 	public Mono<ResponseEntity<Response>> updateResponse(@PathVariable UUID id, @RequestBody Response response){

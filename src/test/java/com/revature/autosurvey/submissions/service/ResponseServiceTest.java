@@ -71,7 +71,7 @@ public class ResponseServiceTest {
 		}
 	
 	@Test
-	public void addResponsesReturnsFluxResponses() {
+	void addResponsesReturnsFluxResponses() {
 		Response response = responses.get(0);
 		Mono<Response> responseMono = Mono.just(response);
 		Flux<Response> responseFlux = responseMono.flux();
@@ -82,7 +82,7 @@ public class ResponseServiceTest {
 	}
 	
 	@Test
-	public void addResponseReturnsMonoResponse() {
+	void addResponseReturnsMonoResponse() {
 		Response response = responses.get(0);
 		Mono<Response> responseMono = Mono.just(response);
 		
@@ -92,7 +92,7 @@ public class ResponseServiceTest {
 	}
 	
 	@Test
-	public void buildResponseFromCsvLineReturnsResponse() {
+	void buildResponseFromCsvLineReturnsResponse() {
 		Response res = new Response();
 		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
 		Map<String,String> questions = new HashMap<>();
@@ -113,32 +113,32 @@ public class ResponseServiceTest {
 	}
 	
 	@Test
-	public void addResponsesFromFileReturns() {
+	void addResponsesFromFileReturns() {
 		//I do not know how to generate a Flux<FilePart> so I gotta figure that out to write this test
 	}
 	
 	@Test
-	public void getTrainingWeekFromStringReturnsTrainingWeekEnum() {
+	void getTrainingWeekFromStringReturnsTrainingWeekEnum() {
 		String weekString = "Week A";
 		assertEquals(TrainingWeek.A, responseService.getTrainingWeekFromString(weekString));
 	}
 
 	@Test
-	public void testGetResponse() {
+	void testGetResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseService.getResponse(id)).expectNext(new Response()).expectComplete().verify();
 	}
 
 	@Test
-	public void testGetResponseNoResponse() {
+	void testGetResponseNoResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseRepository.findById(id)).thenReturn(Mono.empty());
 		StepVerifier.create(responseService.getResponse(id)).expectError().verify();
 	}
 
 	@Test
-	public void testUpdateResponseExists() {
+	void testUpdateResponseExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseRepository.findById(id)).thenReturn(Mono.just(new Response()));
@@ -147,7 +147,7 @@ public class ResponseServiceTest {
 	}
 
 	@Test
-	public void testUpdateResponseDoesNotExists() {
+	void testUpdateResponseDoesNotExists() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseRepository.findById(id)).thenReturn(Mono.empty());
@@ -168,7 +168,7 @@ public class ResponseServiceTest {
 	}
 
 	@Test
-	public void testGetAllResponsesByBatch() {
+	void testGetAllResponsesByBatch() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		testResponse1.setBatch("Batch 23");

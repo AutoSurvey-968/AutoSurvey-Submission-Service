@@ -75,40 +75,32 @@ public class ResponseServiceImpl implements ResponseService {
 		});
 	}
 
+	public List<String> bigSplit(String string) {
+		String[] stringArr = string.split(",");
+		List<String> stringList = new ArrayList<>(Arrays.asList(stringArr));
+		Boolean truthFlag = true;
+		while (Boolean.TRUE.equals(truthFlag)) {
+			truthFlag = false;
+			for (int i = 0; i < stringList.size(); i++) {
+				if (!stringList.get(i).isEmpty() && stringList.get(i).charAt(0) == 34 && stringList.get(i).charAt(stringList.get(i).length()-1) != 34) {
+					stringList.set(i, stringList.get(i) + "," + stringList.get(i + 1));
+					stringList.remove(i + 1);
+					truthFlag = true;
+					break;
+				}
+			}
+		}
+		return stringList;
+	}
+	
 	@Override
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId) {
 		Response response = new Response();
 		Map<String, String> responseMap = new HashMap<>();
 		
-		String[] questions = questionLine.split(",");
-		List<String> questionsString = new ArrayList<>(Arrays.asList(questions));
-		Boolean truthFlag = true;
-		while (truthFlag) {
-			truthFlag = false;
-			for (int i = 0; i < questionsString.size(); i++) {
-				if (questionsString.get(i).charAt(0) == 34 && questionsString.get(i).charAt(questionsString.get(i).length()-1) != 34) {
-					questionsString.set(i, questionsString.get(i) + "," + questionsString.get(i + 1));
-					questionsString.remove(i + 1);
-					truthFlag = true;
-					break;
-				}
-			}
-		}
+		List<String> questionsString = bigSplit(questionLine);
+		List<String> answersString = bigSplit(csvLine);
 		
-		String[] answers = csvLine.split(",");
-		List<String> answersString = new ArrayList<>(Arrays.asList(answers));
-		truthFlag = true;
-		while (truthFlag) {
-			truthFlag = false;
-			for (int i = 0; i < answersString.size(); i++) {
-				if (!answersString.get(i).isEmpty() && answersString.get(i).charAt(0) == 34 && answersString.get(i).charAt(answersString.get(i).length()-1) != 34) {
-					answersString.set(i, answersString.get(i) + "," + answersString.get(i + 1));
-					answersString.remove(i + 1);
-					truthFlag = true;
-					break;
-				}
-			}
-		}
 		for (int i = 0; i < answersString.size(); i++) {
 			if (!answersString.get(i).isEmpty()) {
 				responseMap.put(questionsString.get(i), answersString.get(i));
@@ -157,8 +149,8 @@ public class ResponseServiceImpl implements ResponseService {
 		case "Week 8" : return TrainingWeek.EIGHT;
 		case "Week 9" : return TrainingWeek.NINE;
 		case "Week 10" : return TrainingWeek.TEN;
+		default : return null;
 		}
-		return null;
 	}
 		
 	@Override
