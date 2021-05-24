@@ -1,8 +1,9 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.util.List;
 import java.util.UUID;
 
-import org.reactivestreams.Publisher;
+import org.springframework.http.codec.multipart.FilePart;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
@@ -23,7 +24,17 @@ public interface ResponseService {
 
 	public Mono<Response> deleteResponse(UUID uuid);
 
-	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyUuid);
+	public Flux<Response> getResponsesByWeek(TrainingWeek eight);
 
-	public Publisher getResponsesByWeek(TrainingWeek eight);
+	public Mono<Response> addResponse(Response response);
+
+	public Flux<Response> addResponses(Flux<Response> responses);
+
+	public Flux<Response> addResponses(List<Response> responses);
+
+	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
+
+	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId);
+
+	public TrainingWeek getTrainingWeekFromString(String weekString);
 }
