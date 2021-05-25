@@ -41,8 +41,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> addResponses(Flux<Response> responses) {
-		Flux<Response> result = responseRepository.saveAll(responses);
-		return result;
+		return responseRepository.saveAll(responses);
 	}
 	
 	@Override
