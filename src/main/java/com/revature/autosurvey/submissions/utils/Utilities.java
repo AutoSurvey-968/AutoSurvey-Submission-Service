@@ -51,11 +51,8 @@ public class Utilities {
 	}
 	
 	public Flux<String> readStringFromFile(FilePart file) {
-		System.out.println("hi");
 		return file.content().map(buffer -> {
-			System.out.println("hi2");
 			byte[] bytes = new byte[buffer.readableByteCount()];
-			System.out.println("hi3");
 			System.out.println(buffer);
 			buffer.read(bytes);
 			DataBufferUtils.release(buffer);

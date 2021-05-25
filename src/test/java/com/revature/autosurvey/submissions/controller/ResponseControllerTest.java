@@ -152,4 +152,49 @@ public class ResponseControllerTest {
 		.verify();
 	}
 	
+	@Test
+	void testAddResponsesFluxEmpty() {
+		Flux<Response> emtpyFlux = Flux.empty();
+		when(responseService.addResponses(emtpyFlux)).thenReturn(emtpyFlux);
+		StepVerifier.create(responseController.addResponses(emtpyFlux))
+		.expectComplete()
+		.verify();
+		
+	}
+	
+	@Test
+	void testAddResponsesFluxOneResponse() {
+		Flux<Response> responseFlux = Flux.just(new Response());
+		when(responseService.addResponses(responseFlux)).thenReturn(responseFlux);
+		StepVerifier.create(responseController.addResponses(responseFlux))
+		.expectNext(ResponseEntity.ok().body(new Response()))
+		.expectComplete()
+		.verify();
+		
+	}
+	
+	@Test
+	void testAddResponsesFluxMultipleResponses() {
+		Flux<Response> responseFlux = Flux.fromArray(new Response[] {new Response(), new Response(), new Response()});
+		when(responseService.addResponses(responseFlux)).thenReturn(responseFlux);
+		StepVerifier.create(responseController.addResponses(responseFlux))
+		.expectNext(ResponseEntity.ok().body(new Response()))
+		.expectNext(ResponseEntity.ok().body(new Response()))
+		.expectNext(ResponseEntity.ok().body(new Response()))
+		.expectComplete()
+		.verify();
+		
+	}
+	
+	@Test
+	void testAddResponsesFluxError() {
+		Flux<Response> responseFlux = Flux.just(new Response());
+		when(responseService.addResponses(responseFlux)).thenReturn(Flux.error(new Exception()));
+		StepVerifier.create(responseController.addResponses(responseFlux))
+		.expectNext(ResponseEntity.badRequest().body(new Response()))
+		.expectComplete()
+		.verify();
+		
+	}
+	
 }
