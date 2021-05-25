@@ -48,13 +48,6 @@ public class ResponseServiceTest {
 		public ResponseRepository getResponseRepository() {
 			return Mockito.mock(ResponseRepository.class);
 		}
-
-		@Bean
-		public Utilities getUtilities() {
-			Utilities utilities = new Utilities();
-			return utilities;
-		}
-
 	}
 
 	@Autowired
