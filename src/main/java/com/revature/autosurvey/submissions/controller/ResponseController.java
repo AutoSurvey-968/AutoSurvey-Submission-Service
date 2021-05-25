@@ -26,7 +26,7 @@ public class ResponseController {
 	private ResponseService responseService;
 	
 	@Autowired
-	public void setResponceService(ResponseService responseService) {
+	public void setResponseService(ResponseService responseService) {
 		this.responseService = responseService;
 	}
 	

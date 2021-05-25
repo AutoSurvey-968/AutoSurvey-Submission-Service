@@ -31,7 +31,7 @@ public class ResponseControllerTest {
 		@Bean
 		public ResponseController getResponseController(ResponseService responseService) {
 			ResponseController responseController = new ResponseController();
-			responseController.setResponceService(responseService);
+			responseController.setResponseService(responseService);
 			return responseController;
 		}
 		
