@@ -3,6 +3,6 @@ WORKDIR /app
 
 COPY target/submission-service.jar .
 COPY src/main/resources/cassandra_truststore.jks src/main/resources/
-EXPOSE 8081
+EXPOSE 8080
 
 CMD [ "java", "-jar", "submission-service.jar" ]
