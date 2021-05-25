@@ -131,10 +131,10 @@ public class ResponseServiceTest {
 		answerList.add("3/3/2020  14:08:17");
 		answerList.add("Mock Batch 45");
 		answerList.add("Week A");
-		when(Utilities.getTrainingWeekFromString(weekString)).thenReturn(TrainingWeek.A);
-		when(Utilities.timeLongFromString(timeString)).thenReturn(1583244497000L);
-		when(Utilities.bigSplit(questionLine)).thenReturn(questionList);
-		when(Utilities.bigSplit(csvLine)).thenReturn(answerList);
+		//when(Utilities.getTrainingWeekFromString(weekString)).thenReturn(TrainingWeek.A);
+		//when(Utilities.timeLongFromString(timeString)).thenReturn(1583244497000L);
+		//when(Utilities.bigSplit(questionLine)).thenReturn(questionList);
+		//when(Utilities.bigSplit(csvLine)).thenReturn(answerList);
 
 		assertEquals(res, responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId));
 	}
