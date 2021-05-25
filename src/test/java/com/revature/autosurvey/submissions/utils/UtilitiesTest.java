@@ -15,7 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 @ExtendWith(SpringExtension.class)
-public class UtilitiesTest {
+class UtilitiesTest {
 
 	@TestConfiguration
 	static class Configuration {
