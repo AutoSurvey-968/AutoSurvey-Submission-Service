@@ -22,7 +22,12 @@ import reactor.core.publisher.Mono;
 @Service
 public class ResponseServiceImpl implements ResponseService {
 	private ResponseRepository responseRepository;
-	private Utilities utilities = new Utilities();
+	private Utilities utilities;
+	
+	@Autowired
+	public void setUtilities(Utilities utilities) {
+		this.utilities = utilities;
+	}
 
 	@Autowired
 	public void setResponseRepository(ResponseRepository responseRepository) {
