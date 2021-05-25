@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.http.codec.multipart.FilePart;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
+import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,6 +15,8 @@ import reactor.core.publisher.Mono;
 public interface ResponseService {
 
 	public void setResponseRepository(ResponseRepository responseRepository);
+	
+	public void setUtilities(Utilities utilities);
 
 	public Mono<Response> getResponse(UUID uuid);
 
@@ -29,13 +31,8 @@ public interface ResponseService {
 	public Flux<Response> addResponses(Flux<Response> responses);
 	public Flux<Response> addResponses(List<Response> responses);
 	
-	public Long timeLongFromString(String timeString);
-	
-	public List<String> bigSplit(String string);
-	
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
 	
 	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId);
 	
-	public TrainingWeek getTrainingWeekFromString(String weekString);
 }
