@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -98,17 +101,24 @@ public class ResponseServiceImpl implements ResponseService {
 		return stringList;
 	}
 	
+//	@Override
+//	public Long timeLongFromString(String timeString) {
+//		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+//		Date date = null;
+//		try {
+//			date = format.parse(timeString);
+//		} catch (ParseException e) {
+//			e.printStackTrace();
+//		}
+//		Long timeMs = date.getTime();
+//		return timeMs;
+//	}
+	
 	@Override
-	public Long timeLongFromString(String timeString) {
-		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-		Date date = null;
-		try {
-			date = format.parse(timeString);
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-		Long timeMs = date.getTime();
-		return timeMs;
+	public Long timeLongFromString(String string) {
+		DateTimeFormatter formatDateTime = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss");
+        LocalDateTime localDateTime = LocalDateTime.from(formatDateTime.parse(string));
+        return localDateTime.toEpochSecond(ZoneOffset.UTC);
 	}
 	
 	@Override
