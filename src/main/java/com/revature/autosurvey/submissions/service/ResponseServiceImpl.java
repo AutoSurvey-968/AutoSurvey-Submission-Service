@@ -1,22 +1,15 @@
 package com.revature.autosurvey.submissions.service;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -105,19 +98,6 @@ public class ResponseServiceImpl implements ResponseService {
 		return stringList;
 	}
 	
-//	@Override
-//	public Long timeLongFromString(String timeString) {
-//		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-//		Date date = null;
-//		try {
-//			date = format.parse(timeString);
-//		} catch (ParseException e) {
-//			e.printStackTrace();
-//		}
-//		Long timeMs = date.getTime();
-//		return timeMs;
-//	}
-	
 	@Override
 
 	public Long timeLongFromString(String timeString) {
@@ -125,8 +105,7 @@ public class ResponseServiceImpl implements ResponseService {
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("M/d/yyyy HH:mm:ss");
 		LocalDateTime ldate = null;
 			ldate = LocalDateTime.parse(timeString, dtf);
-		Long timeMs = ldate.toInstant(ZoneOffset.ofHours(0)).toEpochMilli();
-		return timeMs;
+		return ldate.toInstant(ZoneOffset.ofHours(0)).toEpochMilli();
 	}
 	
 	@Override
