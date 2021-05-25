@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
@@ -123,6 +124,32 @@ public class ResponseControllerTest {
 		.expectNext(ResponseEntity.ok(testResponse1))
 		.expectNext(ResponseEntity.ok(testResponse2))
 		.verifyComplete();
+	}
+	
+	@Test
+	void testAddResponsesCSV() {
+		FilePart filePart = Mockito.mock(FilePart.class);
+		UUID id = UUID.randomUUID();
+		Flux<FilePart> fileFlux = Flux.just(filePart);
+		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.fromArray(new Response[]{new Response(), new Response(), new Response()}));
+		StepVerifier.create(responseController.addResponses(fileFlux, id))
+		.expectNext(ResponseEntity.ok().body(new Response()))
+		.expectNext(ResponseEntity.ok().body(new Response()))
+		.expectNext(ResponseEntity.ok().body(new Response()))
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	void testAddResponsesCSVError() {
+		FilePart filePart = Mockito.mock(FilePart.class);
+		UUID id = UUID.randomUUID();
+		Flux<FilePart> fileFlux = Flux.just(filePart);
+		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.error(new Exception()));
+		StepVerifier.create(responseController.addResponses(fileFlux, id))
+		.expectNext(ResponseEntity.badRequest().body(new Response()))
+		.expectComplete()
+		.verify();
 	}
 	
 }
