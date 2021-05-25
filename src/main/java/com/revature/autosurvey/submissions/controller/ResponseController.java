@@ -23,7 +23,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/submission")
 public class ResponseController {
 	private ResponseService responseService;
 	
