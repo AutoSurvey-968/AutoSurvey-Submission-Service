@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.utils;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +22,7 @@ public class Utilities {
 		throw new IllegalStateException("Utility class");
 	}
 
-	private static Random rand = new Random();
+	private static Random rand = new SecureRandom();
 
 	public static int getRandomNumber(int min, int max) {
 		int bound = max - min;
