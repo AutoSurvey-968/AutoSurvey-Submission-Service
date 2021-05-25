@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
@@ -195,4 +196,51 @@ public class ResponseServiceTest {
 		.expectNextMatches(response -> response.getBatch().equals(testBatch))
 		.verifyComplete();
 	}
+	
+	@Test
+	void testAddResponsesOneResponse() {
+		Flux<Response> responseFlux = Flux.just(new Response());
+		when(responseRepository.saveAll(responseFlux)).thenReturn(responseFlux);
+		StepVerifier.create(responseService.addResponses(responseFlux))
+		.expectNext(new Response())
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	void testAddResponsesMultipleResponses() {
+		Flux<Response> responseFlux = Flux.fromArray(new Response[] {new Response(), new Response(), new Response()});
+		when(responseRepository.saveAll(responseFlux)).thenReturn(responseFlux);
+		StepVerifier.create(responseService.addResponses(responseFlux))
+		.expectNext(new Response())
+		.expectNext(new Response())
+		.expectNext(new Response())
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	void testAddResponsesEmpty() {
+		Flux<Response> emtpyFlux = Flux.empty();
+		when(responseRepository.saveAll(emtpyFlux)).thenReturn(emtpyFlux);
+		StepVerifier.create(responseService.addResponses(emtpyFlux))
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	void testAddResponsesReturnError() {
+		Flux<Response> responseFlux = Flux.just(new Response());
+		when(responseRepository.saveAll(responseFlux)).thenReturn(Flux.error(new Exception()));
+		StepVerifier.create(responseService.addResponses(responseFlux))
+		.expectError()
+		.verify();
+	}
+	
+	//@Test
+	//void testAddResponsesFromFile() {
+	//	Flux<FilePart> fileFlux;
+	//	UUID id = UUID.randomUUID();
+	//	when(fileFlux.flatMap(any())).thenReturn("any");
+	//}
 }
