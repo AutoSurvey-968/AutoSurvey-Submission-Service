@@ -13,12 +13,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface ResponseRepository extends ReactiveCassandraRepository<Response, UUID>{
+public interface ResponseRepository extends ReactiveCassandraRepository<Response, UUID> {
 	@AllowFiltering
 	public Mono<Response> findByUuid(UUID uuid);
+
 	public Flux<Response> findAllByBatch(String batch);
+
 	@AllowFiltering
 	public Flux<Response> findAllByWeek(TrainingWeek week);
+
 	@AllowFiltering
 	Mono<Response> deleteByUuid(UUID uuid);
 }

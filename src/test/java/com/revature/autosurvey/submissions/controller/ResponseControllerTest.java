@@ -3,6 +3,7 @@ package com.revature.autosurvey.submissions.controller;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 
 import com.revature.autosurvey.submissions.beans.Response;
+import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.service.ResponseService;
 
 import reactor.core.publisher.Flux;
@@ -50,7 +52,7 @@ public class ResponseControllerTest {
 	void testGetResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseController.getResponses(null, null, id))
+		StepVerifier.create(responseController.getResponses(null, null, Optional.of(id)))
 			.expectNext(ResponseEntity.ok().body(new Response()))
 			.expectComplete()
 			.verify();
@@ -60,7 +62,7 @@ public class ResponseControllerTest {
 	void testGetEmptyResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.empty());
-		StepVerifier.create(responseController.getResponses(null, null, id))
+		StepVerifier.create(responseController.getResponses(null, null, Optional.of(id)))
 			.expectNext(ResponseEntity.notFound().build())
 			.expectComplete()
 			.verify();
@@ -70,7 +72,7 @@ public class ResponseControllerTest {
 	void testGetErrorResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.getResponses(null, null, id))
+		StepVerifier.create(responseController.getResponses(null, null, Optional.of(id)))
 			.expectNext(ResponseEntity.badRequest().body(new Response()))
 			.expectComplete()
 			.verify();
@@ -111,16 +113,45 @@ public class ResponseControllerTest {
 				.verifyComplete();
 	}
 	
+	/*
+	 * @Test void testGetAllResponsesByBatch() {
+	 * System.out.println("I'm in the batch test"); Response testResponse1 = new
+	 * Response(); Response testResponse2 = new Response(); Optional<String>
+	 * testBatch = Optional.of("Batch 23"); testResponse1.setBatch(testBatch.get());
+	 * testResponse2.setBatch(testBatch.get());
+	 * when(responseService.getResponsesByBatch(testBatch.get())).thenReturn(Flux.
+	 * just(testResponse1, testResponse2));
+	 * StepVerifier.create(responseController.getResponses(testBatch, null, null))
+	 * .expectNext(ResponseEntity.ok(testResponse1))
+	 * .expectNext(ResponseEntity.ok(testResponse2)) .verifyComplete(); }
+	 */
+	
 	@Test
-	void testGetAllResponsesByBatch() {
+	void testGetAllResponsesByWeek() {
+		System.out.println("I'm in the week test");
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		String testBatch = "Batch 23";
-		testResponse1.setBatch(testBatch);
-		testResponse2.setBatch(testBatch);
-		String batch = "Batch 23";
-		when(responseService.getResponsesByBatch(batch)).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(batch , null, null))
+		testResponse1.setWeek(TrainingWeek.EIGHT);
+		testResponse2.setWeek(TrainingWeek.EIGHT);
+		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseController.getResponses(null, Optional.of("Week 8"), null))
+		.expectNext(ResponseEntity.ok(testResponse1))
+		.expectNext(ResponseEntity.ok(testResponse2))
+		.verifyComplete();
+	}
+	
+	@Test
+	void testGetAllResponsesByBatchAndWeek() {
+		System.out.println("I'm in the batchweek test");
+		Response testResponse1 = new Response();
+		Response testResponse2 = new Response();
+		Optional<String> testBatch = Optional.of("Batch 23");
+		testResponse1.setBatch(testBatch.get());
+		testResponse2.setBatch(testBatch.get());
+		testResponse1.setWeek(TrainingWeek.EIGHT);
+		testResponse2.setWeek(TrainingWeek.EIGHT);
+		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseController.getResponses(testBatch, Optional.of("Week 8"), null))
 		.expectNext(ResponseEntity.ok(testResponse1))
 		.expectNext(ResponseEntity.ok(testResponse2))
 		.verifyComplete();
