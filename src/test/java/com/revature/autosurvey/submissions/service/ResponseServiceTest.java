@@ -195,4 +195,45 @@ public class ResponseServiceTest {
 		.expectNextMatches(response -> response.getBatch().equals(testBatch))
 		.verifyComplete();
 	}
+	
+	@Test
+	void testAddResponsesOneResponse() {
+		Flux<Response> responseFlux = Flux.just(new Response());
+		when(responseRepository.saveAll(responseFlux)).thenReturn(responseFlux);
+		StepVerifier.create(responseService.addResponses(responseFlux))
+		.expectNext(new Response())
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	void testAddResponsesMultipleResponses() {
+		Flux<Response> responseFlux = Flux.fromArray(new Response[] {new Response(), new Response(), new Response()});
+		when(responseRepository.saveAll(responseFlux)).thenReturn(responseFlux);
+		StepVerifier.create(responseService.addResponses(responseFlux))
+		.expectNext(new Response())
+		.expectNext(new Response())
+		.expectNext(new Response())
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	void testAddResponsesEmpty() {
+		Flux<Response> emtpyFlux = Flux.empty();
+		when(responseRepository.saveAll(emtpyFlux)).thenReturn(emtpyFlux);
+		StepVerifier.create(responseService.addResponses(emtpyFlux))
+		.expectComplete()
+		.verify();
+	}
+	
+	@Test
+	void testAddResponsesReturnError() {
+		Flux<Response> responseFlux = Flux.just(new Response());
+		when(responseRepository.saveAll(responseFlux)).thenReturn(Flux.error(new Exception()));
+		StepVerifier.create(responseService.addResponses(responseFlux))
+		.expectError()
+		.verify();
+	}
+	
 }
