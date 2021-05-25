@@ -24,6 +24,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
+import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,6 +38,8 @@ public class ResponseServiceTest {
 		@Bean
 		public ResponseService getResponseService(ResponseRepository responseRepository) {
 			ResponseService responseService = new ResponseServiceImpl();
+			Utilities utilities = new Utilities();
+			responseService.setUtilities(utilities);
 			responseService.setResponseRepository(responseRepository);
 			return responseService;
 		}
@@ -44,6 +47,12 @@ public class ResponseServiceTest {
 		@Bean
 		public ResponseRepository getResponseRepository() {
 			return Mockito.mock(ResponseRepository.class);
+		}
+		
+		@Bean
+		public Utilities getUtilities() {
+			Utilities utilities = new Utilities();
+			return utilities;
 		}
 	}
 
