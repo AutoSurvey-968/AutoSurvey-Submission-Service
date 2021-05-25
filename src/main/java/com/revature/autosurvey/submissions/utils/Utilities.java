@@ -9,12 +9,15 @@ import java.util.List;
 
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
 import java.util.Random;
 
+@Component
 public class Utilities {
 	private Random rand = new Random();
 	

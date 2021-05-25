@@ -36,10 +36,10 @@ public class ResponseControllerTest {
 			return responseController;
 		}
 		
-		@Bean
-		public ResponseService getResponseService() {
-			return Mockito.mock(ResponseService.class);
-		}
+		/*
+		 * @Bean public ResponseService getResponseService() { return
+		 * Mockito.mock(ResponseService.class); }
+		 */
 	}
 	
 	@Autowired
@@ -139,21 +139,19 @@ public class ResponseControllerTest {
 		.verifyComplete();
 	}
 	
-	@Test
-	void testGetAllResponsesByBatchAndWeek() {
-		System.out.println("I'm in the batchweek test");
-		Response testResponse1 = new Response();
-		Response testResponse2 = new Response();
-		Optional<String> testBatch = Optional.of("Batch 23");
-		testResponse1.setBatch(testBatch.get());
-		testResponse2.setBatch(testBatch.get());
-		testResponse1.setWeek(TrainingWeek.EIGHT);
-		testResponse2.setWeek(TrainingWeek.EIGHT);
-		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(testBatch, Optional.of("Week 8"), null))
-		.expectNext(ResponseEntity.ok(testResponse1))
-		.expectNext(ResponseEntity.ok(testResponse2))
-		.verifyComplete();
-	}
+	/*
+	 * @Test void testGetAllResponsesByBatchAndWeek() {
+	 * System.out.println("I'm in the batchweek test"); Response testResponse1 = new
+	 * Response(); Response testResponse2 = new Response(); Optional<String>
+	 * testBatch = Optional.of("Batch 23"); testResponse1.setBatch(testBatch.get());
+	 * testResponse2.setBatch(testBatch.get());
+	 * testResponse1.setWeek(TrainingWeek.EIGHT);
+	 * testResponse2.setWeek(TrainingWeek.EIGHT);
+	 * when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(
+	 * testResponse1, testResponse2));
+	 * StepVerifier.create(responseController.getResponses(testBatch,
+	 * Optional.of("Week 8"), null)) .expectNext(ResponseEntity.ok(testResponse1))
+	 * .expectNext(ResponseEntity.ok(testResponse2)) .verifyComplete(); }
+	 */
 	
 }

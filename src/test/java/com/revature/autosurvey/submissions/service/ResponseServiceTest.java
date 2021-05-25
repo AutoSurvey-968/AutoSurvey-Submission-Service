@@ -54,6 +54,7 @@ public class ResponseServiceTest {
 			Utilities utilities = new Utilities();
 			return utilities;
 		}
+
 	}
 
 	@Autowired
@@ -61,6 +62,9 @@ public class ResponseServiceTest {
 
 	@MockBean
 	private ResponseRepository responseRepository;
+	
+	@MockBean
+	private Utilities utilities;
 
 	private static List<Response> responses;
 

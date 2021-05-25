@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
+import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Mono;
 @RestController
 public class ResponseController {
 	private ResponseService responseService;
+	private Utilities util;
 
 	@Autowired
 	public void setResponceService(ResponseService responseService) {
@@ -39,7 +41,7 @@ public class ResponseController {
 		System.out.println(week);
 		if (batch.isPresent() && week.isPresent()) {
 			return responseService.getResponsesByBatch(batch.get()).filter(
-					responses -> responses.getWeek().equals(responseService.getTrainingWeekFromString(week.get())))
+					responses -> responses.getWeek().equals(util.getTrainingWeekFromString(week.get())))
 					.map(filtered -> ResponseEntity.ok().body(filtered))
 					.onErrorReturn(ResponseEntity.badRequest().build());
 		}
@@ -51,7 +53,7 @@ public class ResponseController {
 		}
 
 		if (week.isPresent()) {
-			return responseService.getResponsesByWeek(responseService.getTrainingWeekFromString(week.get()))
+			return responseService.getResponsesByWeek(util.getTrainingWeekFromString(week.get()))
 					.map(responses -> ResponseEntity.ok().body(responses))
 					.onErrorReturn(ResponseEntity.badRequest().build());
 		}
