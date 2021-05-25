@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
+import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 import com.revature.autosurvey.submissions.utils.Utilities;
 
@@ -117,6 +118,11 @@ public class ResponseServiceImpl implements ResponseService {
 	@Override
 	public Flux<Response> getResponsesByBatch(String batchName) {		
 		return responseRepository.findAllByBatch(batchName);
+	}
+
+	@Override
+	public Flux<Response> getResponsesByWeek(TrainingWeek tWeek) {
+		return responseRepository.findAllByWeek(tWeek);
 	}
 
 }
