@@ -35,11 +35,6 @@ public class ResponseControllerTest {
 			responseController.setResponceService(responseService);
 			return responseController;
 		}
-		
-		/*
-		 * @Bean public ResponseService getResponseService() { return
-		 * Mockito.mock(ResponseService.class); }
-		 */
 	}
 	
 	@Autowired
@@ -51,7 +46,7 @@ public class ResponseControllerTest {
 	void testGetResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.just(new Response()));
-		StepVerifier.create(responseController.getResponses(null, null, Optional.of(id)))
+		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
 			.expectNext(ResponseEntity.ok().body(new Response()))
 			.expectComplete()
 			.verify();
@@ -61,7 +56,7 @@ public class ResponseControllerTest {
 	void testGetEmptyResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.empty());
-		StepVerifier.create(responseController.getResponses(null, null, Optional.of(id)))
+		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
 			.expectNext(ResponseEntity.notFound().build())
 			.expectComplete()
 			.verify();
@@ -71,7 +66,7 @@ public class ResponseControllerTest {
 	void testGetErrorResponse() {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.getResponses(null, null, Optional.of(id)))
+		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
 			.expectNext(ResponseEntity.badRequest().body(new Response()))
 			.expectComplete()
 			.verify();
@@ -133,7 +128,7 @@ public class ResponseControllerTest {
 		testResponse1.setWeek(TrainingWeek.EIGHT);
 		testResponse2.setWeek(TrainingWeek.EIGHT);
 		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(null, Optional.of("Week 8"), null))
+		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.of("Week 8"), Optional.empty()))
 		.expectNext(ResponseEntity.ok(testResponse1))
 		.expectNext(ResponseEntity.ok(testResponse2))
 		.verifyComplete();
