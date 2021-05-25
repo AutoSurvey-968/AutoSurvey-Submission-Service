@@ -64,22 +64,7 @@ public class ResponseController {
 		return Flux.just(ResponseEntity.badRequest().build());
 	}
 
-//	@PostMapping()
-//	public Flux<ResponseEntity<Response>> addResponses(@RequestParam ("csv") Boolean csv, 
-//			@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId, 
-//			@RequestBody Flux<Response> responses) {
-//		if (Boolean.TRUE.equals(csv)) {
-//			return responseService.addResponsesFromFile(fileFlux, surveyId).map(
-//					response -> ResponseEntity.ok().body(response))
-//					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
-//		} else {
-//			return responseService.addResponses(responses).map(
-//					resp -> ResponseEntity.ok().body(resp))
-//					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
-//		}
-//	}
-
-	@PostMapping("/csv")
+	@PostMapping(consumes = "text/csv")
 	public Flux<ResponseEntity<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
 			@RequestPart("surveyId") UUID surveyId) {
 		return responseService.addResponsesFromFile(fileFlux, surveyId)
@@ -87,7 +72,7 @@ public class ResponseController {
 				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 	}
 
-	@PostMapping("/bodyResponses")
+	@PostMapping(consumes = "application/json")
 	public Flux<ResponseEntity<Response>> addResponses(@RequestBody Flux<Response> responses) {
 		return responseService.addResponses(responses).map(resp -> ResponseEntity.ok().body(resp))
 				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
