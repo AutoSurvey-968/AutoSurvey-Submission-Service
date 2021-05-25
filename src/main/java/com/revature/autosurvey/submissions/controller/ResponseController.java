@@ -51,19 +51,33 @@ public class ResponseController {
 		}
 	}
 	
-	@PostMapping()
-	public Flux<ResponseEntity<Response>> addResponses(@RequestParam ("csv") Boolean csv, 
-			@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId, 
-			@RequestBody Flux<Response> responses) {
-		if (Boolean.TRUE.equals(csv)) {
-			return responseService.addResponsesFromFile(fileFlux, surveyId).map(
-					response -> ResponseEntity.ok().body(response))
-					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
-		} else {
-			return responseService.addResponses(responses).map(
-					resp -> ResponseEntity.ok().body(resp))
-					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
-		}
+//	@PostMapping()
+//	public Flux<ResponseEntity<Response>> addResponses(@RequestParam ("csv") Boolean csv, 
+//			@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId, 
+//			@RequestBody Flux<Response> responses) {
+//		if (Boolean.TRUE.equals(csv)) {
+//			return responseService.addResponsesFromFile(fileFlux, surveyId).map(
+//					response -> ResponseEntity.ok().body(response))
+//					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+//		} else {
+//			return responseService.addResponses(responses).map(
+//					resp -> ResponseEntity.ok().body(resp))
+//					.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+//		}
+//	}
+	
+	@PostMapping("/csv")
+	public Flux<ResponseEntity<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId) {
+		return responseService.addResponsesFromFile(fileFlux, surveyId).map(
+				response -> ResponseEntity.ok().body(response))
+				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+	}
+	
+	@PostMapping("/bodyResponses")
+	public Flux<ResponseEntity<Response>> addResponses(@RequestBody Flux<Response> responses) {
+		return responseService.addResponses(responses).map(
+				resp -> ResponseEntity.ok().body(resp))
+				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 	}
 	
 	@PutMapping("/{id}")
@@ -71,12 +85,6 @@ public class ResponseController {
 		return responseService.updateResponse(id, response).map(updatedResponse -> ResponseEntity.ok().body(response))
 				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 	}
-	
-//	@DeleteMapping("/{id}")
-//	public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable UUID id){
-//		return responseService.deleteResponse(id).thenReturn(ResponseEntity.noContent().build())
-//				.onErrorReturn(ResponseEntity.badRequest().build());
-//	}
 	
 	@DeleteMapping("{id}")
     public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable("id") UUID uuid) {
