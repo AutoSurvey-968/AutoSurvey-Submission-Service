@@ -106,7 +106,7 @@ public class ResponseServiceTest {
 	@Test
 	void timeLongFromStringReturnsTimeLong() {
 		String string = "3/3/2020  14:08:17";
-		Long timeLong = 1583273297000L;
+		Long timeLong = 1583244497000L;
 		
 		assertEquals(timeLong, responseService.timeLongFromString(string));
 	}
@@ -125,7 +125,7 @@ public class ResponseServiceTest {
 		res.setResponses(questions);
 		res.setWeek(TrainingWeek.A);
 		res.setBatch("Mock Batch 45");
-		res.setUuid(Uuids.startOf(1583273297000L));		
+		res.setUuid(Uuids.startOf(1583244497000L));		
 		
 		String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A";
 		String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
