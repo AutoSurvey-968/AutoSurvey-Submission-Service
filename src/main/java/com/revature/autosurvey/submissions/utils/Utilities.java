@@ -15,16 +15,15 @@ import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import reactor.core.publisher.Flux;
 import java.util.Random;
 
-@Component
 public class Utilities {
-	private Random rand = new Random();
+	private static Random rand = new Random();
 	
-	public int getRandomNumber(int min, int max) {
+	public static int getRandomNumber(int min, int max) {
 		int bound = max - min;
 		return rand.nextInt(bound) + min;
 	}
 	
-	public Long timeLongFromString(String timeString) {
+	public static Long timeLongFromString(String timeString) {
 		timeString = String.join(" ", timeString.split("\\s+"));
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("M/d/yyyy HH:mm:ss");
 		LocalDateTime ldate = null;
@@ -33,7 +32,7 @@ public class Utilities {
 		return ldate.toInstant(ZoneOffset.ofHours(0)).toEpochMilli() + millis;
 	}
 	
-	public List<String> bigSplit(String string) {
+	public static List<String> bigSplit(String string) {
 		String[] stringArr = string.split(",");
 		List<String> stringList = new ArrayList<>(Arrays.asList(stringArr));
 		Boolean truthFlag = true;
@@ -51,7 +50,7 @@ public class Utilities {
 		return stringList;
 	}
 	
-	public Flux<String> readStringFromFile(FilePart file) {
+	public static Flux<String> readStringFromFile(FilePart file) {
 		return file.content().map(buffer -> {
 			byte[] bytes = new byte[buffer.readableByteCount()];
 			buffer.read(bytes);
@@ -61,7 +60,7 @@ public class Utilities {
 		});
 	}
 	
-	public TrainingWeek getTrainingWeekFromString(String weekString) {
+	public static TrainingWeek getTrainingWeekFromString(String weekString) {
 		switch (weekString) {
 		case "Week A" : return TrainingWeek.A;
 		case "Week B" : return TrainingWeek.B;

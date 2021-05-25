@@ -26,16 +26,10 @@ import reactor.core.publisher.Mono;
 @RestController
 public class ResponseController {
 	private ResponseService responseService;
-	private Utilities util;
 
 	@Autowired
-	public void setResponceService(ResponseService responseService) {
+	public void setResponseService(ResponseService responseService) {
 		this.responseService = responseService;
-	}
-
-	@Autowired
-	public void setUtilities(Utilities utilities) {
-		this.util = utilities;
 	}
 
 	@GetMapping
@@ -55,7 +49,7 @@ public class ResponseController {
 		}
 
 		if (week.isPresent()) {
-			return responseService.getResponsesByWeek(util.getTrainingWeekFromString(week.get()))
+			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()))
 					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
 		}
 

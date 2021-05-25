@@ -36,9 +36,8 @@ public class ResponseServiceTest {
 	@TestConfiguration
 	static class Configuration {
 		@Bean
-		public ResponseService getResponseService(ResponseRepository responseRepository, Utilities utilities) {
-			ResponseService responseService = new ResponseServiceImpl();
-			responseService.setUtilities(utilities);
+		public ResponseServiceImpl getResponseService(ResponseRepository responseRepository) {
+			ResponseServiceImpl responseService = new ResponseServiceImpl();
 			responseService.setResponseRepository(responseRepository);
 			return responseService;
 		}
@@ -47,21 +46,13 @@ public class ResponseServiceTest {
 		public ResponseRepository getResponseRepository() {
 			return Mockito.mock(ResponseRepository.class);
 		}
-
-		@Bean
-		public Utilities getUtilities() {
-			return Mockito.mock(Utilities.class);
-		}
 	}
 
 	@Autowired
-	private ResponseService responseService;
+	private ResponseServiceImpl responseService;
 
 	@MockBean
 	private ResponseRepository responseRepository;
-
-	@MockBean
-	private Utilities utilities;
 
 	private static List<Response> responses;
 
@@ -140,10 +131,10 @@ public class ResponseServiceTest {
 		answerList.add("3/3/2020  14:08:17");
 		answerList.add("Mock Batch 45");
 		answerList.add("Week A");
-		when(utilities.getTrainingWeekFromString(weekString)).thenReturn(TrainingWeek.A);
-		when(utilities.timeLongFromString(timeString)).thenReturn(1583244497000L);
-		when(utilities.bigSplit(questionLine)).thenReturn(questionList);
-		when(utilities.bigSplit(csvLine)).thenReturn(answerList);
+		when(Utilities.getTrainingWeekFromString(weekString)).thenReturn(TrainingWeek.A);
+		when(Utilities.timeLongFromString(timeString)).thenReturn(1583244497000L);
+		when(Utilities.bigSplit(questionLine)).thenReturn(questionList);
+		when(Utilities.bigSplit(csvLine)).thenReturn(answerList);
 
 		assertEquals(res, responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId));
 	}

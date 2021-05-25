@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.service.ResponseService;
+import com.revature.autosurvey.submissions.service.ResponseServiceImpl;
 import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
@@ -30,22 +32,24 @@ public class ResponseControllerTest {
 	@TestConfiguration
 	static class Configuration {
 		@Bean
-		public ResponseController getResponseController(ResponseService responseService, Utilities utilities) {
-			ResponseController responseController = new ResponseController();
-			responseService.setUtilities(utilities);
-			responseController.setResponceService(responseService);
-			return responseController;
+		public ResponseController getResponseController(ResponseService rs) {
+			ResponseController rc = new ResponseController();
+			rc.setResponseService(rs);
+			return rc;
 		}
+		
+		@Bean
+		public ResponseService getService() {
+			return Mockito.mock(ResponseService.class);
+		}
+		
 	}
 
 	@Autowired
 	private ResponseController responseController;
-
+	
 	@MockBean
 	private ResponseService responseService;
-
-	@MockBean
-	private Utilities util;
 
 	@Test
 	void testGetResponse() {

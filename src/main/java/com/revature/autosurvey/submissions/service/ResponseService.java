@@ -15,10 +15,6 @@ import reactor.core.publisher.Mono;
 
 public interface ResponseService {
 
-	public void setResponseRepository(ResponseRepository responseRepository);
-
-	public void setUtilities(Utilities utilities);
-
 	public Mono<Response> getResponse(UUID uuid);
 
 	public Mono<Response> updateResponse(UUID uuid, Response response);

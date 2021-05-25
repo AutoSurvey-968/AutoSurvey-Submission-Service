@@ -23,12 +23,6 @@ import reactor.core.publisher.Mono;
 @Service
 public class ResponseServiceImpl implements ResponseService {
 	private ResponseRepository responseRepository;
-	private Utilities utilities;
-	
-	@Autowired
-	public void setUtilities(Utilities utilities) {
-		this.utilities = utilities;
-	}
 
 	@Autowired
 	public void setResponseRepository(ResponseRepository responseRepository) {
@@ -76,8 +70,8 @@ public class ResponseServiceImpl implements ResponseService {
 		Response response = new Response();
 		Map<String, String> responseMap = new HashMap<>();
 		
-		List<String> questionsString = utilities.bigSplit(questionLine);
-		List<String> answersString = utilities.bigSplit(csvLine);
+		List<String> questionsString = Utilities.bigSplit(questionLine);
+		List<String> answersString = Utilities.bigSplit(csvLine);
 		
 		for (int i = 0; i < answersString.size(); i++) {
 			if (!answersString.get(i).isEmpty()) {
@@ -87,16 +81,16 @@ public class ResponseServiceImpl implements ResponseService {
 		response.setBatch(responseMap.get("What batch are you in?"));
 		response.setSurveyUuid(surveyId);
 		String weekString = responseMap.get("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
-		response.setWeek(utilities.getTrainingWeekFromString(weekString));
+		response.setWeek(Utilities.getTrainingWeekFromString(weekString));
 		response.setResponses(responseMap);
 		String timeString = responseMap.get("Timestamp");
-		response.setUuid(Uuids.startOf(utilities.timeLongFromString(timeString)));
+		response.setUuid(Uuids.startOf(Utilities.timeLongFromString(timeString)));
 		return response;
 	}
 	
 	@Override
 	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId){
-		Flux<Response> responsesToAdd = fileFlux.flatMap(utilities::readStringFromFile)
+		Flux<Response> responsesToAdd = fileFlux.flatMap(Utilities::readStringFromFile)
 				.map(string -> {
 					List<Response> responses = new ArrayList<>();
 					String[] lines = string.split("\\r?\\n");
@@ -127,7 +121,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> getResponsesByBatchForWeek(String batch, String week) {
-		return responseRepository.findAllByBatchForWeek(batch, week);
+		return responseRepository.findAllByBatchAndWeek(batch, week);
 	}
 
 }
