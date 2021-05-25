@@ -36,9 +36,8 @@ public class ResponseServiceTest {
 	@TestConfiguration
 	static class Configuration {
 		@Bean
-		public ResponseService getResponseService(ResponseRepository responseRepository) {
+		public ResponseService getResponseService(ResponseRepository responseRepository, Utilities utilities) {
 			ResponseService responseService = new ResponseServiceImpl();
-			Utilities utilities = new Utilities();
 			responseService.setUtilities(utilities);
 			responseService.setResponseRepository(responseRepository);
 			return responseService;
@@ -48,6 +47,11 @@ public class ResponseServiceTest {
 		public ResponseRepository getResponseRepository() {
 			return Mockito.mock(ResponseRepository.class);
 		}
+
+		@Bean
+		public Utilities getUtilities() {
+			return Mockito.mock(Utilities.class);
+		}
 	}
 
 	@Autowired
@@ -55,7 +59,7 @@ public class ResponseServiceTest {
 
 	@MockBean
 	private ResponseRepository responseRepository;
-	
+
 	@MockBean
 	private Utilities utilities;
 
@@ -99,8 +103,11 @@ public class ResponseServiceTest {
 
 	@Test
 	void buildResponseFromCsvLineReturnsResponse() {
-		Response res = new Response();
+		String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A";
+		String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
 		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
+		// Expected response
+		Response res = new Response();
 		Map<String, String> questions = new HashMap<>();
 		res.setSurveyUuid(surveyId);
 		questions.put("question1", "answer1");
@@ -113,14 +120,32 @@ public class ResponseServiceTest {
 		res.setResponses(questions);
 		res.setWeek(TrainingWeek.A);
 		res.setBatch("Mock Batch 45");
+		res.setUuid(UUID.fromString("13814000-1dd2-11b2-8080-808080808080"));
 
-		String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A";
-		String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
+		// Mocking
+		String weekString = "Week A";
+		String timeString = "3/3/2020 14:08:17";
+		List<String> questionList = new ArrayList<>();
+		questionList.add("question1");
+		questionList.add("question2");
+		questionList.add("question3");
+		questionList.add("Timestamp");
+		questionList.add("What batch are you in?");
+		questionList.add(
+				"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
+		List<String> answerList = new ArrayList<>();
+		answerList.add("answer1");
+		answerList.add("answer2");
+		answerList.add("");
+		answerList.add("3/3/2020  14:08:17");
+		answerList.add("Mock Batch 45");
+		answerList.add("Week A");
+		when(utilities.getTrainingWeekFromString(weekString)).thenReturn(TrainingWeek.A);
+		when(utilities.timeLongFromString(timeString)).thenReturn(1583244497000L);
+		when(utilities.bigSplit(questionLine)).thenReturn(questionList);
+		when(utilities.bigSplit(csvLine)).thenReturn(answerList);
 
-		Response responseFromMethod = responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId);
-		res.setUuid(responseFromMethod.getUuid());
-
-		assertEquals(res, responseFromMethod);
+		assertEquals(res, responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId));
 	}
 
 	@Test
@@ -195,45 +220,35 @@ public class ResponseServiceTest {
 				.expectNextMatches(response -> response.getBatch().equals(testBatch))
 				.expectNextMatches(response -> response.getBatch().equals(testBatch)).verifyComplete();
 	}
-	
+
 	@Test
 	void testAddResponsesOneResponse() {
 		Flux<Response> responseFlux = Flux.just(new Response());
 		when(responseRepository.saveAll(responseFlux)).thenReturn(responseFlux);
-		StepVerifier.create(responseService.addResponses(responseFlux))
-		.expectNext(new Response())
-		.expectComplete()
-		.verify();
+		StepVerifier.create(responseService.addResponses(responseFlux)).expectNext(new Response()).expectComplete()
+				.verify();
 	}
-	
+
 	@Test
 	void testAddResponsesMultipleResponses() {
-		Flux<Response> responseFlux = Flux.fromArray(new Response[] {new Response(), new Response(), new Response()});
+		Flux<Response> responseFlux = Flux.fromArray(new Response[] { new Response(), new Response(), new Response() });
 		when(responseRepository.saveAll(responseFlux)).thenReturn(responseFlux);
-		StepVerifier.create(responseService.addResponses(responseFlux))
-		.expectNext(new Response())
-		.expectNext(new Response())
-		.expectNext(new Response())
-		.expectComplete()
-		.verify();
+		StepVerifier.create(responseService.addResponses(responseFlux)).expectNext(new Response())
+				.expectNext(new Response()).expectNext(new Response()).expectComplete().verify();
 	}
-	
+
 	@Test
 	void testAddResponsesEmpty() {
 		Flux<Response> emtpyFlux = Flux.empty();
 		when(responseRepository.saveAll(emtpyFlux)).thenReturn(emtpyFlux);
-		StepVerifier.create(responseService.addResponses(emtpyFlux))
-		.expectComplete()
-		.verify();
+		StepVerifier.create(responseService.addResponses(emtpyFlux)).expectComplete().verify();
 	}
-	
+
 	@Test
 	void testAddResponsesReturnError() {
 		Flux<Response> responseFlux = Flux.just(new Response());
 		when(responseRepository.saveAll(responseFlux)).thenReturn(Flux.error(new Exception()));
-		StepVerifier.create(responseService.addResponses(responseFlux))
-		.expectError()
-		.verify();
+		StepVerifier.create(responseService.addResponses(responseFlux)).expectError().verify();
 	}
 
 	@Test
