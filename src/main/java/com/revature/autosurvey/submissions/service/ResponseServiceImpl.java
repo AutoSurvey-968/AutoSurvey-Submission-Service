@@ -38,7 +38,7 @@ public class ResponseServiceImpl implements ResponseService {
 	public Flux<Response> addResponses(Flux<Response> responses) {
 		return responseRepository.saveAll(responses);
 	}
-	
+
 	@Override
 	public Flux<Response> addResponses(List<Response> responses) {
 		return responseRepository.saveAll(responses);
@@ -64,15 +64,15 @@ public class ResponseServiceImpl implements ResponseService {
 	public Mono<Response> deleteResponse(UUID uuid) {
 		return responseRepository.deleteByUuid(uuid);
 	}
-	
+
 	@Override
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId) {
 		Response response = new Response();
 		Map<String, String> responseMap = new HashMap<>();
-		
+
 		List<String> questionsString = Utilities.bigSplit(questionLine);
 		List<String> answersString = Utilities.bigSplit(csvLine);
-		
+
 		for (int i = 0; i < answersString.size(); i++) {
 			if (!answersString.get(i).isEmpty()) {
 				responseMap.put(questionsString.get(i), answersString.get(i));
@@ -80,37 +80,35 @@ public class ResponseServiceImpl implements ResponseService {
 		}
 		response.setBatch(responseMap.get("What batch are you in?"));
 		response.setSurveyUuid(surveyId);
-		String weekString = responseMap.get("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
+		String weekString = responseMap.get(
+				"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
 		response.setWeek(Utilities.getTrainingWeekFromString(weekString));
 		response.setResponses(responseMap);
 		String timeString = responseMap.get("Timestamp");
 		response.setUuid(Uuids.startOf(Utilities.timeLongFromString(timeString)));
 		return response;
 	}
-	
+
 	@Override
-	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId){
-		Flux<Response> responsesToAdd = fileFlux.flatMap(Utilities::readStringFromFile)
-				.map(string -> {
-					List<Response> responses = new ArrayList<>();
-					String[] lines = string.split("\\r?\\n");
-					for(int i = 1; i < lines.length; i++) {
-						try {
-							Response response = buildResponseFromCsvLine(lines[i], lines[0], surveyId);
-							responses.add(response);
-						}catch(Exception e) {
+	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId) {
+		Flux<Response> responsesToAdd = fileFlux.flatMap(Utilities::readStringFromFile).map(string -> {
+			List<Response> responses = new ArrayList<>();
+			String[] lines = string.split("\\r?\\n");
+			for (int i = 1; i < lines.length; i++) {
+				try {
+					Response response = buildResponseFromCsvLine(lines[i], lines[0], surveyId);
+					responses.add(response);
+				} catch (Exception e) {
 //							logger.warn(e);
-						}
-					}
-					return responses;
-				}).flatMapIterable(Function.identity());
+				}
+			}
+			return responses;
+		}).flatMapIterable(Function.identity());
 		return responseRepository.saveAll(responsesToAdd);
 	}
-	
 
-		
 	@Override
-	public Flux<Response> getResponsesByBatch(String batchName) {		
+	public Flux<Response> getResponsesByBatch(String batchName) {
 		return responseRepository.findAllByBatch(batchName);
 	}
 

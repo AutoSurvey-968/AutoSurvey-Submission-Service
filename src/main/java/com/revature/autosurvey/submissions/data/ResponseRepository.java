@@ -24,7 +24,7 @@ public interface ResponseRepository extends ReactiveCassandraRepository<Response
 
 	@AllowFiltering
 	Mono<Response> deleteByUuid(UUID uuid);
-	
+
 	@AllowFiltering
 	Flux<Response> findAllByBatchAndWeek(String batch, String week);
 }

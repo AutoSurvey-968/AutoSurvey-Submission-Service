@@ -6,9 +6,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -24,7 +22,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
-import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -232,7 +229,7 @@ public class ResponseServiceTest {
 	}
 
 	@Test
-	public void testGetAllResponsesByWeek() {
+	void testGetAllResponsesByWeek() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		testResponse1.setWeek(TrainingWeek.EIGHT);

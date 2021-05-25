@@ -19,8 +19,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.service.ResponseService;
-import com.revature.autosurvey.submissions.service.ResponseServiceImpl;
-import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,17 +35,17 @@ public class ResponseControllerTest {
 			rc.setResponseService(rs);
 			return rc;
 		}
-		
+
 		@Bean
 		public ResponseService getService() {
 			return Mockito.mock(ResponseService.class);
 		}
-		
+
 	}
 
 	@Autowired
 	private ResponseController responseController;
-	
+
 	@MockBean
 	private ResponseService responseService;
 
@@ -106,7 +104,6 @@ public class ResponseControllerTest {
 
 	@Test
 	void testGetAllResponsesByBatch() {
-		System.out.println("I'm in the batch test");
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		Optional<String> testBatch = Optional.of("Batch 23");
@@ -124,7 +121,6 @@ public class ResponseControllerTest {
 		Response testResponse2 = new Response();
 		testResponse1.setWeek(TrainingWeek.EIGHT);
 		testResponse2.setWeek(TrainingWeek.EIGHT);
-		System.out.println("I'm in the week test");
 		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.of("Week 8"), Optional.empty()))
 				.expectNext(ResponseEntity.ok(testResponse1)).expectNext(ResponseEntity.ok(testResponse2))
@@ -133,7 +129,6 @@ public class ResponseControllerTest {
 
 	@Test
 	void testGetAllResponsesByBatchAndWeek() {
-		System.out.println("I'm in the batchweek test");
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		Optional<String> testBatch = Optional.of("Batch 23");

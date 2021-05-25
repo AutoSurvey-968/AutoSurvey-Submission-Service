@@ -35,9 +35,6 @@ public class ResponseController {
 	@GetMapping
 	public Flux<ResponseEntity<Response>> getResponses(@RequestParam Optional<String> batch,
 			@RequestParam Optional<String> week, @RequestParam Optional<UUID> id) {
-		System.out.println("butts");
-		System.out.println(batch);
-		System.out.println(week);
 		if (batch.isPresent() && week.isPresent()) {
 			return responseService.getResponsesByBatchForWeek(batch.get(), week.get())
 					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
