@@ -1,5 +1,8 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,6 +17,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
+import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
@@ -76,6 +80,7 @@ public class ResponseServiceImpl implements ResponseService {
 		});
 	}
 
+	@Override
 	public List<String> bigSplit(String string) {
 		String[] stringArr = string.split(",");
 		List<String> stringList = new ArrayList<>(Arrays.asList(stringArr));
@@ -92,6 +97,16 @@ public class ResponseServiceImpl implements ResponseService {
 			}
 		}
 		return stringList;
+	}
+	
+	@Override
+
+	public Long timeLongFromString(String timeString) {
+		timeString = String.join(" ", timeString.split("\\s+"));
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("M/d/yyyy HH:mm:ss");
+		LocalDateTime ldate = null;
+			ldate = LocalDateTime.parse(timeString, dtf);
+		return ldate.toInstant(ZoneOffset.ofHours(0)).toEpochMilli();
 	}
 	
 	@Override
@@ -112,7 +127,8 @@ public class ResponseServiceImpl implements ResponseService {
 		String weekString = responseMap.get("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
 		response.setWeek(getTrainingWeekFromString(weekString)); // "Week 7" TrainingWeek.SEVEN
 		response.setResponses(responseMap);
-//		response.setUuid(UUID.randomUUID()); //Generates a random UUID, not one based on the timestamp associated with the entry
+		String timeString = responseMap.get("Timestamp");
+		response.setUuid(Uuids.startOf(timeLongFromString(timeString)));
 		return response;
 	}
 	

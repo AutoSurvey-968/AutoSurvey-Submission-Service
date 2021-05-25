@@ -32,6 +32,10 @@ public interface ResponseService {
 
 	public Flux<Response> addResponses(List<Response> responses);
 
+	public Long timeLongFromString(String timeString);
+
+	public List<String> bigSplit(String string);
+
 	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
 
 	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId);
