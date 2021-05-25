@@ -125,4 +125,9 @@ public class ResponseServiceImpl implements ResponseService {
 		return responseRepository.findAllByWeek(tWeek);
 	}
 
+	@Override
+	public Flux<Response> getResponsesByBatchForWeek(String batch, String week) {
+		return responseRepository.findAllByBatchForWeek(batch, week);
+	}
+
 }

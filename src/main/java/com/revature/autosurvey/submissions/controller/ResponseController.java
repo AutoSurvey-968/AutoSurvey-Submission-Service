@@ -32,7 +32,7 @@ public class ResponseController {
 	public void setResponceService(ResponseService responseService) {
 		this.responseService = responseService;
 	}
-	
+
 	@Autowired
 	public void setUtilities(Utilities utilities) {
 		this.util = utilities;
@@ -45,22 +45,18 @@ public class ResponseController {
 		System.out.println(batch);
 		System.out.println(week);
 		if (batch.isPresent() && week.isPresent()) {
-			return responseService.getResponsesByBatch(batch.get()).filter(
-					responses -> responses.getWeek().equals(util.getTrainingWeekFromString(week.get())))
-					.map(filtered -> ResponseEntity.ok().body(filtered))
-					.onErrorReturn(ResponseEntity.badRequest().build());
+			return responseService.getResponsesByBatchForWeek(batch.get(), week.get())
+					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
 		}
 
 		if (batch.isPresent()) {
-			return responseService.getResponsesByBatch(batch.get())
-					.map(responses -> ResponseEntity.ok().body(responses))
+			return responseService.getResponsesByBatch(batch.get()).map(responses -> ResponseEntity.ok(responses))
 					.onErrorReturn(ResponseEntity.badRequest().build());
 		}
 
 		if (week.isPresent()) {
 			return responseService.getResponsesByWeek(util.getTrainingWeekFromString(week.get()))
-					.map(responses -> ResponseEntity.ok().body(responses))
-					.onErrorReturn(ResponseEntity.badRequest().build());
+					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
 		}
 
 		if (id.isPresent()) {

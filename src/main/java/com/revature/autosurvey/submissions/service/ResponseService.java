@@ -39,4 +39,6 @@ public interface ResponseService {
 
 	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId);
 
+	public Flux<Response> getResponsesByBatchForWeek(String batch, String week);
+
 }
