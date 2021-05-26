@@ -39,7 +39,7 @@ public class LoggingAspect {
 			// stopping the exception from being thrown (it needs to be handled elsewhere)
 			// but we do want to log it for ourselves.
 		}
-		log.trace("Method returning with: s", result);
+		log.trace("Method returning with: %s", result);
 		return result;
 	}
 
