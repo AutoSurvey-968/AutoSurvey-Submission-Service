@@ -24,7 +24,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
-import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
