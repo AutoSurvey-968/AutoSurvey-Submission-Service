@@ -15,6 +15,22 @@ import com.revature.autosurvey.submissions.beans.TrainingWeek;
 class UtilitiesTest {
 	
 	@Test
+	void getRandomNumberReturnsNumbersInRange() {
+		List<Integer> numbersList = new ArrayList<>();
+		for (int i = 0; i < 1000; i++) {
+			numbersList.add(Utilities.getRandomNumber(0, 999));
+		}
+		Boolean flag = true;
+		for (int number : numbersList) {
+			if (number < 0 || number > 999) {
+				flag = false;
+				break;
+			}
+		}
+		assertEquals(true, flag);
+	}
+	
+	@Test
 	void bigSplitReturnsCorrectList() {
 		String string = "this is a value,\"This is a, value wi,th a ,b,unch ,of com,mas ,i,n it\",and this is another value,and so is this";
 		List<String> result = new ArrayList<>();
