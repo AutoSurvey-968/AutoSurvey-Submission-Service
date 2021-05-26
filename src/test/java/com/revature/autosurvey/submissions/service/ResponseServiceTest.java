@@ -6,7 +6,9 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -43,6 +45,11 @@ public class ResponseServiceTest {
 		public ResponseRepository getResponseRepository() {
 			return Mockito.mock(ResponseRepository.class);
 		}
+		
+//		@Bean
+//		public Utilities getUtilities() {
+//			return Mockito.mock(Utilities.class);
+//		}
 	}
 
 	@Autowired
@@ -50,6 +57,9 @@ public class ResponseServiceTest {
 
 	@MockBean
 	private ResponseRepository responseRepository;
+	
+//	@MockBean
+//	private Utilities utilities;
 
 	private static List<Response> responses;
 
@@ -89,41 +99,63 @@ public class ResponseServiceTest {
 		assertEquals(responseMono, responseService.addResponse(response));
 	}
 
-	/*
-	 * @Test void buildResponseFromCsvLineReturnsResponse() { String csvLine =
-	 * "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A"; String
-	 * questionLine =
-	 * "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""
-	 * ; UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001"); //
-	 * Expected response Response res = new Response(); Map<String, String>
-	 * questions = new HashMap<>(); res.setSurveyUuid(surveyId);
-	 * questions.put("question1", "answer1"); questions.put("question2", "answer2");
-	 * questions.put("Timestamp", "3/3/2020  14:08:17");
-	 * questions.put("What batch are you in?", "Mock Batch 45"); questions.put(
-	 * "\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""
-	 * , "Week A"); res.setResponses(questions); res.setWeek(TrainingWeek.A);
-	 * res.setBatch("Mock Batch 45");
-	 * res.setUuid(UUID.fromString("13814000-1dd2-11b2-8080-808080808080"));
-	 * 
-	 * // Mocking String weekString = "Week A"; String timeString =
-	 * "3/3/2020 14:08:17"; List<String> questionList = new ArrayList<>();
-	 * questionList.add("question1"); questionList.add("question2");
-	 * questionList.add("question3"); questionList.add("Timestamp");
-	 * questionList.add("What batch are you in?"); questionList.add(
-	 * "\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""
-	 * ); List<String> answerList = new ArrayList<>(); answerList.add("answer1");
-	 * answerList.add("answer2"); answerList.add("");
-	 * answerList.add("3/3/2020  14:08:17"); answerList.add("Mock Batch 45");
-	 * answerList.add("Week A");
-	 * when(Utilities.getTrainingWeekFromString(weekString)).thenReturn(TrainingWeek
-	 * .A);
-	 * when(Utilities.timeLongFromString(timeString)).thenReturn(1583244497000L);
-	 * when(Utilities.bigSplit(questionLine)).thenReturn(questionList);
-	 * when(Utilities.bigSplit(csvLine)).thenReturn(answerList);
-	 * 
-	 * assertEquals(res, responseService.buildResponseFromCsvLine(csvLine,
-	 * questionLine, surveyId)); }
-	 */
+	
+	 @Test void buildResponseFromCsvLineReturnsResponse() { 
+		 String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A"; 
+		 String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""; 
+		 UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
+		 
+		 Response responseFromMethod = responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId);
+
+		 Response expectedResponse = new Response(); Map<String, String>
+		 questions = new HashMap<>(); expectedResponse.setSurveyUuid(surveyId);
+		 questions.put("question1", "answer1"); questions.put("question2", "answer2");
+		 questions.put("Timestamp", "3/3/2020  14:08:17");
+		 questions.put("What batch are you in?", "Mock Batch 45"); questions.put(
+		 "\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""
+		 , "Week A"); expectedResponse.setResponses(questions); expectedResponse.setWeek(TrainingWeek.A);
+		 expectedResponse.setBatch("Mock Batch 45");
+		 expectedResponse.setUuid(responseFromMethod.getUuid());
+		 
+		 assertEquals(expectedResponse, responseFromMethod);
+	 }
+		 
+//	 @Test void buildResponseFromCsvLineReturnsResponseOld() { 
+//		 String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A"; 
+//		 String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""; 
+//		 UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001"); 
+//			 
+//		 //Expected response 
+//		 Response res = new Response(); Map<String, String>
+//		 questions = new HashMap<>(); res.setSurveyUuid(surveyId);
+//		 questions.put("question1", "answer1"); questions.put("question2", "answer2");
+//		 questions.put("Timestamp", "3/3/2020  14:08:17");
+//		 questions.put("What batch are you in?", "Mock Batch 45"); questions.put(
+//		 "\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""
+//		 , "Week A"); res.setResponses(questions); res.setWeek(TrainingWeek.A);
+//		 res.setBatch("Mock Batch 45");
+//		 res.setUuid(UUID.fromString("13814000-1dd2-11b2-8080-808080808080"));
+//		 
+//		 // Mocking 
+//		 String weekString = "Week A"; 
+//		 String timeString = "3/3/2020 14:08:17"; 
+//		 List<String> questionList = new ArrayList<>();
+//		 questionList.add("question1"); questionList.add("question2");
+//		 questionList.add("question3"); questionList.add("Timestamp");
+//		 questionList.add("What batch are you in?"); questionList.add("\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""); 
+//		 List<String> answerList = new ArrayList<>(); answerList.add("answer1");
+//		 answerList.add("answer2"); answerList.add("");
+//		 answerList.add("3/3/2020  14:08:17"); answerList.add("Mock Batch 45");
+//		 answerList.add("Week A");
+//		 
+//		 when(Utilities.getTrainingWeekFromString(weekString)).thenReturn(TrainingWeek.A);
+//		 when(Utilities.timeLongFromString(timeString)).thenReturn(1583244497000L);
+//		 when(Utilities.bigSplit(questionLine)).thenReturn(questionList);
+//		 when(Utilities.bigSplit(csvLine)).thenReturn(answerList);
+//		 
+//		 assertEquals(res, responseService.buildResponseFromCsvLine(csvLine,questionLine, surveyId));
+//	}
+	 
 
 	@Test
 	void addResponsesFromFileReturns() {
