@@ -1,6 +1,5 @@
 package com.revature.autosurvey.submissions.utils;
 
-import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -10,11 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.stereotype.Component;
-
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
