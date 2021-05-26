@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.controller;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
+import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -24,57 +26,61 @@ import reactor.core.publisher.Mono;
 @RestController
 public class ResponseController {
 	private ResponseService responseService;
-	
+
 	@Autowired
 	public void setResponseService(ResponseService responseService) {
 		this.responseService = responseService;
 	}
-	
+
 	@GetMapping
-	public Flux<ResponseEntity<Response>> getResponses(
-			@RequestParam(required = false) String batch,
-			@RequestParam(required = false) String week,
-			@RequestParam(required = false) UUID id){
-		if(id != null) {
-			return responseService.getResponse(id).map(response -> ResponseEntity.ok().body(response))
+	public Flux<ResponseEntity<Response>> getResponses(@RequestParam Optional<String> batch,
+			@RequestParam Optional<String> week, @RequestParam Optional<UUID> id) {
+		if (batch.isPresent() && week.isPresent()) {
+			return responseService.getResponsesByBatchForWeek(batch.get(), week.get())
+					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
+		}
+
+		if (batch.isPresent()) {
+			return responseService.getResponsesByBatch(batch.get()).map(responses -> ResponseEntity.ok(responses))
+					.onErrorReturn(ResponseEntity.badRequest().build());
+		}
+
+		if (week.isPresent()) {
+			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()))
+					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
+		}
+
+		if (id.isPresent()) {
+			return responseService.getResponse(id.get()).map(response -> ResponseEntity.ok().body(response))
 					.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
 					.onErrorReturn(ResponseEntity.badRequest().body(new Response())).flux();
 		}
-		if(batch != null) {
-			return responseService.getResponsesByBatch(batch).map(responses ->
-				ResponseEntity.ok().body(responses))
-					.onErrorReturn(ResponseEntity.badRequest().build());
-		}
-		else {
-			return Flux.just(ResponseEntity.badRequest().build());
-		}
+		return Flux.just(ResponseEntity.badRequest().build());
 	}
-	
+
 	@PostMapping(consumes = "text/csv")
-	public Flux<ResponseEntity<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux, @RequestPart("surveyId") UUID surveyId) {
-		return responseService.addResponsesFromFile(fileFlux, surveyId).map(
-				response -> ResponseEntity.ok().body(response))
+	public Flux<ResponseEntity<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
+			@RequestPart("surveyId") UUID surveyId) {
+		return responseService.addResponsesFromFile(fileFlux, surveyId)
+				.map(response -> ResponseEntity.ok().body(response))
 				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 	}
-	
+
 	@PostMapping(consumes = "application/json")
 	public Flux<ResponseEntity<Response>> addResponses(@RequestBody Flux<Response> responses) {
-		return responseService.addResponses(responses).map(
-				resp -> ResponseEntity.ok().body(resp))
+		return responseService.addResponses(responses).map(resp -> ResponseEntity.ok().body(resp))
 				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 	}
-	
+
 	@PutMapping("/{id}")
-	public Mono<ResponseEntity<Response>> updateResponse(@PathVariable UUID id, @RequestBody Response response){
+	public Mono<ResponseEntity<Response>> updateResponse(@PathVariable UUID id, @RequestBody Response response) {
 		return responseService.updateResponse(id, response).map(updatedResponse -> ResponseEntity.ok().body(response))
 				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
 	}
-	
-	@DeleteMapping("{id}")
-    public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable("id") UUID uuid) {
-        return responseService.deleteResponse(uuid)
-                .map(response -> ResponseEntity.noContent().build())
-                .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
-    }
-}
 
+	@DeleteMapping("{id}")
+	public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable("id") UUID uuid) {
+		return responseService.deleteResponse(uuid).map(response -> ResponseEntity.noContent().build())
+				.onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
+	}
+}
