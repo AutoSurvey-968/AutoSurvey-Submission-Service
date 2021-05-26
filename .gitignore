@@ -34,3 +34,6 @@ build/
 
 ### trustStore ###
 *.jks
+
+### furrybase ###
+*.json
