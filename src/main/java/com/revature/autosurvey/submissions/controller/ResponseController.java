@@ -3,6 +3,7 @@ package com.revature.autosurvey.submissions.controller;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.apache.tinkerpop.shaded.minlog.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
@@ -12,9 +13,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
@@ -24,6 +27,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@RequestMapping(value = "/submissions")
 public class ResponseController {
 	private ResponseService responseService;
 
@@ -33,29 +37,29 @@ public class ResponseController {
 	}
 
 	@GetMapping
-	public Flux<ResponseEntity<Response>> getResponses(@RequestParam Optional<String> batch,
+	public Flux<Response> getResponses(ServerWebExchange exchange, @RequestParam Optional<String> batch,
 			@RequestParam Optional<String> week, @RequestParam Optional<UUID> id) {
 		if (batch.isPresent() && week.isPresent()) {
-			return responseService.getResponsesByBatchForWeek(batch.get(), week.get())
-					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
+			System.out.println("I'm in batchweek");
+			return responseService.getResponsesByBatchForWeek(batch.get(), week.get());
 		}
 
 		if (batch.isPresent()) {
-			return responseService.getResponsesByBatch(batch.get()).map(responses -> ResponseEntity.ok(responses))
-					.onErrorReturn(ResponseEntity.badRequest().build());
+			System.out.println("I'm in batch");
+			return responseService.getResponsesByBatch(batch.get());
 		}
 
 		if (week.isPresent()) {
-			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()))
-					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
+			System.out.println("I'm in week");
+			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()));
 		}
 
 		if (id.isPresent()) {
-			return responseService.getResponse(id.get()).map(response -> ResponseEntity.ok().body(response))
-					.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
-					.onErrorReturn(ResponseEntity.badRequest().body(new Response())).flux();
+			System.out.println("I'm in ID");
+			return responseService.getResponse(id.get()).flux();
 		}
-		return Flux.just(ResponseEntity.badRequest().build());
+		System.out.println("I'm nowhere");
+		return responseService.getAllResponses();
 	}
 
 	@PostMapping(consumes = "text/csv")

@@ -143,4 +143,12 @@ public class ResponseControllerTest {
 				.verifyComplete();
 	}
 
+	@Test
+	void testGetAllResponsesGetsResponses() {
+		Response testResponse = new Response();
+		when(responseService.getAllResponses()).thenReturn(Flux.just(testResponse));
+		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.empty()))
+				.expectNext(ResponseEntity.ok(testResponse)).verifyComplete();
+	}
+
 }

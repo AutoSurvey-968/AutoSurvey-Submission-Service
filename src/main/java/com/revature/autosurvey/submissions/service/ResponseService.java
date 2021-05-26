@@ -13,26 +13,28 @@ import reactor.core.publisher.Mono;
 
 public interface ResponseService {
 
-	public Mono<Response> getResponse(UUID uuid);
+	Mono<Response> getResponse(UUID uuid);
 
-	public Mono<Response> updateResponse(UUID uuid, Response response);
+	Mono<Response> updateResponse(UUID uuid, Response response);
 
-	public Flux<Response> getResponsesByBatch(String batch);
+	Flux<Response> getResponsesByBatch(String batch);
 
-	public Mono<Response> deleteResponse(UUID uuid);
+	Mono<Response> deleteResponse(UUID uuid);
 
-	public Flux<Response> getResponsesByWeek(TrainingWeek eight);
+	Flux<Response> getResponsesByWeek(TrainingWeek eight);
 
-	public Mono<Response> addResponse(Response response);
+	Mono<Response> addResponse(Response response);
 
-	public Flux<Response> addResponses(Flux<Response> responses);
+	Flux<Response> addResponses(Flux<Response> responses);
 
-	public Flux<Response> addResponses(List<Response> responses);
+	Flux<Response> addResponses(List<Response> responses);
 
-	public Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
+	Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
 
-	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId);
+	Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId);
 
-	public Flux<Response> getResponsesByBatchForWeek(String batch, String week);
+	Flux<Response> getResponsesByBatchForWeek(String batch, String week);
+
+	public Flux<Response> getAllResponses();
 
 }

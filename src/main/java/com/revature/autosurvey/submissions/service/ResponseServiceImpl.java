@@ -121,5 +121,10 @@ public class ResponseServiceImpl implements ResponseService {
 	public Flux<Response> getResponsesByBatchForWeek(String batch, String week) {
 		return responseRepository.findAllByBatchAndWeek(batch, week);
 	}
+	
+	@Override
+	public Flux<Response> getAllResponses() {
+		return responseRepository.findAll();
+	}
 
 }
