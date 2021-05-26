@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
-public class ResponseControllerTest {
+class ResponseControllerTest {
 
 	@TestConfiguration
 	static class Configuration {

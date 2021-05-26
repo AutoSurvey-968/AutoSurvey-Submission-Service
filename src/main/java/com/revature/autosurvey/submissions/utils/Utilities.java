@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.utils;
 
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -9,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
@@ -60,9 +62,7 @@ public class Utilities {
 
 	public static Flux<String> readStringFromFile(FilePart file) {
 		return file.content().map(buffer -> {
-			System.out.println("hi");
 			byte[] bytes = new byte[buffer.readableByteCount()];
-			System.out.println(buffer);
 			buffer.read(bytes);
 			DataBufferUtils.release(buffer);
 

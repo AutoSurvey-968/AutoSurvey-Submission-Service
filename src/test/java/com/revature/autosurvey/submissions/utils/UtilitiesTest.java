@@ -1,8 +1,10 @@
 package com.revature.autosurvey.submissions.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
+import org.springframework.core.io.buffer.DefaultDataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -20,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 class UtilitiesTest {
@@ -126,10 +132,22 @@ class UtilitiesTest {
 	void testReadStringFromFile() {
 		FilePart filePart = Mockito.mock(FilePart.class);
 		DataBuffer dataBuffer = Mockito.mock(DataBuffer.class);
+		byte[] byteArray = "timeStamp".getBytes();
+		ByteBuffer byteBuffer = ByteBuffer.allocate(byteArray.length);
+		byteBuffer.put(byteArray);
+		byteBuffer.position(0);
 		Flux<DataBuffer> fluxDataBuffer = Flux.just(dataBuffer);
 		when(filePart.content()).thenReturn(fluxDataBuffer);
-		
-		Utilities.readStringFromFile(filePart);
+		when(dataBuffer.readableByteCount()).thenReturn(byteArray.length);
+		when(dataBuffer.read(any(byte[].class))).thenAnswer(invocation -> {
+			Object[] args = invocation.getArguments();
+			byteBuffer.get((byte[])args[0]);
+			return null;
+		});
+		StepVerifier.create(Utilities.readStringFromFile(filePart))
+		.expectNext("timeStamp")
+		.expectComplete()
+		.verify();
 		
 	}
 
