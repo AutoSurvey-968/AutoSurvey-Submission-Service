@@ -3,7 +3,6 @@ package com.revature.autosurvey.submissions.controller;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.apache.tinkerpop.shaded.minlog.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
@@ -37,11 +35,11 @@ public class ResponseController {
 	}
 
 	@GetMapping
-	public Flux<Response> getResponses(ServerWebExchange exchange, @RequestParam Optional<String> batch,
-			@RequestParam Optional<String> week, @RequestParam Optional<UUID> id) {
+	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<String> week,
+			@RequestParam Optional<UUID> id) {
 		if (batch.isPresent() && week.isPresent()) {
 			System.out.println("I'm in batchweek");
-			return responseService.getResponsesByBatchForWeek(batch.get(), week.get());
+			return responseService.getResponsesByBatchAndWeek(batch.get(), week.get());
 		}
 
 		if (batch.isPresent()) {
@@ -71,9 +69,8 @@ public class ResponseController {
 	}
 
 	@PostMapping(consumes = "application/json")
-	public Flux<ResponseEntity<Response>> addResponses(@RequestBody Flux<Response> responses) {
-		return responseService.addResponses(responses).map(resp -> ResponseEntity.ok().body(resp))
-				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+	public Flux<Response> addResponses(@RequestBody Flux<Response> responses) {
+		return responseService.addResponses(responses);
 	}
 
 	@PutMapping("/{id}")

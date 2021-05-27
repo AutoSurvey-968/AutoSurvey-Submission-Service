@@ -33,8 +33,8 @@ public interface ResponseService {
 
 	Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId);
 
-	Flux<Response> getResponsesByBatchForWeek(String batch, String week);
+	Flux<Response> getResponsesByBatchAndWeek(String batch, String week);
 
-	public Flux<Response> getAllResponses();
+	Flux<Response> getAllResponses();
 
 }
