@@ -90,7 +90,6 @@ public class ResponseServiceImpl implements ResponseService {
 		return response;
 	}
 
-	@PreAuthorize("hasRole('USER')")
 	@Override
 	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId) {
 		Flux<Response> responsesToAdd = fileFlux.flatMap(Utilities::readStringFromFile).map(string -> {

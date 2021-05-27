@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,6 +33,7 @@ public class ResponseController {
 		this.responseService = responseService;
 	}
 	
+	@PreAuthorize("hasRole('USER')")
 	@GetMapping
 	public Flux<ResponseEntity<Response>> getResponses(@RequestParam Optional<String> batch,
 			@RequestParam Optional<String> week, @RequestParam Optional<UUID> id) {
