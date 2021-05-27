@@ -134,10 +134,11 @@ class ResponseControllerTest {
 		Flux<FilePart> fileFlux = Flux.just(filePart);
 		when(responseService.addResponsesFromFile(fileFlux, id))
 				.thenReturn(Flux.fromArray(new Response[] { new Response(), new Response(), new Response() }));
-		StepVerifier.create(responseController.addResponses(fileFlux, idString))
-				.expectNext(ResponseEntity.ok().body(new Response()))
-				.expectNext(ResponseEntity.ok().body(new Response()))
-				.expectNext(ResponseEntity.ok().body(new Response())).expectComplete().verify();
+		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
+		StepVerifier.create(body)
+			.expectNext(new Response())
+			.expectNext(new Response())
+			.expectNext(new Response()).expectComplete().verify();
 	}
 
 	@Test
@@ -147,8 +148,8 @@ class ResponseControllerTest {
 		String idString = id.toString();
 		Flux<FilePart> fileFlux = Flux.just(filePart);
 		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.error(new Exception()));
-		StepVerifier.create(responseController.addResponses(fileFlux, idString))
-				.expectNext(ResponseEntity.badRequest().body(new Response())).expectComplete().verify();
+		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
+		StepVerifier.create(body).verifyError();
 	}
 
 	@Test
