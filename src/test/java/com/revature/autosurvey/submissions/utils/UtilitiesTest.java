@@ -139,6 +139,18 @@ class UtilitiesTest {
 	}
 	
 	@Test
+	void getTrainingWeekFromStringReturnsTrainingWeekEnum11() {
+		String weekString = "Week 11";
+		assertEquals(TrainingWeek.ELEVEN, Utilities.getTrainingWeekFromString(weekString));
+	}
+	
+	@Test
+	void getTrainingWeekFromStringReturnsTrainingWeekEnum12() {
+		String weekString = "Week 12";
+		assertEquals(TrainingWeek.TWELVE, Utilities.getTrainingWeekFromString(weekString));
+	}
+	
+	@Test
 	void getTrainingWeekFromStringReturnsNull() {
 		String weekString = "Any Other Value";
 		assertEquals(null, Utilities.getTrainingWeekFromString(weekString));

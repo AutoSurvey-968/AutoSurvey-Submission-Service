@@ -173,9 +173,15 @@ class ResponseServiceTest {
 		UUID idResult = responseService.deleteResponse(id).block().getUuid();
 		assertEquals(id, idResult);
 	}
+	
+	@Test
+	void testGetAllResponsesGetsResponses() {
+		when(responseRepository.findAll()).thenReturn(Flux.empty());
+		StepVerifier.create(responseService.getAllResponses()).verifyComplete();
+	}
 
 	@Test
-	void testGetAllResponsesByBatch() {
+	void testGetAllResponsesByBatchReturnsProperBatch() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		String testBatch = "Batch 23";
@@ -218,7 +224,7 @@ class ResponseServiceTest {
 	}
 
 	@Test
-	void testGetAllResponsesByWeek() {
+	void testGetAllResponsesByWeekReturnsProperWeek() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		testResponse1.setWeek(TrainingWeek.EIGHT);
