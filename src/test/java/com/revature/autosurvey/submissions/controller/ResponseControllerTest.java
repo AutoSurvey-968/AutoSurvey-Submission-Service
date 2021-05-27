@@ -130,10 +130,11 @@ class ResponseControllerTest {
 	void testAddResponsesCSV() {
 		FilePart filePart = Mockito.mock(FilePart.class);
 		UUID id = UUID.randomUUID();
+		String idString = id.toString();
 		Flux<FilePart> fileFlux = Flux.just(filePart);
 		when(responseService.addResponsesFromFile(fileFlux, id))
 				.thenReturn(Flux.fromArray(new Response[] { new Response(), new Response(), new Response() }));
-		StepVerifier.create(responseController.addResponses(fileFlux, id))
+		StepVerifier.create(responseController.addResponses(fileFlux, idString))
 				.expectNext(ResponseEntity.ok().body(new Response()))
 				.expectNext(ResponseEntity.ok().body(new Response()))
 				.expectNext(ResponseEntity.ok().body(new Response())).expectComplete().verify();
@@ -143,9 +144,10 @@ class ResponseControllerTest {
 	void testAddResponsesCSVError() {
 		FilePart filePart = Mockito.mock(FilePart.class);
 		UUID id = UUID.randomUUID();
+		String idString = id.toString();
 		Flux<FilePart> fileFlux = Flux.just(filePart);
 		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.error(new Exception()));
-		StepVerifier.create(responseController.addResponses(fileFlux, id))
+		StepVerifier.create(responseController.addResponses(fileFlux, idString))
 				.expectNext(ResponseEntity.badRequest().body(new Response())).expectComplete().verify();
 	}
 
