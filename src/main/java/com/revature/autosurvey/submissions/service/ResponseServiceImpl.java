@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.datastax.oss.driver.api.core.uuid.Uuids;
@@ -89,6 +90,7 @@ public class ResponseServiceImpl implements ResponseService {
 		return response;
 	}
 
+	@PreAuthorize("hasRole('USER')")
 	@Override
 	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId) {
 		Flux<Response> responsesToAdd = fileFlux.flatMap(Utilities::readStringFromFile).map(string -> {
