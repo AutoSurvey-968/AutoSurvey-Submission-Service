@@ -2,43 +2,78 @@
 
 ## Project Description
 
-Here goes your awesome project description!
+The submission microservice for AutoSurvey-968.
 
 ## Technologies Used
 
-* Tech 1 - version 1.0
-* Tech 2 - version 2.0
-* Tech 3 - version 3.0
+* Java - SE1.8
+* Java Spring
+  - Reactive Web
+* SonarCloud
+* Lombok
+* Swagger
+* DataStax
+* Eureka
+* Karate
+* JUnit
+* Jacoco
 
 ## Features
 
-List of features ready and TODOs for future development
-* Awesome feature 1
-* Awesome feature 2
-* Awesome feature 3
-
-To-do list:
-* Wow improvement to be done 1
-* Wow improvement to be done 2
+* Create and maintain tables of anonymous survey responses
+* Convert and upload responses to a database from a .csv file
+* Upload direct user responses to a database
+* Get responses, organized by batch number or batch's week number
+* Able to update and delete specific responses
 
 ## Getting Started
-   
-(include git clone command)
-(include all environment setup steps)
 
-> Be sure to include BOTH Windows and Unix command  
-> Be sure to mention if the commands only work on a specific platform (eg. AWS, GCP)
+**See [Primary README.md](https://github.com/AutoSurvey-968/AutoSurvey-back) for full program setup instructions.**
 
-- All the `code` required to get started
-- Images of what it should look like
+Set environment variables:
+* AWS_USER - Keyspaces username
+* AWS_PASS - Keyspaces password
+* TRUST_PASS - Local Truststore password
 
 ## Usage
 
-> Here, you instruct other people on how to use your project after they’ve installed it. This would also be a good place to include screenshots of your project in action.
+```
+{base-url}/
+```
+
+### GET:
+**Authorization level**: ADMIN-ONLY
+
+Gets all responses in database.
+
+### POST:
+**Authorization level**: ADMIN-ONLY
+
+Submits a response or multiple responses to the database.
+
+Accepts a .csv file.
+
+```
+{base-url}/:id
+```
+### PUT:
+**Authorization level**: ADMIN-ONLY
+
+Update a specific response
+
+### DELETE:
+**Authorization level**: ADMIN-ONLY
+
+Delete a specific response
 
 ## Contributors
 
-> Here list the people who have contributed to this project. (ignore this section, if its a solo project)
+- [Matt Kerwin](https://github.com/MatKerwin)
+- [Christopher Morrison](https://github.com/cmorrison-rev)
+- [Nerijus Gelezinis](https://github.com/NGelezinis)
+- [Robert Bierly](https://github.com/rnbiv45)
+- [Arieh Gennello](https://github.com/MoldedPixels)
+
 
 ## License
 
