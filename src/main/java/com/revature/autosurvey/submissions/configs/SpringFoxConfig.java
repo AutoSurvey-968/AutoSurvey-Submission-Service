@@ -15,8 +15,8 @@ public class SpringFoxConfig {
     public Docket createRestApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(new ApiInfoBuilder()
-                        .description("AutoSurvey Analytics API")
-                        .title("Analytics API")
+                        .description("AutoSurvey Submissions API")
+                        .title("Submissions API")
                         .version("1.0.0")
                         .build())
                 .enable(true)
