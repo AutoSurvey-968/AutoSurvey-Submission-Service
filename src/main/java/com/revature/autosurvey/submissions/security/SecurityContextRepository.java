@@ -26,7 +26,6 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
 	@Override
 	public Mono<SecurityContext> load(ServerWebExchange swe) {
-		System.out.println("inside load of security context repo");
 		if (swe.getRequest().getCookies().containsKey(COOKIE_KEY)
 				&& swe.getRequest().getCookies().getFirst(COOKIE_KEY) != null) {
 			String authCookie = swe.getRequest().getCookies().getFirst(COOKIE_KEY).getValue();
