@@ -34,8 +34,7 @@ public class ResponseController {
 	public void setResponseService(ResponseService responseService) {
 		this.responseService = responseService;
 	}
-	
-	@PreAuthorize("hasRole('USER')")
+
 	@GetMapping
 	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<String> week,
 			@RequestParam Optional<UUID> id) {
@@ -58,6 +57,7 @@ public class ResponseController {
 	}
 
 	@PostMapping(consumes = "text/csv")
+	@PreAuthorize("isAuthenticated()")
 	public Flux<ResponseEntity<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
 			@RequestPart("surveyId") UUID surveyId) {
 		return responseService.addResponsesFromFile(fileFlux, surveyId)

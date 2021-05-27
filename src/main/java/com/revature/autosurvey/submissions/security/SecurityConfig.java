@@ -36,12 +36,7 @@ public class SecurityConfig {
 						(swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
 				.and().csrf().disable().formLogin().disable().httpBasic().disable()
 				.authenticationManager(authenticationManager).securityContextRepository(securityContextRepository)
-				.authorizeExchange().pathMatchers(HttpMethod.GET, "/").permitAll().anyExchange().authenticated().and().build();
-	}
-	
-	@Bean
-	public PasswordEncoder encoder() {
-	    return new BCryptPasswordEncoder();
+				.authorizeExchange().pathMatchers(HttpMethod.POST, "/submissions").permitAll().anyExchange().authenticated().and().build();
 	}
 
 }

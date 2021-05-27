@@ -91,6 +91,7 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
+	@PreAuthorize("isAuthenticated()")
 	public Flux<Response> addResponsesFromFile(Flux<FilePart> fileFlux, UUID surveyId) {
 		Flux<Response> responsesToAdd = fileFlux.flatMap(Utilities::readStringFromFile).map(string -> {
 			List<Response> responses = new ArrayList<>();
