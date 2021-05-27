@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@RequestMapping(value = "/submissions")
 public class ResponseController {
 	private ResponseService responseService;
 
@@ -35,29 +37,24 @@ public class ResponseController {
 	
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping
-	public Flux<ResponseEntity<Response>> getResponses(@RequestParam Optional<String> batch,
-			@RequestParam Optional<String> week, @RequestParam Optional<UUID> id) {
+	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<String> week,
+			@RequestParam Optional<UUID> id) {
 		if (batch.isPresent() && week.isPresent()) {
-			return responseService.getResponsesByBatchForWeek(batch.get(), week.get())
-					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
+			return responseService.getResponsesByBatchAndWeek(batch.get(), week.get());
 		}
 
 		if (batch.isPresent()) {
-			return responseService.getResponsesByBatch(batch.get()).map(responses -> ResponseEntity.ok(responses))
-					.onErrorReturn(ResponseEntity.badRequest().build());
+			return responseService.getResponsesByBatch(batch.get());
 		}
 
 		if (week.isPresent()) {
-			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()))
-					.map(responses -> ResponseEntity.ok(responses)).onErrorReturn(ResponseEntity.badRequest().build());
+			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()));
 		}
 
 		if (id.isPresent()) {
-			return responseService.getResponse(id.get()).map(response -> ResponseEntity.ok().body(response))
-					.switchIfEmpty(Mono.just(ResponseEntity.notFound().build()))
-					.onErrorReturn(ResponseEntity.badRequest().body(new Response())).flux();
+			return responseService.getResponse(id.get()).flux();
 		}
-		return Flux.just(ResponseEntity.badRequest().build());
+		return responseService.getAllResponses();
 	}
 
 	@PostMapping(consumes = "text/csv")
@@ -69,9 +66,8 @@ public class ResponseController {
 	}
 
 	@PostMapping(consumes = "application/json")
-	public Flux<ResponseEntity<Response>> addResponses(@RequestBody Flux<Response> responses) {
-		return responseService.addResponses(responses).map(resp -> ResponseEntity.ok().body(resp))
-				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+	public Flux<Response> addResponses(@RequestBody Flux<Response> responses) {
+		return responseService.addResponses(responses);
 	}
 
 	@PutMapping("/{id}")
