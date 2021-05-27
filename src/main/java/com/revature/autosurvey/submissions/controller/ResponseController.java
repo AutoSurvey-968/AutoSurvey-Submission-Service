@@ -38,25 +38,20 @@ public class ResponseController {
 	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<String> week,
 			@RequestParam Optional<UUID> id) {
 		if (batch.isPresent() && week.isPresent()) {
-			System.out.println("I'm in batchweek");
 			return responseService.getResponsesByBatchAndWeek(batch.get(), week.get());
 		}
 
 		if (batch.isPresent()) {
-			System.out.println("I'm in batch");
 			return responseService.getResponsesByBatch(batch.get());
 		}
 
 		if (week.isPresent()) {
-			System.out.println("I'm in week");
 			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()));
 		}
 
 		if (id.isPresent()) {
-			System.out.println("I'm in ID");
 			return responseService.getResponse(id.get()).flux();
 		}
-		System.out.println("I'm nowhere");
 		return responseService.getAllResponses();
 	}
 
