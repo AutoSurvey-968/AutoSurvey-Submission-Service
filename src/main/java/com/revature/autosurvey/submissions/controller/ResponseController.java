@@ -56,13 +56,13 @@ public class ResponseController {
 		return responseService.getAllResponses();
 	}
 
-	@PostMapping(consumes = "text/csv")
+	@PostMapping(consumes = "multipart/form-data")
 	@PreAuthorize("isAuthenticated()")
-	public Flux<ResponseEntity<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
-			@RequestPart("surveyId") UUID surveyId) {
-		return responseService.addResponsesFromFile(fileFlux, surveyId)
-				.map(response -> ResponseEntity.ok().body(response))
-				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+	public ResponseEntity<Flux<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
+			@RequestPart("surveyId") String surveyId) {
+		UUID surveyUuid = UUID.fromString(surveyId);
+		Flux<Response> responses =  responseService.addResponsesFromFile(fileFlux, surveyUuid);
+		return ResponseEntity.ok().body(responses);
 	}
 
 	@PostMapping(consumes = "application/json")
