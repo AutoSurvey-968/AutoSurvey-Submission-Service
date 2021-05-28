@@ -35,5 +35,5 @@ build/
 ### trustStore ###
 *.jks
 
-### furrybase ###
+### Firebase ###
 *.json
