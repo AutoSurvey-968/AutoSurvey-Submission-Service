@@ -5,7 +5,7 @@ if [ -z "$(docker network ls -q -f name=autosurvey-network)" ]; then
     docker network create autosurvey-network
 fi
 
-# rm submission-serivce container if it exists
+# rm submission-service container if it exists
 if [ -n "$(docker container ls -aqf name=submission-service)" ]; then
     echo "Removing submission-service"
     docker container stop submission-service
@@ -13,4 +13,4 @@ if [ -n "$(docker container ls -aqf name=submission-service)" ]; then
 fi
 
 #start submission-service container
-docker container run -d --name submission-service --network autosurvey-network -e EUREKA_URL -e CREDENTIALS_JSON -e CREDENTIALS_JSON_ENCODED -e FIREBASE_API_KEY -e SERVICE_ACCOUNT_ID -e AWS_PASS -e AWS_submission -e TRUSTSTORE_PASS -e TRUSTSTORE_ENCODED autosurvey/submission-service
+docker container run -d --name submission-service --network autosurvey-network -e EUREKA_URL -e CREDENTIALS_JSON -e CREDENTIALS_JSON_ENCODED -e FIREBASE_API_KEY -e SERVICE_ACCOUNT_ID -e AWS_PASS -e AWS_USER -e TRUSTSTORE_PASS -e TRUSTSTORE_ENCODED autosurvey/submission-service
