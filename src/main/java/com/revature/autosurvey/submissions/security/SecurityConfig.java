@@ -33,7 +33,7 @@ public class SecurityConfig {
 				.authorizeExchange().pathMatchers(HttpMethod.POST, "/").permitAll()
 				.pathMatchers("/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/v2/api-docs",
 						"/webjars/**")
-				.permitAll().anyExchange().authenticated().and().build();
+				.permitAll().anyExchange().permitAll().and().build();
 	}
 
 }
