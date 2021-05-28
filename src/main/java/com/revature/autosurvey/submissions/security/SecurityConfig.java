@@ -30,8 +30,8 @@ public class SecurityConfig {
 						(swe, e) -> Mono.fromRunnable(() -> swe.getResponse().setStatusCode(HttpStatus.FORBIDDEN)))
 				.and().csrf().disable().formLogin().disable().httpBasic().disable()
 				.authenticationManager(authenticationManager).securityContextRepository(securityContextRepository)
-				.authorizeExchange().pathMatchers(HttpMethod.POST, "/").permitAll()
-				.pathMatchers("/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/v2/api-docs",
+				.authorizeExchange().pathMatchers(HttpMethod.OPTIONS).permitAll().pathMatchers(HttpMethod.POST, "/")
+				.permitAll().pathMatchers("/swagger-resources/**", "/swagger-ui.html", "/swagger-ui/**", "/v2/api-docs",
 						"/webjars/**")
 				.permitAll().anyExchange().permitAll().and().build();
 	}
