@@ -11,7 +11,6 @@ import java.util.Random;
 
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
-
 import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
@@ -93,6 +92,10 @@ public class Utilities {
 			return TrainingWeek.NINE;
 		case "Week 10":
 			return TrainingWeek.TEN;
+		case "Week 11":
+			return TrainingWeek.ELEVEN;
+		case "Week 12":
+			return TrainingWeek.TWELVE;
 		default:
 			return null;
 		}

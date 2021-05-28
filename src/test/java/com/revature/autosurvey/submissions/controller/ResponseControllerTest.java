@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
@@ -25,15 +26,15 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
-public class ResponseControllerTest {
+class ResponseControllerTest {
 
 	@TestConfiguration
 	static class Configuration {
 		@Bean
-		public ResponseController getResponseController(ResponseService rs) {
-			ResponseController rc = new ResponseController();
-			rc.setResponseService(rs);
-			return rc;
+		public ResponseController getResponseController(ResponseService responseService) {
+			ResponseController responseController = new ResponseController();
+			responseController.setResponseService(responseService);
+			return responseController;
 		}
 
 		@Bean
@@ -54,7 +55,7 @@ public class ResponseControllerTest {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
-				.expectNext(ResponseEntity.ok().body(new Response())).expectComplete().verify();
+				.expectNext(new Response()).verifyComplete();
 	}
 
 	@Test
@@ -62,7 +63,7 @@ public class ResponseControllerTest {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.empty());
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
-				.expectNext(ResponseEntity.notFound().build()).expectComplete().verify();
+				.verifyComplete();
 	}
 
 	@Test
@@ -70,7 +71,7 @@ public class ResponseControllerTest {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
-				.expectNext(ResponseEntity.badRequest().body(new Response())).expectComplete().verify();
+				.expectError();
 	}
 
 	@Test
@@ -111,8 +112,7 @@ public class ResponseControllerTest {
 		testResponse2.setBatch(testBatch.get());
 		when(responseService.getResponsesByBatch(testBatch.get())).thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseController.getResponses(testBatch, Optional.empty(), Optional.empty()))
-				.expectNext(ResponseEntity.ok(testResponse1)).expectNext(ResponseEntity.ok(testResponse2))
-				.verifyComplete();
+				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
 
 	@Test
@@ -123,8 +123,63 @@ public class ResponseControllerTest {
 		testResponse2.setWeek(TrainingWeek.EIGHT);
 		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.of("Week 8"), Optional.empty()))
-				.expectNext(ResponseEntity.ok(testResponse1)).expectNext(ResponseEntity.ok(testResponse2))
-				.verifyComplete();
+				.expectNext(testResponse1, testResponse2).verifyComplete();
+	}
+
+	@Test
+	void testAddResponsesCSV() {
+		FilePart filePart = Mockito.mock(FilePart.class);
+		UUID id = UUID.randomUUID();
+		Flux<FilePart> fileFlux = Flux.just(filePart);
+		when(responseService.addResponsesFromFile(fileFlux, id))
+				.thenReturn(Flux.fromArray(new Response[] { new Response(), new Response(), new Response() }));
+		StepVerifier.create(responseController.addResponses(fileFlux, id))
+				.expectNext(ResponseEntity.ok().body(new Response()))
+				.expectNext(ResponseEntity.ok().body(new Response()))
+				.expectNext(ResponseEntity.ok().body(new Response())).expectComplete().verify();
+	}
+
+	@Test
+	void testAddResponsesCSVError() {
+		FilePart filePart = Mockito.mock(FilePart.class);
+		UUID id = UUID.randomUUID();
+		Flux<FilePart> fileFlux = Flux.just(filePart);
+		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.error(new Exception()));
+		StepVerifier.create(responseController.addResponses(fileFlux, id))
+				.expectNext(ResponseEntity.badRequest().body(new Response())).expectComplete().verify();
+	}
+
+	@Test
+	void testAddResponsesFluxEmpty() {
+		Flux<Response> emtpyFlux = Flux.empty();
+		when(responseService.addResponses(emtpyFlux)).thenReturn(emtpyFlux);
+		StepVerifier.create(responseController.addResponses(emtpyFlux)).expectComplete().verify();
+
+	}
+
+	@Test
+	void testAddResponsesFluxOneResponse() {
+		Flux<Response> responseFlux = Flux.just(new Response());
+		when(responseService.addResponses(responseFlux)).thenReturn(responseFlux);
+		StepVerifier.create(responseController.addResponses(responseFlux)).expectNext(new Response()).verifyComplete();
+
+	}
+
+	@Test
+	void testAddResponsesFluxMultipleResponses() {
+		Flux<Response> responseFlux = Flux.fromArray(new Response[] { new Response(), new Response(), new Response() });
+		when(responseService.addResponses(responseFlux)).thenReturn(responseFlux);
+		StepVerifier.create(responseController.addResponses(responseFlux)).expectNext(new Response())
+				.expectNext(new Response()).expectNext(new Response()).verifyComplete();
+
+	}
+
+	@Test
+	void testAddResponsesFluxError() {
+		Flux<Response> responseFlux = Flux.just(new Response());
+		when(responseService.addResponses(responseFlux)).thenReturn(Flux.error(new Exception()));
+		StepVerifier.create(responseController.addResponses(responseFlux)).expectError().verify();
+
 	}
 
 	@Test
@@ -136,11 +191,18 @@ public class ResponseControllerTest {
 		testResponse2.setBatch(testBatch.get());
 		testResponse1.setWeek(TrainingWeek.EIGHT);
 		testResponse2.setWeek(TrainingWeek.EIGHT);
-		when(responseService.getResponsesByBatchForWeek(any(), any()))
+		when(responseService.getResponsesByBatchAndWeek(any(), any()))
 				.thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseController.getResponses(testBatch, Optional.of("Week 8"), Optional.empty()))
-				.expectNext(ResponseEntity.ok(testResponse1)).expectNext(ResponseEntity.ok(testResponse2))
-				.verifyComplete();
+				.expectNext(testResponse1, testResponse2).verifyComplete();
+	}
+
+	@Test
+	void testGetAllResponsesGetsResponses() {
+		Response testResponse = new Response();
+		when(responseService.getAllResponses()).thenReturn(Flux.just(testResponse));
+		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.empty()))
+				.expectNextCount(1L);
 	}
 
 }

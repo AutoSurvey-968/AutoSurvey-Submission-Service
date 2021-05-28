@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
@@ -30,7 +31,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
-public class ResponseServiceTest {
+class ResponseServiceTest {
 
 	@TestConfiguration
 	static class Configuration {
@@ -172,9 +173,15 @@ public class ResponseServiceTest {
 		UUID idResult = responseService.deleteResponse(id).block().getUuid();
 		assertEquals(id, idResult);
 	}
+	
+	@Test
+	void testGetAllResponsesGetsResponses() {
+		when(responseRepository.findAll()).thenReturn(Flux.empty());
+		StepVerifier.create(responseService.getAllResponses()).verifyComplete();
+	}
 
 	@Test
-	void testGetAllResponsesByBatch() {
+	void testGetAllResponsesByBatchReturnsProperBatch() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		String testBatch = "Batch 23";
@@ -217,7 +224,7 @@ public class ResponseServiceTest {
 	}
 
 	@Test
-	void testGetAllResponsesByWeek() {
+	void testGetAllResponsesByWeekReturnsProperWeek() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		testResponse1.setWeek(TrainingWeek.EIGHT);

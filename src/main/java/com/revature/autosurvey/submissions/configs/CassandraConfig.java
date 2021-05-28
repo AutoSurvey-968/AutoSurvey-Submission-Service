@@ -24,8 +24,8 @@ public class CassandraConfig {
 	public CqlSessionFactoryBean session() {
 		CqlSessionFactoryBean factory = new CqlSessionFactoryBean();
 		DriverConfigLoader loader = DriverConfigLoader.fromClasspath("application.conf");
-		factory.setSessionBuilderConfigurer(builder -> builder.withConfigLoader(loader).withKeyspace("\"AutoSurvey\""));
-		factory.setKeyspaceName("\"AutoSurvey\"");
+		factory.setSessionBuilderConfigurer(builder -> builder.withConfigLoader(loader).withKeyspace("autosurvey"));
+		factory.setKeyspaceName("autosurvey");
 		return factory;
 	}
 
@@ -35,8 +35,7 @@ public class CassandraConfig {
 		((MappingCassandraConverter) converter).setUserTypeResolver(new SimpleUserTypeResolver(session));
 		sessionFactory.setSession(session);
 		sessionFactory.setConverter(converter);
-		// Please do not drop all of my tables.
-		sessionFactory.setSchemaAction(SchemaAction.NONE);
+		sessionFactory.setSchemaAction(SchemaAction.CREATE_IF_NOT_EXISTS);
 
 		return sessionFactory;
 	}
@@ -44,9 +43,7 @@ public class CassandraConfig {
 	@Bean
 	public CassandraMappingContext mappingContext(CqlSession cqlSession) {
 
-		CassandraMappingContext mappingContext = new CassandraMappingContext();
-
-		return mappingContext;
+		return new CassandraMappingContext();
 	}
 
 	@Bean
