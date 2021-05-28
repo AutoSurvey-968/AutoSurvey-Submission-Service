@@ -70,8 +70,11 @@ public class ResponseController {
 
 	@PutMapping("/{id}")
 	public Mono<ResponseEntity<Response>> updateResponse(@PathVariable UUID id, @RequestBody Response response) {
-		return responseService.updateResponse(id, response).map(updatedResponse -> ResponseEntity.ok().body(response))
-				.onErrorReturn(ResponseEntity.badRequest().body(new Response()));
+		if(id == null || response == null || response.getUuid() == null || !response.getUuid().equals(id)) {
+			return Mono.just(ResponseEntity.badRequest().build());
+		}
+		return responseService.updateResponse(id, response).map(updatedResponse -> ResponseEntity.ok().body(updatedResponse))
+				.onErrorReturn(ResponseEntity.notFound().build());
 	}
 
 	@DeleteMapping("{id}")
