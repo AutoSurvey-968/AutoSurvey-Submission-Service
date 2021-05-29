@@ -18,7 +18,6 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.service.ResponseService;
 
 import reactor.core.publisher.Flux;
@@ -93,6 +92,7 @@ class ResponseControllerTest {
 		StepVerifier.create(responseController.updateResponse(id, response))
 				.expectNext(ResponseEntity.notFound().build()).expectComplete().verify();
 	}
+
 	@Test
 	void testUpdateResponseNotMatchingUuids() {
 		UUID id = UUID.randomUUID();
@@ -102,6 +102,7 @@ class ResponseControllerTest {
 		StepVerifier.create(responseController.updateResponse(id, response))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
+
 	@Test
 	void testUpdateResponseNullId() {
 		UUID id = UUID.randomUUID();
@@ -111,6 +112,7 @@ class ResponseControllerTest {
 		StepVerifier.create(responseController.updateResponse(id, response))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
+
 	@Test
 	void testUpdateResponseNullResponse() {
 		UUID id = UUID.randomUUID();
@@ -120,6 +122,7 @@ class ResponseControllerTest {
 		StepVerifier.create(responseController.updateResponse(id, response))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
+
 	@Test
 	void testUpdateResponseNullResponseId() {
 		UUID id = UUID.randomUUID();
@@ -156,10 +159,11 @@ class ResponseControllerTest {
 	void testGetAllResponsesByWeek() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		testResponse1.setWeek(TrainingWeek.EIGHT);
-		testResponse2.setWeek(TrainingWeek.EIGHT);
+		Optional<String> testWeek = Optional.of("Week 8");
+		testResponse1.setWeek(testWeek.get());
+		testResponse2.setWeek(testWeek.get());
 		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.of("Week 8"), Optional.empty()))
+		StepVerifier.create(responseController.getResponses(Optional.empty(), testWeek, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
 
@@ -172,10 +176,8 @@ class ResponseControllerTest {
 		when(responseService.addResponsesFromFile(fileFlux, id))
 				.thenReturn(Flux.fromArray(new Response[] { new Response(), new Response(), new Response() }));
 		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
-		StepVerifier.create(body)
-			.expectNext(new Response())
-			.expectNext(new Response())
-			.expectNext(new Response()).expectComplete().verify();
+		StepVerifier.create(body).expectNext(new Response()).expectNext(new Response()).expectNext(new Response())
+				.expectComplete().verify();
 	}
 
 	@Test
@@ -227,13 +229,14 @@ class ResponseControllerTest {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		Optional<String> testBatch = Optional.of("Batch 23");
+		Optional<String> testWeek = Optional.of("Week 8");
 		testResponse1.setBatch(testBatch.get());
 		testResponse2.setBatch(testBatch.get());
-		testResponse1.setWeek(TrainingWeek.EIGHT);
-		testResponse2.setWeek(TrainingWeek.EIGHT);
+		testResponse1.setWeek(testWeek.get());
+		testResponse2.setWeek(testWeek.get());
 		when(responseService.getResponsesByBatchAndWeek(any(), any()))
 				.thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(testBatch, Optional.of("Week 8"), Optional.empty()))
+		StepVerifier.create(responseController.getResponses(testBatch, testWeek, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
 

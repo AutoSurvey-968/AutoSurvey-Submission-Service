@@ -24,8 +24,8 @@ public class CassandraConfig {
 	public CqlSessionFactoryBean session() {
 		CqlSessionFactoryBean factory = new CqlSessionFactoryBean();
 		DriverConfigLoader loader = DriverConfigLoader.fromClasspath("application.conf");
-		factory.setSessionBuilderConfigurer(builder -> builder.withConfigLoader(loader).withKeyspace("autosurvey"));
-		factory.setKeyspaceName("autosurvey");
+		factory.setSessionBuilderConfigurer(builder -> builder.withConfigLoader(loader).withKeyspace("\"AutoSurvey\""));
+		factory.setKeyspaceName("\"AutoSurvey\"");
 		return factory;
 	}
 

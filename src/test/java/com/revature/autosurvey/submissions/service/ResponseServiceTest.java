@@ -19,11 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
@@ -46,7 +44,7 @@ class ResponseServiceTest {
 		public ResponseRepository getResponseRepository() {
 			return Mockito.mock(ResponseRepository.class);
 		}
-		
+
 	}
 
 	@Autowired
@@ -62,12 +60,12 @@ class ResponseServiceTest {
 		responses = new ArrayList<>();
 		Response response1 = new Response();
 		response1.setBatch("1");
-		response1.setWeek(TrainingWeek.ONE);
+		response1.setWeek("Week 1");
 		response1.setUuid(UUID.fromString("11111111-1111-1111-1111-111111111101"));
 		responses.add(response1);
 		Response response2 = new Response();
 		response1.setBatch("2");
-		response1.setWeek(TrainingWeek.TWO);
+		response1.setWeek("Week 2");
 		response1.setUuid(UUID.fromString("11111111-1111-1111-1111-111111111102"));
 		responses.add(response2);
 	}
@@ -93,27 +91,32 @@ class ResponseServiceTest {
 		assertEquals(responseMono, responseService.addResponse(response));
 	}
 
-	
-	 @Test void buildResponseFromCsvLineReturnsResponse() { 
-		 String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A"; 
-		 String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""; 
-		 UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
-		 
-		 Response responseFromMethod = responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId);
+	@Test
+	void buildResponseFromCsvLineReturnsResponse() {
+		String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A";
+		String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
+		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
 
-		 Response expectedResponse = new Response(); Map<String, String>
-		 questions = new HashMap<>(); expectedResponse.setSurveyUuid(surveyId);
-		 questions.put("question1", "answer1"); questions.put("question2", "answer2");
-		 questions.put("Timestamp", "3/3/2020  14:08:17");
-		 questions.put("What batch are you in?", "Mock Batch 45"); questions.put(
-		 "\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""
-		 , "Week A"); expectedResponse.setResponses(questions); expectedResponse.setWeek(TrainingWeek.A);
-		 expectedResponse.setBatch("Mock Batch 45");
-		 expectedResponse.setUuid(responseFromMethod.getUuid());
-		 
-		 assertEquals(expectedResponse, responseFromMethod);
-	 }
-		
+		Response responseFromMethod = responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId);
+
+		Response expectedResponse = new Response();
+		Map<String, String> questions = new HashMap<>();
+		expectedResponse.setSurveyUuid(surveyId);
+		questions.put("question1", "answer1");
+		questions.put("question2", "answer2");
+		questions.put("Timestamp", "3/3/2020  14:08:17");
+		questions.put("What batch are you in?", "Mock Batch 45");
+		questions.put(
+				"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"",
+				"Week A");
+		expectedResponse.setResponses(questions);
+		expectedResponse.setWeek("Week A");
+		expectedResponse.setBatch("Mock Batch 45");
+		expectedResponse.setUuid(responseFromMethod.getUuid());
+
+		assertEquals(expectedResponse, responseFromMethod);
+	}
+
 	@Test
 	void addResponsesFromFileReturns() {
 		// I do not know how to generate a Flux<FilePart> so I gotta figure that out to
@@ -173,7 +176,7 @@ class ResponseServiceTest {
 		UUID idResult = responseService.deleteResponse(id).block().getUuid();
 		assertEquals(id, idResult);
 	}
-	
+
 	@Test
 	void testGetAllResponsesGetsResponses() {
 		when(responseRepository.findAll()).thenReturn(Flux.empty());
@@ -227,12 +230,13 @@ class ResponseServiceTest {
 	void testGetAllResponsesByWeekReturnsProperWeek() {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		testResponse1.setWeek(TrainingWeek.EIGHT);
-		testResponse2.setWeek(TrainingWeek.EIGHT);
-		when(responseRepository.findAllByWeek(TrainingWeek.EIGHT)).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseService.getResponsesByWeek(TrainingWeek.EIGHT))
-				.expectNextMatches(response -> response.getWeek().equals(TrainingWeek.EIGHT))
-				.expectNextMatches(response -> response.getWeek().equals(TrainingWeek.EIGHT)).verifyComplete();
+		String testWeek = "Week 8";
+		testResponse1.setWeek(testWeek);
+		testResponse2.setWeek(testWeek);
+		when(responseRepository.findAllByWeek(testWeek)).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseService.getResponsesByWeek(testWeek))
+				.expectNextMatches(response -> response.getWeek().equals(testWeek))
+				.expectNextMatches(response -> response.getWeek().equals(testWeek)).verifyComplete();
 	}
 
 }

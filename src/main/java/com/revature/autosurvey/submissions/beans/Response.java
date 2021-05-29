@@ -31,7 +31,7 @@ public class Response {
 			ordinal=1,
 			type = PrimaryKeyType.CLUSTERED,
 			ordering = Ordering.DESCENDING) 
-	private TrainingWeek week;
+	private String week;
 	@Column 
 	private UUID surveyUuid;
 	@Column

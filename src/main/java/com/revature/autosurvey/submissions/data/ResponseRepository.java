@@ -7,7 +7,6 @@ import org.springframework.data.cassandra.repository.ReactiveCassandraRepository
 import org.springframework.stereotype.Repository;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,7 +19,7 @@ public interface ResponseRepository extends ReactiveCassandraRepository<Response
 	Flux<Response> findAllByBatch(String batch);
 
 	@AllowFiltering
-	Flux<Response> findAllByWeek(TrainingWeek week);
+	Flux<Response> findAllByWeek(String week);
 
 	@AllowFiltering
 	Mono<Response> deleteByUuid(UUID uuid);

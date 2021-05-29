@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 import com.revature.autosurvey.submissions.utils.Utilities;
 
@@ -83,7 +82,7 @@ public class ResponseServiceImpl implements ResponseService {
 		response.setSurveyUuid(surveyId);
 		String weekString = responseMap.get(
 				"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
-		response.setWeek(Utilities.getTrainingWeekFromString(weekString));
+		response.setWeek(weekString);
 		response.setResponses(responseMap);
 		String timeString = responseMap.get("Timestamp");
 		response.setUuid(Uuids.startOf(Utilities.timeLongFromString(timeString)));
@@ -115,7 +114,7 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> getResponsesByWeek(TrainingWeek tWeek) {
+	public Flux<Response> getResponsesByWeek(String tWeek) {
 		return responseRepository.findAllByWeek(tWeek);
 	}
 
@@ -123,7 +122,7 @@ public class ResponseServiceImpl implements ResponseService {
 	public Flux<Response> getResponsesByBatchAndWeek(String batch, String week) {
 		return responseRepository.findAllByBatchAndWeek(batch, week);
 	}
-	
+
 	@Override
 	public Flux<Response> getAllResponses() {
 		return responseRepository.findAll();

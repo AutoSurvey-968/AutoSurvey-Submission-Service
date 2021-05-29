@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.springframework.http.codec.multipart.FilePart;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,7 +20,7 @@ public interface ResponseService {
 
 	Mono<Response> deleteResponse(UUID uuid);
 
-	Flux<Response> getResponsesByWeek(TrainingWeek eight);
+	Flux<Response> getResponsesByWeek(String week);
 
 	Mono<Response> addResponse(Response response);
 

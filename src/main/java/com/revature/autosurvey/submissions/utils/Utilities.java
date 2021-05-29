@@ -11,7 +11,6 @@ import java.util.Random;
 
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.codec.multipart.FilePart;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
 
@@ -64,41 +63,6 @@ public class Utilities {
 
 			return new String(bytes);
 		});
-	}
-
-	public static TrainingWeek getTrainingWeekFromString(String weekString) {
-		switch (weekString) {
-		case "Week A":
-			return TrainingWeek.A;
-		case "Week B":
-			return TrainingWeek.B;
-		case "Week 1":
-			return TrainingWeek.ONE;
-		case "Week 2":
-			return TrainingWeek.TWO;
-		case "Week 3":
-			return TrainingWeek.THREE;
-		case "Week 4":
-			return TrainingWeek.FOUR;
-		case "Week 5":
-			return TrainingWeek.FIVE;
-		case "Week 6":
-			return TrainingWeek.SIX;
-		case "Week 7":
-			return TrainingWeek.SEVEN;
-		case "Week 8":
-			return TrainingWeek.EIGHT;
-		case "Week 9":
-			return TrainingWeek.NINE;
-		case "Week 10":
-			return TrainingWeek.TEN;
-		case "Week 11":
-			return TrainingWeek.ELEVEN;
-		case "Week 12":
-			return TrainingWeek.TWELVE;
-		default:
-			return null;
-		}
 	}
 
 }

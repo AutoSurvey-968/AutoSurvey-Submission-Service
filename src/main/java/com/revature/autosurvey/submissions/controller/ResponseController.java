@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
-import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -45,7 +44,7 @@ public class ResponseController {
 		}
 
 		if (week.isPresent()) {
-			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()));
+			return responseService.getResponsesByWeek(week.get());
 		}
 
 		if (id.isPresent()) {
