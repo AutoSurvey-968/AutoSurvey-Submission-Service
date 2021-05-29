@@ -2,7 +2,7 @@
 
 ## Project Description
 
-The submission microservice for AutoSurvey-968. Webhook are you still alive?
+The submission microservice for AutoSurvey-968. Hello, Webhooks :)
 
 ## Technologies Used
 
