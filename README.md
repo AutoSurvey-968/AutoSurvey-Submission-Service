@@ -32,9 +32,11 @@ The submission microservice for AutoSurvey-968. Hello, I am Testy McTesterson.
 **See [Primary README.md](https://github.com/AutoSurvey-968/AutoSurvey-back) for full program setup instructions.**
 
 Set environment variables:
-* AWS_USER - Keyspaces username
-* AWS_PASS - Keyspaces password
-* TRUST_PASS - Local Truststore password
+```
+AWS_USER - Keyspaces username
+AWS_PASS - Keyspaces password
+TRUSTSTORE_PASS - Local Truststore password
+```
 
 ## Usage
 
