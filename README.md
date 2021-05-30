@@ -19,13 +19,13 @@ The submission microservice for AutoSurvey-968. Hello, I am Testy McTesterson.
 * Jacoco
 * Mockaroo
 
-## Features
+## Implemented Features
 
-* Create and maintain tables of anonymous survey responses
-* Convert and upload responses to a database from a .csv file
-* Upload direct user responses to a database
-* Get responses, organized by batch number or batch's week number
-* Able to update and delete specific responses
+-[X] Create and maintain tables of anonymous survey responses
+-[X] Convert and upload responses to a database from a .csv file
+-[X] Upload direct user responses to a database
+-[X] Get responses, organized by batch number or batch's calendar week (or both!)
+-[X] Able to update and delete specific responses
 
 ## Getting Started
 
