@@ -17,6 +17,7 @@ The submission microservice for AutoSurvey-968. Hello, I am Testy McTesterson.
 * Karate
 * JUnit
 * Jacoco
+* Mockaroo
 
 ## Features
 
