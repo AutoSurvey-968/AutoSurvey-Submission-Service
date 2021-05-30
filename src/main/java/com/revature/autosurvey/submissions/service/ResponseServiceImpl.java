@@ -1,6 +1,7 @@
 package com.revature.autosurvey.submissions.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,12 +81,12 @@ public class ResponseServiceImpl implements ResponseService {
 		}
 		response.setBatch(responseMap.get("What batch are you in?"));
 		response.setSurveyUuid(surveyId);
-		String weekString = responseMap.get(
-				"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
-		response.setWeek(weekString);
+		//String weekString = responseMap.get(
+		//		"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
 		response.setResponses(responseMap);
-		String timeString = responseMap.get("Timestamp");
-		response.setUuid(Uuids.startOf(Utilities.timeLongFromString(timeString)));
+		Long timestamp = Utilities.timeLongFromString(responseMap.get("Timestamp"));
+		response.setDate(new Date(timestamp));
+		response.setUuid(Uuids.startOf(timestamp));
 		return response;
 	}
 
@@ -114,13 +115,13 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> getResponsesByWeek(String tWeek) {
-		return responseRepository.findAllByWeek(tWeek);
+	public Flux<Response> getResponsesByDate(Date date) {
+		return responseRepository.findAllByDate(date);
 	}
 
 	@Override
-	public Flux<Response> getResponsesByBatchAndWeek(String batch, String week) {
-		return responseRepository.findAllByBatchAndWeek(batch, week);
+	public Flux<Response> getResponsesByBatchAndDate(String batch, Date date) {
+		return responseRepository.findAllByBatchAndDate(batch, date);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.controller;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,18 +34,18 @@ public class ResponseController {
 	}
 
 	@GetMapping
-	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<String> week,
+	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<Date> date,
 			@RequestParam Optional<UUID> id) {
-		if (batch.isPresent() && week.isPresent()) {
-			return responseService.getResponsesByBatchAndWeek(batch.get(), week.get());
+		if (batch.isPresent() && date.isPresent()) {
+			return responseService.getResponsesByBatchAndDate(batch.get(), date.get());
 		}
 
 		if (batch.isPresent()) {
 			return responseService.getResponsesByBatch(batch.get());
 		}
 
-		if (week.isPresent()) {
-			return responseService.getResponsesByWeek(week.get());
+		if (date.isPresent()) {
+			return responseService.getResponsesByDate(date.get());
 		}
 
 		if (id.isPresent()) {

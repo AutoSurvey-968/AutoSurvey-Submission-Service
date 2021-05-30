@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.beans;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,15 +24,15 @@ public class Response {
 	@PrimaryKeyColumn(
 			name="batch",
 			ordinal=0,
-			type = PrimaryKeyType.PARTITIONED,
+			type = PrimaryKeyType.CLUSTERED,
 			ordering = Ordering.DESCENDING)
 	private String batch;
 	@PrimaryKeyColumn(
-			name="week",
+			name="date",
 			ordinal=1,
-			type = PrimaryKeyType.CLUSTERED,
+			type = PrimaryKeyType.PARTITIONED,
 			ordering = Ordering.DESCENDING) 
-	private String week;
+	private Date date;
 	@Column 
 	private UUID surveyUuid;
 	@Column

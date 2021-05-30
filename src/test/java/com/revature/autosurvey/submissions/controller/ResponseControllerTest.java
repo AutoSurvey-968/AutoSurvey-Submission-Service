@@ -3,6 +3,10 @@ package com.revature.autosurvey.submissions.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -156,14 +160,15 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetAllResponsesByWeek() {
+	void testGetAllResponsesByDate() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		Optional<String> testWeek = Optional.of("Week 8");
-		testResponse1.setWeek(testWeek.get());
-		testResponse2.setWeek(testWeek.get());
-		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(Optional.empty(), testWeek, Optional.empty()))
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Optional<Date> testDate = Optional.of(format.parse("2021-03-29"));
+		testResponse1.setDate(testDate.get());
+		testResponse2.setDate(testDate.get());
+		when(responseService.getResponsesByDate(any())).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseController.getResponses(Optional.empty(), testDate, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
 
@@ -225,18 +230,19 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetAllResponsesByBatchAndWeek() {
+	void testGetAllResponsesByBatchAndDate() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		Optional<String> testBatch = Optional.of("Batch 23");
-		Optional<String> testWeek = Optional.of("Week 8");
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Optional<Date> testDate = Optional.of(format.parse("2021-03-29"));
 		testResponse1.setBatch(testBatch.get());
 		testResponse2.setBatch(testBatch.get());
-		testResponse1.setWeek(testWeek.get());
-		testResponse2.setWeek(testWeek.get());
-		when(responseService.getResponsesByBatchAndWeek(any(), any()))
+		testResponse1.setDate(testDate.get());
+		testResponse2.setDate(testDate.get());
+		when(responseService.getResponsesByBatchAndDate(any(), any()))
 				.thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(testBatch, testWeek, Optional.empty()))
+		StepVerifier.create(responseController.getResponses(testBatch, testDate, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
 

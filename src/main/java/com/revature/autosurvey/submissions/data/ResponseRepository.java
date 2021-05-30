@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.data;
 
+import java.util.Date;
 import java.util.UUID;
 
 import org.springframework.data.cassandra.repository.AllowFiltering;
@@ -16,14 +17,14 @@ public interface ResponseRepository extends ReactiveCassandraRepository<Response
 	@AllowFiltering
 	Mono<Response> findByUuid(UUID uuid);
 
+	@AllowFiltering
 	Flux<Response> findAllByBatch(String batch);
 
-	@AllowFiltering
-	Flux<Response> findAllByWeek(String week);
+	Flux<Response> findAllByDate(Date date);
 
 	@AllowFiltering
 	Mono<Response> deleteByUuid(UUID uuid);
 
 	@AllowFiltering
-	Flux<Response> findAllByBatchAndWeek(String batch, String week);
+	Flux<Response> findAllByBatchAndDate(String batch, Date date);
 }

@@ -5,7 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
+import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -60,12 +65,10 @@ class ResponseServiceTest {
 		responses = new ArrayList<>();
 		Response response1 = new Response();
 		response1.setBatch("1");
-		response1.setWeek("Week 1");
 		response1.setUuid(UUID.fromString("11111111-1111-1111-1111-111111111101"));
 		responses.add(response1);
 		Response response2 = new Response();
 		response1.setBatch("2");
-		response1.setWeek("Week 2");
 		response1.setUuid(UUID.fromString("11111111-1111-1111-1111-111111111102"));
 		responses.add(response2);
 	}
@@ -110,7 +113,7 @@ class ResponseServiceTest {
 				"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"",
 				"Week A");
 		expectedResponse.setResponses(questions);
-		expectedResponse.setWeek("Week A");
+		expectedResponse.setDate(new Date(Utilities.timeLongFromString(questions.get("Timestamp"))));
 		expectedResponse.setBatch("Mock Batch 45");
 		expectedResponse.setUuid(responseFromMethod.getUuid());
 
@@ -227,16 +230,17 @@ class ResponseServiceTest {
 	}
 
 	@Test
-	void testGetAllResponsesByWeekReturnsProperWeek() {
+	void testGetAllResponsesByWeekReturnsProperWeek() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		String testWeek = "Week 8";
-		testResponse1.setWeek(testWeek);
-		testResponse2.setWeek(testWeek);
-		when(responseRepository.findAllByWeek(testWeek)).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseService.getResponsesByWeek(testWeek))
-				.expectNextMatches(response -> response.getWeek().equals(testWeek))
-				.expectNextMatches(response -> response.getWeek().equals(testWeek)).verifyComplete();
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Date testDate = format.parse("2021-03-29");
+		testResponse1.setDate(testDate);
+		testResponse2.setDate(testDate);
+		when(responseRepository.findAllByDate(testDate)).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseService.getResponsesByDate(testDate))
+				.expectNextMatches(response -> response.getDate().equals(testDate))
+				.expectNextMatches(response -> response.getDate().equals(testDate)).verifyComplete();
 	}
 
 }
