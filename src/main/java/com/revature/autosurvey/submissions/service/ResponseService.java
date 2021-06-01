@@ -28,6 +28,8 @@ public interface ResponseService {
 	Flux<Response> addResponses(Flux<Response> responses);
 
 	Flux<Response> addResponses(List<Response> responses);
+	
+	public Flux<Response> addResponsesWithUuids (Flux<Response> responses);
 
 	Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
 

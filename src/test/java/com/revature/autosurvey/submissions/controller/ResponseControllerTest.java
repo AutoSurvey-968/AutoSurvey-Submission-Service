@@ -192,7 +192,7 @@ class ResponseControllerTest {
 	@Test
 	void testAddResponsesFluxEmpty() {
 		Flux<Response> emtpyFlux = Flux.empty();
-		when(responseService.addResponses(emtpyFlux)).thenReturn(emtpyFlux);
+		when(responseService.addResponsesWithUuids(emtpyFlux)).thenReturn(emtpyFlux);
 		StepVerifier.create(responseController.addResponses(emtpyFlux)).expectComplete().verify();
 
 	}
@@ -200,7 +200,7 @@ class ResponseControllerTest {
 	@Test
 	void testAddResponsesFluxOneResponse() {
 		Flux<Response> responseFlux = Flux.just(new Response());
-		when(responseService.addResponses(responseFlux)).thenReturn(responseFlux);
+		when(responseService.addResponsesWithUuids(responseFlux)).thenReturn(responseFlux);
 		StepVerifier.create(responseController.addResponses(responseFlux)).expectNext(new Response()).verifyComplete();
 
 	}
@@ -208,7 +208,7 @@ class ResponseControllerTest {
 	@Test
 	void testAddResponsesFluxMultipleResponses() {
 		Flux<Response> responseFlux = Flux.fromArray(new Response[] { new Response(), new Response(), new Response() });
-		when(responseService.addResponses(responseFlux)).thenReturn(responseFlux);
+		when(responseService.addResponsesWithUuids(responseFlux)).thenReturn(responseFlux);
 		StepVerifier.create(responseController.addResponses(responseFlux)).expectNext(new Response())
 				.expectNext(new Response()).expectNext(new Response()).verifyComplete();
 
@@ -217,7 +217,7 @@ class ResponseControllerTest {
 	@Test
 	void testAddResponsesFluxError() {
 		Flux<Response> responseFlux = Flux.just(new Response());
-		when(responseService.addResponses(responseFlux)).thenReturn(Flux.error(new Exception()));
+		when(responseService.addResponsesWithUuids(responseFlux)).thenReturn(Flux.error(new Exception()));
 		StepVerifier.create(responseController.addResponses(responseFlux)).expectError().verify();
 
 	}

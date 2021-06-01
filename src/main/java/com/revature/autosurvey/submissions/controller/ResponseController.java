@@ -64,9 +64,26 @@ public class ResponseController {
 	}
 
 	@PostMapping(consumes = "application/json")
+	@PreAuthorize("isAuthenticated()")
 	public Flux<Response> addResponses(@RequestBody Flux<Response> responses) {
-		return responseService.addResponses(responses);
+//		responses = responses.map(res -> {
+//			res.setUuid(Uuids.timeBased());
+//			return res;
+//		});
+		return responseService.addResponsesWithUuids(responses);
 	}
+	
+//	@PostMapping(consumes = "application/json")
+//	public ResponseEntity<Flux<Response>> addResponses(@RequestBody Mono<Response> response) {
+//		Long timeLong = System.currentTimeMillis();
+//		UUID id = Uuids.startOf(timeLong);
+//		response = response.map(res -> {
+//		res.setUuid(id);
+//		return res;
+//		});
+//		Flux<Response> results = responseService.addResponse(response);
+//		return ResponseEntity.ok().body(results);
+//	}
 
 	@PutMapping("/{id}")
 	public Mono<ResponseEntity<Response>> updateResponse(@PathVariable UUID id, @RequestBody Response response) {

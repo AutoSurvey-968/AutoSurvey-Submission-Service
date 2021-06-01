@@ -46,6 +46,15 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
+	public Flux<Response> addResponsesWithUuids (Flux<Response> responses) {
+		responses = responses.map(res -> {
+			res.setUuid(Uuids.timeBased());
+			return res;
+		});
+		return responseRepository.saveAll(responses);
+	}
+	
+	@Override
 	public Mono<Response> getResponse(UUID id) {
 		return responseRepository.findByUuid(id);
 	}
