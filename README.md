@@ -2,7 +2,7 @@
 
 ## Project Description
 
-The submission microservice for AutoSurvey-968. Hello, I am Testy McTesterson.
+The submission microservice for AutoSurvey-968.
 
 ## Technologies Used
 
