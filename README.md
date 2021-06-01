@@ -2,7 +2,7 @@
 
 ## Project Description
 
-The submission microservice for AutoSurvey-968.
+The submission microservice for AutoSurvey-968. Hello, I am Testy McTesterson.
 
 ## Technologies Used
 
@@ -17,23 +17,26 @@ The submission microservice for AutoSurvey-968.
 * Karate
 * JUnit
 * Jacoco
+* Mockaroo
 
-## Features
+## Implemented Features
 
-* Create and maintain tables of anonymous survey responses
-* Convert and upload responses to a database from a .csv file
-* Upload direct user responses to a database
-* Get responses, organized by batch number or batch's week number
-* Able to update and delete specific responses
+- [x] Create and maintain tables of anonymous survey responses
+- [x] Convert and upload responses to a database from a .csv file
+- [x] Upload direct user responses to a database
+- [x] Get responses, organized by batch number or batch's calendar week (or both!)
+- [x] Able to update and delete specific responses
 
 ## Getting Started
 
 **See [Primary README.md](https://github.com/AutoSurvey-968/AutoSurvey-back) for full program setup instructions.**
 
 Set environment variables:
-* AWS_USER - Keyspaces username
-* AWS_PASS - Keyspaces password
-* TRUST_PASS - Local Truststore password
+```
+AWS_USER - Keyspaces username
+AWS_PASS - Keyspaces password
+TRUSTSTORE_PASS - Local Truststore password
+```
 
 ## Usage
 

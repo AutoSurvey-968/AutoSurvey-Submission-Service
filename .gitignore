@@ -34,3 +34,6 @@ build/
 
 ### trustStore ###
 *.jks
+
+### Firebase ###
+*.json
