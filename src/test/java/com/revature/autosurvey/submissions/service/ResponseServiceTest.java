@@ -74,27 +74,6 @@ class ResponseServiceTest {
 	}
 
 	@Test
-	void addResponsesReturnsFluxResponses() {
-		Response response = responses.get(0);
-		Mono<Response> responseMono = Mono.just(response);
-		Flux<Response> responseFlux = responseMono.flux();
-
-		when(responseRepository.saveAll(responses)).thenReturn(responseFlux);
-
-		assertEquals(responseFlux, responseService.addResponses(responses));
-	}
-
-	@Test
-	void addResponseReturnsMonoResponse() {
-		Response response = responses.get(0);
-		Mono<Response> responseMono = Mono.just(response);
-
-		when(responseRepository.save(response)).thenReturn(responseMono);
-
-		assertEquals(responseMono, responseService.addResponse(response));
-	}
-
-	@Test
 	void buildResponseFromCsvLineReturnsResponse() {
 		String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A";
 		String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
