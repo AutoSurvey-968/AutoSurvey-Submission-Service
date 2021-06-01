@@ -160,14 +160,14 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetAllResponsesByDate() throws ParseException {
+	void testGetAllResponsesByWeek() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		Optional<Date> testDate = Optional.of(format.parse("2021-03-29"));
 		testResponse1.setDate(testDate.get());
 		testResponse2.setDate(testDate.get());
-		when(responseService.getResponsesByDate(any())).thenReturn(Flux.just(testResponse1, testResponse2));
+		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), testDate, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
@@ -240,7 +240,7 @@ class ResponseControllerTest {
 		testResponse2.setBatch(testBatch.get());
 		testResponse1.setDate(testDate.get());
 		testResponse2.setDate(testDate.get());
-		when(responseService.getResponsesByBatchAndDate(any(), any()))
+		when(responseService.getResponsesByBatchAndWeek(any(), any()))
 				.thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseController.getResponses(testBatch, testDate, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();

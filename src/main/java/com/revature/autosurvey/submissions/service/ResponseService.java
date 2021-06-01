@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -17,11 +18,7 @@ public interface ResponseService {
 
 	Mono<Response> deleteResponse(UUID uuid);
 
-	Mono<Response> addResponse(Response response);
-
 	Flux<Response> addResponses(Flux<Response> responses);
-
-	Flux<Response> addResponses(List<Response> responses);
 
 	Response buildResponseFromCsvLine(String csvLine, String questionLine, UUID surveyId);
 
@@ -29,11 +26,11 @@ public interface ResponseService {
 
 	Flux<Response> getAllResponses();
 	
-	Flux<Response> getResponsesByDate(Date date);
+	Flux<Response> getResponsesByWeek(Date date);
 	
 	Flux<Response> getResponsesByBatch(String batch);
 
-	Flux<Response> getResponsesByBatchAndDate(String batch, Date date);
+	Flux<Response> getResponsesByBatchAndWeek(String batch, Date date);
 	
 	Mono<Response> getResponse(UUID uuid);
 

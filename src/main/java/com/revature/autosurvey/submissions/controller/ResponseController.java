@@ -34,18 +34,18 @@ public class ResponseController {
 	}
 
 	@GetMapping
-	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<Date> date,
+	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<Date> weekStart,
 			@RequestParam Optional<UUID> id) {
-		if (batch.isPresent() && date.isPresent()) {
-			return responseService.getResponsesByBatchAndDate(batch.get(), date.get());
+		if (batch.isPresent() && weekStart.isPresent()) {
+			return responseService.getResponsesByBatchAndWeek(batch.get(), weekStart.get());
 		}
 
 		if (batch.isPresent()) {
 			return responseService.getResponsesByBatch(batch.get());
 		}
 
-		if (date.isPresent()) {
-			return responseService.getResponsesByDate(date.get());
+		if (weekStart.isPresent()) {
+			return responseService.getResponsesByWeek(weekStart.get());
 		}
 
 		if (id.isPresent()) {
@@ -59,7 +59,7 @@ public class ResponseController {
 	public ResponseEntity<Flux<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
 			@RequestPart("surveyId") String surveyId) {
 		UUID surveyUuid = UUID.fromString(surveyId);
-		Flux<Response> responses =  responseService.addResponsesFromFile(fileFlux, surveyUuid);
+		Flux<Response> responses = responseService.addResponsesFromFile(fileFlux, surveyUuid);
 		return ResponseEntity.ok().body(responses);
 	}
 
@@ -68,7 +68,8 @@ public class ResponseController {
 		return responseService.addResponses(responses);
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("{id}")
+	@PreAuthorize("isAuthenticated()")
 	public Mono<ResponseEntity<Response>> updateResponse(@PathVariable UUID id, @RequestBody Response response) {
 		if(id == null || response == null || response.getUuid() == null || !response.getUuid().equals(id)) {
 			return Mono.just(ResponseEntity.badRequest().build());
@@ -78,6 +79,7 @@ public class ResponseController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("isAuthenticated()")
 	public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable("id") UUID uuid) {
 		return responseService.deleteResponse(uuid).map(response -> ResponseEntity.noContent().build())
 				.onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));

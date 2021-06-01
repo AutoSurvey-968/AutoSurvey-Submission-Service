@@ -1,6 +1,9 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,17 +34,7 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Mono<Response> addResponse(Response response) {
-		return responseRepository.save(response);
-	}
-
-	@Override
 	public Flux<Response> addResponses(Flux<Response> responses) {
-		return responseRepository.saveAll(responses);
-	}
-
-	@Override
-	public Flux<Response> addResponses(List<Response> responses) {
 		return responseRepository.saveAll(responses);
 	}
 
@@ -81,8 +74,9 @@ public class ResponseServiceImpl implements ResponseService {
 		}
 		response.setBatch(responseMap.get("What batch are you in?"));
 		response.setSurveyUuid(surveyId);
-		//String weekString = responseMap.get(
-		//		"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
+		// String weekString = responseMap.get(
+		// "\"What was your most recently completed week of training? (Extended batches
+		// start with Week A, normal batches start with Week 1)\"");
 		response.setResponses(responseMap);
 		Long timestamp = Utilities.timeLongFromString(responseMap.get("Timestamp"));
 		response.setDate(new Date(timestamp));
@@ -115,13 +109,23 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> getResponsesByDate(Date date) {
-		return responseRepository.findAllByDate(date);
+	public Flux<Response> getResponsesByWeek(Date date) {
+		Date startDate = date;
+		Calendar endCal = Calendar.getInstance();
+		endCal.setTime(date);
+		endCal.add(Calendar.DATE, 6);
+		Date endDate = endCal.getTime();
+		return responseRepository.findAllByWeek(startDate, endDate);
 	}
 
 	@Override
-	public Flux<Response> getResponsesByBatchAndDate(String batch, Date date) {
-		return responseRepository.findAllByBatchAndDate(batch, date);
+	public Flux<Response> getResponsesByBatchAndWeek(String batch, Date date) {
+		Date startDate = date;
+		Calendar endCal = Calendar.getInstance();
+		endCal.setTime(date);
+		endCal.add(Calendar.DATE, 6);
+		Date endDate = endCal.getTime();
+		return responseRepository.findAllByBatchAndWeek(batch, startDate, endDate);
 	}
 
 	@Override

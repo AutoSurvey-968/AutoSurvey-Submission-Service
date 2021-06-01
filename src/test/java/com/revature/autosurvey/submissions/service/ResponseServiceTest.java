@@ -237,8 +237,8 @@ class ResponseServiceTest {
 		Date testDate = format.parse("2021-03-29");
 		testResponse1.setDate(testDate);
 		testResponse2.setDate(testDate);
-		when(responseRepository.findAllByDate(testDate)).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseService.getResponsesByDate(testDate))
+		when(responseRepository.findAllByWeek(any(), any())).thenReturn(Flux.just(testResponse1, testResponse2));
+		StepVerifier.create(responseService.getResponsesByWeek(testDate))
 				.expectNextMatches(response -> response.getDate().equals(testDate))
 				.expectNextMatches(response -> response.getDate().equals(testDate)).verifyComplete();
 	}
