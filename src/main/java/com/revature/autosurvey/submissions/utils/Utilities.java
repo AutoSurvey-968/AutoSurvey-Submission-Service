@@ -1,6 +1,7 @@
 package com.revature.autosurvey.submissions.utils;
 
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,15 @@ public class Utilities {
 		ldate = LocalDateTime.parse(timeString, dtf);
 		int millis = getRandomNumber(0, 999);
 		return ldate.toInstant(ZoneOffset.ofHours(0)).toEpochMilli() + millis;
+	}
+	
+	public static Timestamp dateOnlyTimestampFromString(String timeString) {
+		String[] timeSplit = timeString.split(" ");
+		String noTimeString = timeSplit[0] + " 00:00:00";
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("M/d/yyyy HH:mm:ss");
+		LocalDateTime ldate = null;
+		ldate = LocalDateTime.parse(noTimeString, dtf);
+		return Timestamp.valueOf(ldate);
 	}
 
 	public static List<String> bigSplit(String string) {
