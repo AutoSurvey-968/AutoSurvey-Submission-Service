@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -187,6 +188,22 @@ class ResponseControllerTest {
 		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.error(new Exception()));
 		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
 		StepVerifier.create(body).verifyError();
+	}
+	
+	@Test
+	void testAddResponsesCSVNoFile() {
+		UUID id = UUID.randomUUID();
+		String idString = id.toString();
+		ResponseEntity<Flux<Response>> body = responseController.addResponses(null, idString);
+		assertEquals(400, body.getStatusCodeValue(), " responseController.addResponses(null, value) should return 400");
+	}
+	
+	@Test
+	void testAddResponsesCSVNoSurveyId() {
+		FilePart filePart = Mockito.mock(FilePart.class);
+		Flux<FilePart> fileFlux = Flux.just(filePart);
+		ResponseEntity<Flux<Response>> body = responseController.addResponses(fileFlux, null);
+		assertEquals(400, body.getStatusCodeValue(), " responseController.addResponses(value, null) should return 400");
 	}
 
 	@Test
