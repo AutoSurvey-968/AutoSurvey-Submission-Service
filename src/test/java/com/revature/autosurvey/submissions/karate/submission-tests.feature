@@ -1,9 +1,8 @@
 @submission-tests
-Feature: tests all the functions for Surveys
+Feature: tests all the functions for Submissions
 
 Background:
-* def jsonResponse = read('test.json')
-* def csvResponse = read('test2.csv')
+* def jsonResponse = read('AutoSurvey_mock_data.json')
 * url "http://localhost:8080"
 
 
@@ -15,22 +14,25 @@ Return an array of all Responses based on the Optionals
 Take in an ID, delete the Response from the db
 
 ##POST - create new response from JSON    
-Given request jsonResponse
+##Given request jsonResponse
+##When method POST
+##Then status 201
+##And match response contains { uuid: '#present', title: 'This is a second title' }
+
+##* def uuid = response.uuid
+
+##POST - create new response from CSV
+
+Given multipart file csvfile = {read:'classpath:/com/revature/autosurvey/submissions/karate/testdata.csv', filename:'testdata.csv'} 
+And multipart field surveyId = 'cf0821d5-ef88-4da6-a197-a993fde05683'
 When method POST
-Then status 201
-And match response contains { uuid: '#present', title: 'This is a second title' }
+Then status 200
 
 * def uuid = response.uuid
 
-##POST - create new response from CSV
-Given request csvResponse
-When method POST
-Then status 201
-And match response contains { uuid: '#present', title: 'This is a second title' }
-
 ##PUT - update response by ID
 Given path "/" + uuid
-AND request jsonResponse
+And request jsonResponse
 When method PUT
 Then status 200
 
