@@ -6,13 +6,13 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +25,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping(value = "/submissions")
 public class ResponseController {
 	private ResponseService responseService;
 
@@ -56,8 +55,12 @@ public class ResponseController {
 	}
 
 	@PostMapping(consumes = "multipart/form-data")
+	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<Flux<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
 			@RequestPart("surveyId") String surveyId) {
+		if(surveyId == null || fileFlux == null) {
+			return ResponseEntity.badRequest().build();
+		}
 		UUID surveyUuid = UUID.fromString(surveyId);
 		Flux<Response> responses =  responseService.addResponsesFromFile(fileFlux, surveyUuid);
 		return ResponseEntity.ok().body(responses);
