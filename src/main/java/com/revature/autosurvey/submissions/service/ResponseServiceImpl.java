@@ -1,6 +1,8 @@
 package com.revature.autosurvey.submissions.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 import com.revature.autosurvey.submissions.utils.Utilities;
 
@@ -31,17 +32,7 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Mono<Response> addResponse(Response response) {
-		return responseRepository.save(response);
-	}
-
-	@Override
 	public Flux<Response> addResponses(Flux<Response> responses) {
-		return responseRepository.saveAll(responses);
-	}
-
-	@Override
-	public Flux<Response> addResponses(List<Response> responses) {
 		return responseRepository.saveAll(responses);
 	}
 
@@ -81,12 +72,13 @@ public class ResponseServiceImpl implements ResponseService {
 		}
 		response.setBatch(responseMap.get("What batch are you in?"));
 		response.setSurveyUuid(surveyId);
-		String weekString = responseMap.get(
-				"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"");
-		response.setWeek(Utilities.getTrainingWeekFromString(weekString));
+		// String weekString = responseMap.get(
+		// "\"What was your most recently completed week of training? (Extended batches
+		// start with Week A, normal batches start with Week 1)\"");
 		response.setResponses(responseMap);
-		String timeString = responseMap.get("Timestamp");
-		response.setUuid(Uuids.startOf(Utilities.timeLongFromString(timeString)));
+		Long timestamp = Utilities.timeLongFromString(responseMap.get("Timestamp"));
+		response.setDate(new Date(timestamp));
+		response.setUuid(Uuids.startOf(timestamp));
 		return response;
 	}
 
@@ -115,15 +107,25 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> getResponsesByWeek(TrainingWeek tWeek) {
-		return responseRepository.findAllByWeek(tWeek);
+	public Flux<Response> getResponsesByWeek(Date date) {
+		Date startDate = date;
+		Calendar endCal = Calendar.getInstance();
+		endCal.setTime(date);
+		endCal.add(Calendar.DATE, 6);
+		Date endDate = endCal.getTime();
+		return responseRepository.findAllByWeek(startDate, endDate);
 	}
 
 	@Override
-	public Flux<Response> getResponsesByBatchAndWeek(String batch, String week) {
-		return responseRepository.findAllByBatchAndWeek(batch, week);
+	public Flux<Response> getResponsesByBatchAndWeek(String batch, Date date) {
+		Date startDate = date;
+		Calendar endCal = Calendar.getInstance();
+		endCal.setTime(date);
+		endCal.add(Calendar.DATE, 6);
+		Date endDate = endCal.getTime();
+		return responseRepository.findAllByBatchAndWeek(batch, startDate, endDate);
 	}
-	
+
 	@Override
 	public Flux<Response> getAllResponses() {
 		return responseRepository.findAll();
