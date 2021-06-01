@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -106,18 +107,18 @@ class ResponseControllerTest {
 	void testUpdateResponseNullId() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		response.setUuid(UUID.randomUUID());
-		when(responseService.updateResponse(null, response)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.updateResponse(id, response))
+		response.setUuid(id);
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(null, response))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
 	@Test
 	void testUpdateResponseNullResponse() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		response.setUuid(UUID.randomUUID());
-		when(responseService.updateResponse(id, null)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.updateResponse(id, response))
+		response.setUuid(id);
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(id, null))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
 	@Test
@@ -126,6 +127,15 @@ class ResponseControllerTest {
 		Response response = new Response();
 		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseController.updateResponse(id, response))
+				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
+	}
+	
+	@Test
+	void testUpdateResponseNullIdAndResponse() {
+		UUID id = UUID.randomUUID();
+		Response response = new Response();
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(null, null))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
 
@@ -187,6 +197,22 @@ class ResponseControllerTest {
 		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.error(new Exception()));
 		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
 		StepVerifier.create(body).verifyError();
+	}
+	
+	@Test
+	void testAddResponsesCSVNoFile() {
+		UUID id = UUID.randomUUID();
+		String idString = id.toString();
+		ResponseEntity<Flux<Response>> body = responseController.addResponses(null, idString);
+		assertEquals(400, body.getStatusCodeValue(), " responseController.addResponses(null, value) should return 400");
+	}
+	
+	@Test
+	void testAddResponsesCSVNoSurveyId() {
+		FilePart filePart = Mockito.mock(FilePart.class);
+		Flux<FilePart> fileFlux = Flux.just(filePart);
+		ResponseEntity<Flux<Response>> body = responseController.addResponses(fileFlux, null);
+		assertEquals(400, body.getStatusCodeValue(), " responseController.addResponses(value, null) should return 400");
 	}
 
 	@Test
