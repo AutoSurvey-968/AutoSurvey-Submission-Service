@@ -107,18 +107,18 @@ class ResponseControllerTest {
 	void testUpdateResponseNullId() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		response.setUuid(UUID.randomUUID());
-		when(responseService.updateResponse(null, response)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.updateResponse(id, response))
+		response.setUuid(id);
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(null, response))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
 	@Test
 	void testUpdateResponseNullResponse() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		response.setUuid(UUID.randomUUID());
-		when(responseService.updateResponse(id, null)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.updateResponse(id, response))
+		response.setUuid(id);
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(id, null))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
 	@Test
@@ -127,6 +127,15 @@ class ResponseControllerTest {
 		Response response = new Response();
 		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseController.updateResponse(id, response))
+				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
+	}
+	
+	@Test
+	void testUpdateResponseNullIdAndResponse() {
+		UUID id = UUID.randomUUID();
+		Response response = new Response();
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(null, null))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
 
