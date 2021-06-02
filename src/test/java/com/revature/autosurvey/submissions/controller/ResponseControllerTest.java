@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +54,7 @@ class ResponseControllerTest {
 	private ResponseService responseService;
 
 	@Test
-	void testGetResponse() {
+	void testGetResponse() throws ParseException {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.just(new Response()));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
@@ -63,7 +62,7 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetEmptyResponse() {
+	void testGetEmptyResponse() throws ParseException {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.empty());
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
@@ -71,7 +70,7 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetErrorResponse() {
+	void testGetErrorResponse() throws ParseException {
 		UUID id = UUID.randomUUID();
 		when(responseService.getResponse(id)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.of(id)))
@@ -158,7 +157,7 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetAllResponsesByBatch() {
+	void testGetAllResponsesByBatch() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		Optional<String> testBatch = Optional.of("Batch 23");
@@ -173,10 +172,10 @@ class ResponseControllerTest {
 	void testGetAllResponsesByWeek() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		Optional<Date> testDate = Optional.of(format.parse("2021-03-29"));
-		testResponse1.setDate(testDate.get());
-		testResponse2.setDate(testDate.get());
+		Optional<String> testDate = Optional.of("2021-03-29");
+		Date format = new SimpleDateFormat("yyyy-MM-dd").parse(testDate.get());
+		testResponse1.setDate(format);
+		testResponse2.setDate(format);
 		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), testDate, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();
@@ -260,12 +259,12 @@ class ResponseControllerTest {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		Optional<String> testBatch = Optional.of("Batch 23");
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		Optional<Date> testDate = Optional.of(format.parse("2021-03-29"));
+		Optional<String> testDate = Optional.of("2021-03-29");
+		Date format = new SimpleDateFormat("yyyy-MM-dd").parse(testDate.get());
 		testResponse1.setBatch(testBatch.get());
 		testResponse2.setBatch(testBatch.get());
-		testResponse1.setDate(testDate.get());
-		testResponse2.setDate(testDate.get());
+		testResponse1.setDate(format);
+		testResponse2.setDate(format);
 		when(responseService.getResponsesByBatchAndWeek(any(), any()))
 				.thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseController.getResponses(testBatch, testDate, Optional.empty()))
@@ -273,7 +272,7 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetAllResponsesGetsResponses() {
+	void testGetAllResponsesGetsResponses() throws ParseException {
 		Response testResponse = new Response();
 		when(responseService.getAllResponses()).thenReturn(Flux.just(testResponse));
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.empty()))

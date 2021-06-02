@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -24,11 +25,11 @@ public interface ResponseService {
 
 	Flux<Response> getAllResponses();
 	
-	Flux<Response> getResponsesByWeek(Date date);
+	Flux<Response> getResponsesByWeek(String date) throws ParseException;
 	
 	Flux<Response> getResponsesByBatch(String batch);
 
-	Flux<Response> getResponsesByBatchAndWeek(String batch, Date date);
+	Flux<Response> getResponsesByBatchAndWeek(String batch, String date) throws ParseException;
 	
 	Mono<Response> getResponse(UUID uuid);
 
