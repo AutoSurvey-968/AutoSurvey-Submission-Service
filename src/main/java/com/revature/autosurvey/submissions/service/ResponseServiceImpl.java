@@ -1,5 +1,7 @@
 package com.revature.autosurvey.submissions.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -107,21 +109,21 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> getResponsesByWeek(Date date) {
-		Date startDate = date;
+	public Flux<Response> getResponsesByWeek(String date) throws ParseException {
+		Date startDate = new SimpleDateFormat("yyy-MM-dd").parse(date);
 		Calendar endCal = Calendar.getInstance();
-		endCal.setTime(date);
-		endCal.add(Calendar.DATE, 6);
+		endCal.setTime(startDate);
+		endCal.add(Calendar.DATE, 7);
 		Date endDate = endCal.getTime();
 		return responseRepository.findAllByWeek(startDate, endDate);
 	}
 
 	@Override
-	public Flux<Response> getResponsesByBatchAndWeek(String batch, Date date) {
-		Date startDate = date;
+	public Flux<Response> getResponsesByBatchAndWeek(String batch, String date) throws ParseException {
+		Date startDate = new SimpleDateFormat("yyy-MM-dd").parse(date);
 		Calendar endCal = Calendar.getInstance();
-		endCal.setTime(date);
-		endCal.add(Calendar.DATE, 6);
+		endCal.setTime(startDate);
+		endCal.add(Calendar.DATE, 7);
 		Date endDate = endCal.getTime();
 		return responseRepository.findAllByBatchAndWeek(batch, startDate, endDate);
 	}
