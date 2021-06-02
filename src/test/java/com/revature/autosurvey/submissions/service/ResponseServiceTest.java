@@ -73,30 +73,30 @@ class ResponseServiceTest {
 		responses.add(response2);
 	}
 
-	/*
-	 * @Test void buildResponseFromCsvLineReturnsResponse() { String csvLine =
-	 * "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A"; String
-	 * questionLine =
-	 * "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""
-	 * ; UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
-	 * 
-	 * Response responseFromMethod =
-	 * responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId);
-	 * 
-	 * Response expectedResponse = new Response(); Map<String, String> questions =
-	 * new HashMap<>(); expectedResponse.setSurveyUuid(surveyId);
-	 * questions.put("question1", "answer1"); questions.put("question2", "answer2");
-	 * questions.put("Timestamp", "3/3/2020  14:08:17");
-	 * questions.put("What batch are you in?", "Mock Batch 45"); questions.put(
-	 * "\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\""
-	 * , "Week A"); expectedResponse.setResponses(questions);
-	 * expectedResponse.setDate(new
-	 * Date(Utilities.timeLongFromString(questions.get("Timestamp"))));
-	 * expectedResponse.setBatch("Mock Batch 45");
-	 * expectedResponse.setUuid(responseFromMethod.getUuid());
-	 * 
-	 * assertEquals(expectedResponse, responseFromMethod); }
-	 */
+	@Test
+	void buildResponseFromCsvLineReturnsResponse() {
+		String csvLine = "answer1,answer2,,3/3/2020  14:08:17,Mock Batch 45,Week A";
+		String questionLine = "question1,question2,question3,Timestamp,What batch are you in?,\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"";
+		UUID surveyId = UUID.fromString("11111111-1111-1111-1111-111111111001");
+
+		Response responseFromMethod = responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId);
+		Response expectedResponse = new Response();
+		Map<String, String> questions = new HashMap<>();
+		expectedResponse.setSurveyUuid(surveyId);
+		questions.put("question1", "answer1");
+		questions.put("question2", "answer2");
+		questions.put("Timestamp", "3/3/2020  14:08:17");
+		questions.put("What batch are you in?", "Mock Batch 45");
+		questions.put(
+				"\"What was your most recently completed week of training? (Extended batches start with Week A, normal batches start with Week 1)\"",
+				"Week A");
+		expectedResponse.setResponses(questions);
+		expectedResponse.setDate(new Date(Utilities.timeLongFromString(questions.get("Timestamp"))));
+		expectedResponse.setBatch("Mock Batch 45");
+		expectedResponse.setUuid(responseFromMethod.getUuid());
+
+		assertEquals(expectedResponse.toString(), responseFromMethod.toString());
+	}
 
 	@Test
 	void addResponsesFromFileReturns() {
@@ -219,6 +219,17 @@ class ResponseServiceTest {
 		StepVerifier.create(responseService.getResponsesByWeek(testDate))
 				.expectNextMatches(response -> response.getDate().equals(testDate))
 				.expectNextMatches(response -> response.getDate().equals(testDate)).verifyComplete();
+	}
+
+	@Test
+	void testGetAllResponseByBatchAndWeek() throws ParseException {
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Date testDate = format.parse("2021-03-29");
+		String testBatch = "Batch 23";
+		when(responseRepository.findAllByBatchAndWeek(any(), any(), any()))
+				.thenReturn(Flux.just(new Response(), new Response()));
+		StepVerifier.create(responseService.getResponsesByBatchAndWeek(testBatch, testDate)).expectNext(new Response())
+				.expectNext(new Response()).verifyComplete();
 	}
 
 }
