@@ -98,7 +98,7 @@ class ResponseServiceTest {
 		assertEquals(expectedResponse.getResponses(), responseFromMethod.getResponses());
 		assertEquals(expectedResponse.getBatch(), responseFromMethod.getBatch());
 		assertEquals(expectedResponse.getClass(), responseFromMethod.getClass());
-		assertEquals(expectedResponse.getDate().getDate(), responseFromMethod.getDate().getDate());
+		assertEquals(expectedResponse.getDate().toString(), responseFromMethod.getDate().toString());
 		assertEquals(expectedResponse.getResponses(), responseFromMethod.getResponses());
 		assertEquals(expectedResponse.getSurveyUuid(), responseFromMethod.getSurveyUuid());
 		assertEquals(expectedResponse.getUuid(), responseFromMethod.getUuid());
