@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.controller;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.service.ResponseService;
-import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -34,18 +34,18 @@ public class ResponseController {
 	}
 
 	@GetMapping
-	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<String> week,
+	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<Date> weekStart,
 			@RequestParam Optional<UUID> id) {
-		if (batch.isPresent() && week.isPresent()) {
-			return responseService.getResponsesByBatchAndWeek(batch.get(), week.get());
+		if (batch.isPresent() && weekStart.isPresent()) {
+			return responseService.getResponsesByBatchAndWeek(batch.get(), weekStart.get());
 		}
 
 		if (batch.isPresent()) {
 			return responseService.getResponsesByBatch(batch.get());
 		}
 
-		if (week.isPresent()) {
-			return responseService.getResponsesByWeek(Utilities.getTrainingWeekFromString(week.get()));
+		if (weekStart.isPresent()) {
+			return responseService.getResponsesByWeek(weekStart.get());
 		}
 
 		if (id.isPresent()) {
@@ -58,8 +58,11 @@ public class ResponseController {
 	@PreAuthorize("isAuthenticated()")
 	public ResponseEntity<Flux<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
 			@RequestPart("surveyId") String surveyId) {
+		if(surveyId == null || fileFlux == null) {
+			return ResponseEntity.badRequest().build();
+		}
 		UUID surveyUuid = UUID.fromString(surveyId);
-		Flux<Response> responses =  responseService.addResponsesFromFile(fileFlux, surveyUuid);
+		Flux<Response> responses = responseService.addResponsesFromFile(fileFlux, surveyUuid);
 		return ResponseEntity.ok().body(responses);
 	}
 
@@ -69,7 +72,8 @@ public class ResponseController {
 		return responseService.addResponsesWithUuids(responses);
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping("{id}")
+	@PreAuthorize("isAuthenticated()")
 	public Mono<ResponseEntity<Response>> updateResponse(@PathVariable UUID id, @RequestBody Response response) {
 		if(id == null || response == null || response.getUuid() == null || !response.getUuid().equals(id)) {
 			return Mono.just(ResponseEntity.badRequest().build());
@@ -79,6 +83,7 @@ public class ResponseController {
 	}
 
 	@DeleteMapping("{id}")
+	@PreAuthorize("isAuthenticated()")
 	public Mono<ResponseEntity<Object>> deleteResponse(@PathVariable("id") UUID uuid) {
 		return responseService.deleteResponse(uuid).map(response -> ResponseEntity.noContent().build())
 				.onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));

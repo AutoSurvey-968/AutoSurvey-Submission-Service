@@ -1,8 +1,13 @@
 package com.revature.autosurvey.submissions.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,7 +23,6 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 import com.revature.autosurvey.submissions.service.ResponseService;
 
 import reactor.core.publisher.Flux;
@@ -93,6 +97,7 @@ class ResponseControllerTest {
 		StepVerifier.create(responseController.updateResponse(id, response))
 				.expectNext(ResponseEntity.notFound().build()).expectComplete().verify();
 	}
+
 	@Test
 	void testUpdateResponseNotMatchingUuids() {
 		UUID id = UUID.randomUUID();
@@ -102,30 +107,42 @@ class ResponseControllerTest {
 		StepVerifier.create(responseController.updateResponse(id, response))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
+
 	@Test
 	void testUpdateResponseNullId() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		response.setUuid(UUID.randomUUID());
-		when(responseService.updateResponse(null, response)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.updateResponse(id, response))
+		response.setUuid(id);
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(null, response))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
+
 	@Test
 	void testUpdateResponseNullResponse() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
-		response.setUuid(UUID.randomUUID());
-		when(responseService.updateResponse(id, null)).thenReturn(Mono.error(new Exception()));
-		StepVerifier.create(responseController.updateResponse(id, response))
+		response.setUuid(id);
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(id, null))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
+
 	@Test
 	void testUpdateResponseNullResponseId() {
 		UUID id = UUID.randomUUID();
 		Response response = new Response();
 		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
 		StepVerifier.create(responseController.updateResponse(id, response))
+				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
+	}
+	
+	@Test
+	void testUpdateResponseNullIdAndResponse() {
+		UUID id = UUID.randomUUID();
+		Response response = new Response();
+		when(responseService.updateResponse(id, response)).thenReturn(Mono.error(new Exception()));
+		StepVerifier.create(responseController.updateResponse(null, null))
 				.expectNext(ResponseEntity.badRequest().build()).expectComplete().verify();
 	}
 
@@ -153,13 +170,15 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetAllResponsesByWeek() {
+	void testGetAllResponsesByWeek() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		testResponse1.setWeek(TrainingWeek.EIGHT);
-		testResponse2.setWeek(TrainingWeek.EIGHT);
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Optional<Date> testDate = Optional.of(format.parse("2021-03-29"));
+		testResponse1.setDate(testDate.get());
+		testResponse2.setDate(testDate.get());
 		when(responseService.getResponsesByWeek(any())).thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.of("Week 8"), Optional.empty()))
+		StepVerifier.create(responseController.getResponses(Optional.empty(), testDate, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
 
@@ -172,10 +191,8 @@ class ResponseControllerTest {
 		when(responseService.addResponsesFromFile(fileFlux, id))
 				.thenReturn(Flux.fromArray(new Response[] { new Response(), new Response(), new Response() }));
 		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
-		StepVerifier.create(body)
-			.expectNext(new Response())
-			.expectNext(new Response())
-			.expectNext(new Response()).expectComplete().verify();
+		StepVerifier.create(body).expectNext(new Response()).expectNext(new Response()).expectNext(new Response())
+				.expectComplete().verify();
 	}
 
 	@Test
@@ -187,6 +204,22 @@ class ResponseControllerTest {
 		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.error(new Exception()));
 		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
 		StepVerifier.create(body).verifyError();
+	}
+	
+	@Test
+	void testAddResponsesCSVNoFile() {
+		UUID id = UUID.randomUUID();
+		String idString = id.toString();
+		ResponseEntity<Flux<Response>> body = responseController.addResponses(null, idString);
+		assertEquals(400, body.getStatusCodeValue(), " responseController.addResponses(null, value) should return 400");
+	}
+	
+	@Test
+	void testAddResponsesCSVNoSurveyId() {
+		FilePart filePart = Mockito.mock(FilePart.class);
+		Flux<FilePart> fileFlux = Flux.just(filePart);
+		ResponseEntity<Flux<Response>> body = responseController.addResponses(fileFlux, null);
+		assertEquals(400, body.getStatusCodeValue(), " responseController.addResponses(value, null) should return 400");
 	}
 
 	@Test
@@ -223,17 +256,19 @@ class ResponseControllerTest {
 	}
 
 	@Test
-	void testGetAllResponsesByBatchAndWeek() {
+	void testGetAllResponsesByBatchAndDate() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
 		Optional<String> testBatch = Optional.of("Batch 23");
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		Optional<Date> testDate = Optional.of(format.parse("2021-03-29"));
 		testResponse1.setBatch(testBatch.get());
 		testResponse2.setBatch(testBatch.get());
-		testResponse1.setWeek(TrainingWeek.EIGHT);
-		testResponse2.setWeek(TrainingWeek.EIGHT);
+		testResponse1.setDate(testDate.get());
+		testResponse2.setDate(testDate.get());
 		when(responseService.getResponsesByBatchAndWeek(any(), any()))
 				.thenReturn(Flux.just(testResponse1, testResponse2));
-		StepVerifier.create(responseController.getResponses(testBatch, Optional.of("Week 8"), Optional.empty()))
+		StepVerifier.create(responseController.getResponses(testBatch, testDate, Optional.empty()))
 				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
 

@@ -11,18 +11,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferFactory;
-import org.springframework.core.io.buffer.DefaultDataBuffer;
-import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import com.revature.autosurvey.submissions.beans.TrainingWeek;
 
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -64,96 +55,6 @@ class UtilitiesTest {
 		Long timeShorter = timeLong/1000;
 		
 		assertEquals(timeShorter, Utilities.timeLongFromString(string)/1000);
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnumA() {
-		String weekString = "Week A";
-		assertEquals(TrainingWeek.A, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnumB() {
-		String weekString = "Week B";
-		assertEquals(TrainingWeek.B, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum1() {
-		String weekString = "Week 1";
-		assertEquals(TrainingWeek.ONE, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum2() {
-		String weekString = "Week 2";
-		assertEquals(TrainingWeek.TWO, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum3() {
-		String weekString = "Week 3";
-		assertEquals(TrainingWeek.THREE, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum4() {
-		String weekString = "Week 4";
-		assertEquals(TrainingWeek.FOUR, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum5() {
-		String weekString = "Week 5";
-		assertEquals(TrainingWeek.FIVE, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum6() {
-		String weekString = "Week 6";
-		assertEquals(TrainingWeek.SIX, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum7() {
-		String weekString = "Week 7";
-		assertEquals(TrainingWeek.SEVEN, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum8() {
-		String weekString = "Week 8";
-		assertEquals(TrainingWeek.EIGHT, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum9() {
-		String weekString = "Week 9";
-		assertEquals(TrainingWeek.NINE, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum10() {
-		String weekString = "Week 10";
-		assertEquals(TrainingWeek.TEN, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum11() {
-		String weekString = "Week 11";
-		assertEquals(TrainingWeek.ELEVEN, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsTrainingWeekEnum12() {
-		String weekString = "Week 12";
-		assertEquals(TrainingWeek.TWELVE, Utilities.getTrainingWeekFromString(weekString));
-	}
-	
-	@Test
-	void getTrainingWeekFromStringReturnsNull() {
-		String weekString = "Any Other Value";
-		assertEquals(null, Utilities.getTrainingWeekFromString(weekString));
 	}
 	
 	@Test
