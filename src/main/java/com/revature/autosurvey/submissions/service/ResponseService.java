@@ -1,7 +1,6 @@
 package com.revature.autosurvey.submissions.service;
 
 import java.text.ParseException;
-import java.util.Date;
 import java.util.UUID;
 
 import org.springframework.http.codec.multipart.FilePart;
