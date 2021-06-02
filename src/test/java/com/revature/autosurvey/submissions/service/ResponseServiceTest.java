@@ -95,13 +95,7 @@ class ResponseServiceTest {
 		expectedResponse.setBatch("Mock Batch 45");
 		expectedResponse.setUuid(responseFromMethod.getUuid());
 
-		assertEquals(expectedResponse.getResponses(), responseFromMethod.getResponses());
-		assertEquals(expectedResponse.getBatch(), responseFromMethod.getBatch());
-		assertEquals(expectedResponse.getClass(), responseFromMethod.getClass());
-		assertEquals(expectedResponse.getDate().toString(), responseFromMethod.getDate().toString());
-		assertEquals(expectedResponse.getResponses(), responseFromMethod.getResponses());
-		assertEquals(expectedResponse.getSurveyUuid(), responseFromMethod.getSurveyUuid());
-		assertEquals(expectedResponse.getUuid(), responseFromMethod.getUuid());
+		assertEquals(expectedResponse.toString(), responseFromMethod.toString());
 	}
 
 	@Test
