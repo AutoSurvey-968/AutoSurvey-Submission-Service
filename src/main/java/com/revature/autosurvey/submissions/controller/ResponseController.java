@@ -1,6 +1,6 @@
 package com.revature.autosurvey.submissions.controller;
 
-import java.util.Date;
+import java.text.ParseException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,13 +34,14 @@ public class ResponseController {
 	}
 
 	@GetMapping
-	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<Date> weekStart,
-			@RequestParam Optional<UUID> id) {
+	public Flux<Response> getResponses(@RequestParam Optional<String> batch, @RequestParam Optional<String> weekStart,
+			@RequestParam Optional<UUID> id) throws ParseException {
 		if (batch.isPresent() && weekStart.isPresent()) {
 			return responseService.getResponsesByBatchAndWeek(batch.get(), weekStart.get());
 		}
 
 		if (batch.isPresent()) {
+
 			return responseService.getResponsesByBatch(batch.get());
 		}
 

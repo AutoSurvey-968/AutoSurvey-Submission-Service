@@ -21,10 +21,10 @@ public interface ResponseRepository extends ReactiveCassandraRepository<Response
 	@AllowFiltering
 	Flux<Response> findAllByBatch(String batch);
 
-	@Query("SELECT * FROM response r WHERE r.date >= %?1 AND r.date <= %?2")
+	@Query("SELECT * FROM response WHERE date >= ?0 AND date <= ?1 ALLOW FILTERING")
 	Flux<Response> findAllByWeek(Date startDate, Date endDate);
 	
-	@Query("SELECT * FROM response r WHERE r.date >= %?2 AND r.date <= %?2 AND r.batch = %?1")
+	@Query("SELECT * FROM response WHERE \"batch\" = ?0 AND date >= ?1 AND date <= ?2 ALLOW FILTERING")
 	Flux<Response> findAllByBatchAndWeek(String batch, Date startDate, Date endDate);
 
 	@AllowFiltering
