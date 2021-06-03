@@ -5,14 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -27,7 +24,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
-import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -82,7 +78,6 @@ class ResponseServiceTest {
 	 * 
 	 * Response responseFromMethod =
 	 * responseService.buildResponseFromCsvLine(csvLine, questionLine, surveyId);
-	 * 
 	 * Response expectedResponse = new Response(); Map<String, String> questions =
 	 * new HashMap<>(); expectedResponse.setSurveyUuid(surveyId);
 	 * questions.put("question1", "answer1"); questions.put("question2", "answer2");
@@ -95,7 +90,7 @@ class ResponseServiceTest {
 	 * expectedResponse.setBatch("Mock Batch 45");
 	 * expectedResponse.setUuid(responseFromMethod.getUuid());
 	 * 
-	 * assertEquals(expectedResponse, responseFromMethod); }
+	 * assertEquals(expectedResponse.toString(), responseFromMethod.toString()); }
 	 */
 
 
@@ -237,14 +232,24 @@ class ResponseServiceTest {
 	void testGetAllResponsesByWeekReturnsProperWeek() throws ParseException {
 		Response testResponse1 = new Response();
 		Response testResponse2 = new Response();
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-		Date testDate = format.parse("2021-03-29");
-		testResponse1.setDate(testDate);
-		testResponse2.setDate(testDate);
+		String testDate = "2021-03-29";
+		Date format = new SimpleDateFormat("yyyy-MM-dd").parse(testDate);
+		testResponse1.setDate(format);
+		testResponse2.setDate(format);
 		when(responseRepository.findAllByWeek(any(), any())).thenReturn(Flux.just(testResponse1, testResponse2));
 		StepVerifier.create(responseService.getResponsesByWeek(testDate))
-				.expectNextMatches(response -> response.getDate().equals(testDate))
-				.expectNextMatches(response -> response.getDate().equals(testDate)).verifyComplete();
+				.expectNextMatches(response -> response.getDate().equals(format))
+				.expectNextMatches(response -> response.getDate().equals(format)).verifyComplete();
+	}
+
+	@Test
+	void testGetAllResponseByBatchAndWeek() throws ParseException {
+				String testDate = "2021-03-29";
+		String testBatch = "Batch 23";
+		when(responseRepository.findAllByBatchAndWeek(any(), any(), any()))
+				.thenReturn(Flux.just(new Response(), new Response()));
+		StepVerifier.create(responseService.getResponsesByBatchAndWeek(testBatch, testDate)).expectNext(new Response())
+				.expectNext(new Response()).verifyComplete();
 	}
 
 }
