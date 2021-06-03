@@ -35,6 +35,10 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> addResponses(Flux<Response> responses) {
+		responses = responses.map(res -> {
+			res.setUuid(Uuids.timeBased());
+			return res;
+		});
 		return responseRepository.saveAll(responses);
 	}
 
