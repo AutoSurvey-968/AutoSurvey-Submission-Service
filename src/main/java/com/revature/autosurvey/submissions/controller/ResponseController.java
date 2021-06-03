@@ -57,14 +57,14 @@ public class ResponseController {
 
 	@PostMapping(consumes = "multipart/form-data")
 	@PreAuthorize("isAuthenticated()")
-	public ResponseEntity<Flux<Response>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
+	public Mono<ResponseEntity<Flux<Response>>> addResponses(@RequestPart("file") Flux<FilePart> fileFlux,
 			@RequestPart("surveyId") String surveyId) {
 		if(surveyId == null || fileFlux == null) {
-			return ResponseEntity.badRequest().build();
+			return Mono.just(ResponseEntity.badRequest().build());
 		}
 		UUID surveyUuid = UUID.fromString(surveyId);
 		Flux<Response> responses = responseService.addResponsesFromFile(fileFlux, surveyUuid);
-		return ResponseEntity.ok().body(responses);
+		return Mono.just(ResponseEntity.ok().body(responses));
 	}
 
 	@PostMapping(consumes = "application/json")
