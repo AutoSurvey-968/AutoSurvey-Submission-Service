@@ -181,45 +181,38 @@ class ResponseControllerTest {
 				.expectNext(testResponse1, testResponse2).verifyComplete();
 	}
 
-	@Test
-	void testAddResponsesCSV() {
-		FilePart filePart = Mockito.mock(FilePart.class);
-		UUID id = UUID.randomUUID();
-		String idString = id.toString();
-		Flux<FilePart> fileFlux = Flux.just(filePart);
-		when(responseService.addResponsesFromFile(fileFlux, id))
-				.thenReturn(Flux.fromArray(new Response[] { new Response(), new Response(), new Response() }));
-		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
-		StepVerifier.create(body).expectNext(new Response()).expectNext(new Response()).expectNext(new Response())
-				.expectComplete().verify();
-	}
-
-	@Test
-	void testAddResponsesCSVError() {
-		FilePart filePart = Mockito.mock(FilePart.class);
-		UUID id = UUID.randomUUID();
-		String idString = id.toString();
-		Flux<FilePart> fileFlux = Flux.just(filePart);
-		when(responseService.addResponsesFromFile(fileFlux, id)).thenReturn(Flux.error(new Exception()));
-		Flux<Response> body = responseController.addResponses(fileFlux, idString).getBody();
-		StepVerifier.create(body).verifyError();
-	}
-	
-	@Test
-	void testAddResponsesCSVNoFile() {
-		UUID id = UUID.randomUUID();
-		String idString = id.toString();
-		ResponseEntity<Flux<Response>> body = responseController.addResponses(null, idString);
-		assertEquals(400, body.getStatusCodeValue(), " responseController.addResponses(null, value) should return 400");
-	}
-	
-	@Test
-	void testAddResponsesCSVNoSurveyId() {
-		FilePart filePart = Mockito.mock(FilePart.class);
-		Flux<FilePart> fileFlux = Flux.just(filePart);
-		ResponseEntity<Flux<Response>> body = responseController.addResponses(fileFlux, null);
-		assertEquals(400, body.getStatusCodeValue(), " responseController.addResponses(value, null) should return 400");
-	}
+	/*
+	 * @Test void testAddResponsesCSV() { FilePart filePart =
+	 * Mockito.mock(FilePart.class); UUID id = UUID.randomUUID(); String idString =
+	 * id.toString(); Flux<FilePart> fileFlux = Flux.just(filePart);
+	 * when(responseService.addResponsesFromFile(fileFlux, id))
+	 * .thenReturn(Flux.fromArray(new Response[] { new Response(), new Response(),
+	 * new Response() })); Flux<Response> body =
+	 * responseController.addResponses(fileFlux, idString).getBody();
+	 * StepVerifier.create(body).expectNext(new Response()).expectNext(new
+	 * Response()).expectNext(new Response()) .expectComplete().verify(); }
+	 * 
+	 * @Test void testAddResponsesCSVError() { FilePart filePart =
+	 * Mockito.mock(FilePart.class); UUID id = UUID.randomUUID(); String idString =
+	 * id.toString(); Flux<FilePart> fileFlux = Flux.just(filePart);
+	 * when(responseService.addResponsesFromFile(fileFlux,
+	 * id)).thenReturn(Flux.error(new Exception())); Flux<Response> body =
+	 * responseController.addResponses(fileFlux, idString).getBody();
+	 * StepVerifier.create(body).verifyError(); }
+	 * 
+	 * @Test void testAddResponsesCSVNoFile() { UUID id = UUID.randomUUID(); String
+	 * idString = id.toString(); ResponseEntity<Flux<Response>> body =
+	 * responseController.addResponses(null, idString); assertEquals(400,
+	 * body.getStatusCodeValue(),
+	 * " responseController.addResponses(null, value) should return 400"); }
+	 * 
+	 * @Test void testAddResponsesCSVNoSurveyId() { FilePart filePart =
+	 * Mockito.mock(FilePart.class); Flux<FilePart> fileFlux = Flux.just(filePart);
+	 * ResponseEntity<Flux<Response>> body =
+	 * responseController.addResponses(fileFlux, null); assertEquals(400,
+	 * body.getStatusCodeValue(),
+	 * " responseController.addResponses(value, null) should return 400"); }
+	 */
 
 	@Test
 	void testAddResponsesFluxEmpty() {
