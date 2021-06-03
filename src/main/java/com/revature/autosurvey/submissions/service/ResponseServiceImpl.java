@@ -37,6 +37,7 @@ public class ResponseServiceImpl implements ResponseService {
 	public Flux<Response> addResponses(Flux<Response> responses) {
 		responses = responses.map(res -> {
 			res.setUuid(Uuids.timeBased());
+			res.setDate(new Date(System.currentTimeMillis()));
 			return res;
 		});
 		return responseRepository.saveAll(responses);
