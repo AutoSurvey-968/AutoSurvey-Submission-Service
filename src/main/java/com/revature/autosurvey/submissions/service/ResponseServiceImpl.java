@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class ResponseServiceImpl implements ResponseService {
 	private ResponseRepository responseRepository;
-	private static SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyy-MM-dd");
+	private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyy-MM-dd");
 
 	@Autowired
 	public void setResponseRepository(ResponseRepository responseRepository) {
