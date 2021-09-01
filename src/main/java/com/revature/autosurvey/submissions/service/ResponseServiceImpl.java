@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class ResponseServiceImpl implements ResponseService {
 	private ResponseRepository responseRepository;
-	private final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyy-MM-dd");
+	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
 
 	@Autowired
 	public void setResponseRepository(ResponseRepository responseRepository) {
@@ -115,7 +115,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> getResponsesByWeek(String date) throws ParseException {
-		Date startDate = DATE_TIME_FORMAT.parse(date);
+		Date startDate = dateTimeFormat.parse(date);
 		Calendar endCal = Calendar.getInstance();
 		endCal.setTime(startDate);
 		endCal.add(Calendar.DATE, 7);
@@ -125,7 +125,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> getResponsesByBatchAndWeek(String batch, String date) throws ParseException {
-		Date startDate = DATE_TIME_FORMAT.parse(date);
+		Date startDate = dateTimeFormat.parse(date);
 		Calendar endCal = Calendar.getInstance();
 		endCal.setTime(startDate);
 		endCal.add(Calendar.DATE, 7);
