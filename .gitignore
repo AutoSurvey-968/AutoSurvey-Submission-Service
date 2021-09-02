@@ -37,3 +37,4 @@ build/
 
 ### Firebase ###
 *.json
+/.apt_generated_tests/
