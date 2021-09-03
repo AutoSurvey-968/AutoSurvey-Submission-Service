@@ -32,11 +32,14 @@ The submission microservice for AutoSurvey-968.
 **See [Primary README.md](https://github.com/AutoSurvey-968/AutoSurvey-back) for full program setup instructions.**
 
 Set environment variables:
-```
-AWS_USER - Keyspaces username
-AWS_PASS - Keyspaces password
-TRUSTSTORE_PASS - Local Truststore password
-```
+
+* AWS_USER - Keyspaces username
+* AWS_PASS - Keyspaces password
+* CREDENTIALS_JSON - Firebase json file location
+* FIREBASE_API_KEY - Firebase key
+* SERVICE_ACCOUNT_ID - Firebase account id
+* TRUSTSTORE_PASS - Local Truststore password
+
 
 ## Usage
 
