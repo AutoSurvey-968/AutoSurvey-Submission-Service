@@ -34,8 +34,6 @@ public class ResponseServiceImpl implements ResponseService {
 	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
 	private SqsSender sqsSender;
 	
-
-	private String queue = "https://sqs.us-east-1.amazonaws.com/855430746673/SubmissionQueue";
 	
 	@Autowired
 	public ResponseServiceImpl(SqsSender sqsSender) {
@@ -69,7 +67,6 @@ public class ResponseServiceImpl implements ResponseService {
 	@Override
 	public Mono<Response> getResponse(UUID id) {
 		//Response =  
-		sqsSender.sendResponse(queue, id.toString());
 		return responseRepository.findByUuid(id);
 	}
 
