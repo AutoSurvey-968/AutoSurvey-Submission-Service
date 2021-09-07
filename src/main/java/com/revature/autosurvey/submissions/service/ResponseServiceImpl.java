@@ -9,9 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,9 @@ import org.springframework.stereotype.Service;
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
+import com.revature.autosurvey.submissions.sql.SqsSender;
 import com.revature.autosurvey.submissions.utils.Utilities;
+
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -28,16 +32,35 @@ import reactor.core.publisher.Mono;
 public class ResponseServiceImpl implements ResponseService {
 	private ResponseRepository responseRepository;
 	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
+	private SqsSender sqsSender;
+	
+
+	private String queue = "https://sqs.us-east-1.amazonaws.com/855430746673/SubmissionQueue";
+	
+	@Autowired
+	public ResponseServiceImpl(SqsSender sqsSender) {
+		super();
+		this.sqsSender = sqsSender;
+
+	}
+	
+	public ResponseServiceImpl() {
+		super();
+	}
 
 	@Autowired
 	public void setResponseRepository(ResponseRepository responseRepository) {
 		this.responseRepository = responseRepository;
+
 	}
 
 	@Override
 	public Flux<Response> addResponses(Flux<Response> responses) {
+		System.out.print("sending response");
 		responses = responses.map(res -> {
 			res.setUuid(Uuids.timeBased());
+			//added line 
+			sqsSender.sendResponse(res);
 			return res;
 		});
 		return responseRepository.saveAll(responses);
@@ -45,6 +68,8 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Mono<Response> getResponse(UUID id) {
+		//Response =  
+		sqsSender.sendResponse(queue, id.toString());
 		return responseRepository.findByUuid(id);
 	}
 
@@ -135,6 +160,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> getAllResponses() {
+		
 		return responseRepository.findAll();
 	}
 
