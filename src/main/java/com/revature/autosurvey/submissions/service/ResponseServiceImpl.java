@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
+import com.revature.autosurvey.submissions.utils.SqsReceiver;
+import com.revature.autosurvey.submissions.utils.SqsSender;
 import com.revature.autosurvey.submissions.utils.Utilities;
 
 import reactor.core.publisher.Flux;
@@ -28,6 +30,20 @@ import reactor.core.publisher.Mono;
 public class ResponseServiceImpl implements ResponseService {
 	private ResponseRepository responseRepository;
 	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
+	private SqsSender sqsSender;
+	private SqsReceiver sqsReceiver;
+	
+	@Autowired
+	public ResponseServiceImpl(SqsSender sqsSender, SqsReceiver sqsReceiver) {
+		this();
+		this.sqsSender = sqsSender;
+		this.sqsReceiver = sqsReceiver;
+	}
+	
+	@Autowired
+	public ResponseServiceImpl() {
+		super();
+	}
 
 	@Autowired
 	public void setResponseRepository(ResponseRepository responseRepository) {
@@ -38,6 +54,8 @@ public class ResponseServiceImpl implements ResponseService {
 	public Flux<Response> addResponses(Flux<Response> responses) {
 		responses = responses.map(res -> {
 			res.setUuid(Uuids.timeBased());
+			//added line
+			sqsSender.sendResponse(res);
 			return res;
 		});
 		return responseRepository.saveAll(responses);
@@ -109,12 +127,12 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> getResponsesByBatch(String batchName) {
+	public Flux<Response> getResponsesByBatch(String batchName) {	//configure to SQS
 		return responseRepository.findAllByBatch(batchName);
 	}
 
 	@Override
-	public Flux<Response> getResponsesByWeek(String date) throws ParseException {
+	public Flux<Response> getResponsesByWeek(String date) throws ParseException { //configure to SQS
 		Date startDate = dateTimeFormat.parse(date);
 		Calendar endCal = Calendar.getInstance();
 		endCal.setTime(startDate);
@@ -124,7 +142,7 @@ public class ResponseServiceImpl implements ResponseService {
 	}
 
 	@Override
-	public Flux<Response> getResponsesByBatchAndWeek(String batch, String date) throws ParseException {
+	public Flux<Response> getResponsesByBatchAndWeek(String batch, String date) throws ParseException { //configure to SQS
 		Date startDate = dateTimeFormat.parse(date);
 		Calendar endCal = Calendar.getInstance();
 		endCal.setTime(startDate);
