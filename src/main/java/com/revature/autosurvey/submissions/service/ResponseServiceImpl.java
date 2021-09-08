@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import com.datastax.oss.driver.api.core.uuid.Uuids;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
-import com.revature.autosurvey.submissions.sql.SqsSender;
 import com.revature.autosurvey.submissions.utils.Utilities;
 
 
@@ -31,19 +30,13 @@ import reactor.core.publisher.Mono;
 public class ResponseServiceImpl implements ResponseService {
 	private ResponseRepository responseRepository;
 	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
-	private SqsSender sqsSender;
 	
 	
 	@Autowired
-	public ResponseServiceImpl(SqsSender sqsSender) {
-		super();
-		this.sqsSender = sqsSender;
-
-	}
-	
 	public ResponseServiceImpl() {
 		super();
 	}
+	
 
 	@Autowired
 	public void setResponseRepository(ResponseRepository responseRepository) {
@@ -56,8 +49,6 @@ public class ResponseServiceImpl implements ResponseService {
 		System.out.print("sending response");
 		responses = responses.map(res -> {
 			res.setUuid(Uuids.timeBased());
-			//added line 
-			sqsSender.sendResponse(res);
 			return res;
 		});
 		return responseRepository.saveAll(responses);
@@ -151,12 +142,12 @@ public class ResponseServiceImpl implements ResponseService {
 		endCal.setTime(startDate);
 		endCal.add(Calendar.DATE, 7);
 		Date endDate = endCal.getTime();
+		
 		return responseRepository.findAllByBatchAndWeek(batch, startDate, endDate);
 	}
 
 	@Override
 	public Flux<Response> getAllResponses() {
-		
 		
 		return responseRepository.findAll();
 	}
