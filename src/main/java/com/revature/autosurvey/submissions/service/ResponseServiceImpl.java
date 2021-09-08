@@ -9,11 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -66,7 +65,6 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Mono<Response> getResponse(UUID id) {
-		//Response =  
 		return responseRepository.findByUuid(id);
 	}
 
@@ -132,6 +130,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> getResponsesByBatch(String batchName) {
+		System.out.print("getting by batch");
 		return responseRepository.findAllByBatch(batchName);
 	}
 
@@ -157,6 +156,7 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> getAllResponses() {
+		
 		
 		return responseRepository.findAll();
 	}
