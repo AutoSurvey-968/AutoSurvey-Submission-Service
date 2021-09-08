@@ -1,5 +1,7 @@
 package com.revature.autosurvey.submissions.sql;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
 import org.springframework.messaging.support.MessageBuilder;
@@ -28,9 +30,8 @@ import lombok.Data;
 public class SqsSender {
 
 	private final QueueMessagingTemplate queueMessagingTemplate;
-	
-	private String queueName = "https://sqs.us-east-1.amazonaws.com/855430746673/SubmissionQueue";
-	private MessageBuilder<String> builder;
+    private String queueName = "https://sqs.us-east-1.amazonaws.com/855430746673/SubmissionQueue";
+	private List<String> headerIds;
 
 
 	@Autowired
@@ -52,7 +53,7 @@ public class SqsSender {
 	 public void sendResponse(Response response) {
 		System.out.println("\nSending a message");
 		Message<String> message = MessageBuilder.withPayload(Jackson.toJsonString(response)).build();
-	    message.getHeaders().getId();
+	    headerIds.add(message.getHeaders().getId().toString());
 	    this.queueMessagingTemplate.send(queueName, message);
 	 	}
 
