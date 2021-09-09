@@ -24,7 +24,7 @@ import reactor.core.publisher.Flux;
 
 
 /**
- * @author jasmine
+ * @author Jasmine
  *
  */
 
@@ -44,8 +44,7 @@ public class SqsSender {
 	}
 	
 
-	
-	
+		
     @Async
 	 public void sendResponse(Flux<Response> response) {
     	List<Response> list = response.collectList().block();
@@ -53,7 +52,6 @@ public class SqsSender {
 	    headerIds.add(message.getHeaders().getId());
         this.queueMessagingTemplate.send(queueName, message);
 	 	}
-
 
 }
 
