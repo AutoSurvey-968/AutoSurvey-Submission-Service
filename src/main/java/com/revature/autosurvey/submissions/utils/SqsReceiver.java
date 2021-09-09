@@ -61,7 +61,7 @@ public class SqsReceiver {
     	
     	if(messageData.getBatch()!=null) {
     		res = responseRepo.findAllByBatch(messageData.getBatch());
-    		log.trace("Response retrieved by Batch name");
+    		log.trace("Response retrieved by Batch name.");
     		sqsSender.sendResponse(res);
     	}
     	
