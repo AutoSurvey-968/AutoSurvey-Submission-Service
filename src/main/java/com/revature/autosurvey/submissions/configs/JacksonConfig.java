@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
-//import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -17,7 +16,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  *	Class is used to configure Jackson for LocalTimeDate in Surveys
  */
 @Configuration
-//@EnableScheduling
 public class JacksonConfig {
 
 	@Bean

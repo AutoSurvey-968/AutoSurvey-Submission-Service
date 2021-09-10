@@ -46,7 +46,6 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> addResponses(Flux<Response> responses) {
-		System.out.print("sending response");
 		responses = responses.map(res -> {
 			res.setUuid(Uuids.timeBased());
 			return res;
@@ -121,7 +120,6 @@ public class ResponseServiceImpl implements ResponseService {
 
 	@Override
 	public Flux<Response> getResponsesByBatch(String batchName) {
-		System.out.print("getting by batch");
 		return responseRepository.findAllByBatch(batchName);
 	}
 
