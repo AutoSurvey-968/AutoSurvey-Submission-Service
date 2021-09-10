@@ -102,6 +102,7 @@ public class SqsReceiver {
 		// Parse JSON payload and extract target survey ID from message
 		String batch = "";
 		String date = "";
+		String surveyUuid = "";
 		Flux<Response> res = Flux.empty();
 		Date startDate = null;
 
@@ -111,8 +112,16 @@ public class SqsReceiver {
 			batch = obj.getString("batch");
 			System.out.println("Response date received: " + obj.getString("date"));
 			date = obj.getString("date");
+			System.out.println("Response surveyUuid received: " + obj.getString("surveyUuid"));
+			surveyUuid = obj.getString("surveyUuid");
 		} catch (JSONException e1) {
 			log.error(e1);
+		}
+		/*
+		if(surveyUuid!=null) {
+			res = repository.findAllBySurveyUuid(UUID.fromString(surveyUuid));
+			sqsSender.sendResponse(res, UUID.fromString(req_header));
+			return;
 		}
 		
 		if(!("").equals(batch) && !("").equals(date)) {
@@ -132,12 +141,14 @@ public class SqsReceiver {
     		System.out.println("Response retrieved by Batch and Week");
     		sqsSender.sendResponse(res, UUID.fromString(req_header));
     	}
+    	*/
     	
     	if(!("").equals(batch)) {
     		res = repository.findAllByBatch(batch);
     		log.trace("Response retrieved by Batch name.");
-    		System.out.println("Response retrieved by Batch name.");
+    		System.out.println("Response retrieved by Batch name: " + batch);
     		sqsSender.sendResponse(res, UUID.fromString(req_header));
+    		return;
     	}
     	
     	if(!("").equals(date)) {
@@ -157,6 +168,16 @@ public class SqsReceiver {
     		System.out.println("Response retrieved by Week");
     		sqsSender.sendResponse(res, UUID.fromString(req_header));
     	}
+    	
+    	/*
+    	{
+    		  "uuid": null,
+    		  "batch": null,
+    		  "date": null,
+    		  "surveyUuid": "12345678-1234-1234-1234-123456789abc",
+    		  "responses": null
+    		}
+    	 */
 		
 	}
 }

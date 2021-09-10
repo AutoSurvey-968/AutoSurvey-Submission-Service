@@ -29,4 +29,7 @@ public interface ResponseRepository extends ReactiveCassandraRepository<Response
 
 	@AllowFiltering
 	Mono<Response> deleteByUuid(UUID uuid);
+	
+	@Query("SELECT * FROM response WHERE surveyuuid= ?0 ALLOW FILTERING")
+	Flux<Response> findAllBySurveyUuid(UUID uuid);
 }

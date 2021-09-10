@@ -1,5 +1,6 @@
 package com.revature.autosurvey.submissions.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,10 +38,24 @@ public class SqsSender {
 
 	public void sendResponse(Flux<Response> response, UUID id) {
 		log.trace("Response received by Sender");
-		List<Response> list = response.collectList().block();
-		Message<String> message = MessageBuilder.withPayload(Jackson.toJsonString(list)).build();
-		message.getHeaders().put("MessageId", id);
-		this.queueMessagingTemplate.send(queueName, message);
-		log.trace("Message sent.");
+		System.out.println("Response received by Sender");
+		List<Response> list = new ArrayList<Response>();
+		response.flatMap(r -> {
+			list.add(r);
+			//System.out.println(r);
+			return Flux.fromIterable(list);
+		}).blockLast();
+		System.out.println(list);
+		//Message<String> message = MessageBuilder.withPayload(Jackson.toJsonString(list)).build();
+		//message.getHeaders().put("MessageId", id);
+		/*
+		this.queueMessagingTemplate.send(this.queueName,     
+			     MessageBuilder.withPayload(list)
+			     .setHeader("MessageId", id.toString())
+			     .build());
+		 */
+		//this.queueMessagingTemplate.send(queueName, message);
+		log.trace("Message sent." + list);
+		System.out.println("Message sent: " + list);
 	}
 }
