@@ -28,12 +28,6 @@ import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 @EnableCassandraRepositories(basePackages = { "com.revature.autosurvey.submissions.data" })
 public class CassandraConfig {
 	
-	@Value("${cloud.aws.credentials.access-key}")
-    private String awsAccessKey;
- 
-   
-    @Value("${cloud.aws.credentials.secret-key}")
-    private String awsSecretKey;
 	
 	@Bean
 	public CqlSessionFactoryBean session() {
@@ -71,14 +65,4 @@ public class CassandraConfig {
 		return new CassandraTemplate(sessionFactory, converter);
 	}
 	
-	@Bean
-    @Primary
-    public AmazonSQSAsync amazonSQSAsync() {
-        return AmazonSQSAsyncClientBuilder
-                .standard()
-                .withRegion(Regions.US_EAST_1)
-                .withCredentials(new AWSStaticCredentialsProvider(
-                        new BasicAWSCredentials(awsAccessKey, awsSecretKey)))
-                .build();
-    }
 }
