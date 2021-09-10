@@ -3,6 +3,7 @@ package com.revature.autosurvey.submissions.utils;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
@@ -44,6 +45,9 @@ public class SqsReceiver {
     public void receiveMessage(Message<String> message) {
     	
     	messageData = Jackson.fromJsonString(message.getPayload(), Response.class);
+    	String id = message.getHeaders().get("MessageId").toString();
+    	UUID uuid = UUID.fromString(id);
+    	
     	Flux<Response> res;
     	log.trace("Receiving message: " + messageData);
     	
@@ -56,13 +60,13 @@ public class SqsReceiver {
     		
     		res = responseRepo.findAllByBatchAndWeek(messageData.getBatch(), startDate, endDate);
     		log.trace("Response retrieved by Batch and Week");
-    		sqsSender.sendResponse(res);
+    		sqsSender.sendResponse(res, uuid);
     	}
     	
     	if(messageData.getBatch()!=null) {
     		res = responseRepo.findAllByBatch(messageData.getBatch());
     		log.trace("Response retrieved by Batch name.");
-    		sqsSender.sendResponse(res);
+    		sqsSender.sendResponse(res, uuid);
     	}
     	
     	if(messageData.getDate()!=null) {
@@ -74,7 +78,7 @@ public class SqsReceiver {
     		
     		res = responseRepo.findAllByWeek(startDate, endDate);
     		log.trace("Response retrieved by Week");
-    		sqsSender.sendResponse(res);
+    		sqsSender.sendResponse(res, uuid);
     	}
     }
 
