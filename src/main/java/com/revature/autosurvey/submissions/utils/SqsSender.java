@@ -42,12 +42,12 @@ public class SqsSender {
 		List<Response> list = response.collectList().block();
 		log.trace("Response received to Sender: " + list);
 		Message<String> message = MessageBuilder.withPayload(Jackson.toJsonString(list)).build();
-		if(message.getHeaders().getId()==null) 
-			return;
-		else {
+		try {
 			headerIds.add(message.getHeaders().getId().toString());
-			this.queueMessagingTemplate.send(queueName, message);
-			log.trace("Message sent.");
+		}catch(NullPointerException e) {
+			log.debug("getId is null.");
 		}
+		this.queueMessagingTemplate.send(queueName, message);
+		log.trace("Message sent.");
 	}
 }
