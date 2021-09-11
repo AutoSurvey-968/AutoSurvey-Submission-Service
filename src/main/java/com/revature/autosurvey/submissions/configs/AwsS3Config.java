@@ -3,14 +3,13 @@ package com.revature.autosurvey.submissions.configs;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import com.amazon.sqs.javamessaging.AmazonSQSExtendedClient;
 import com.amazon.sqs.javamessaging.ExtendedClientConfiguration;
 import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -37,10 +36,8 @@ public class AwsS3Config {
     	awsCreds = new BasicAWSCredentials(
       		  awsAccessKey,
       		  awsSecretKey);
-    	System.out.println("AWS Creds:");
-    	System.out.println("Access ID: " + awsAccessKey);
-    	System.out.println("Secret Key: " + awsSecretKey);
-        /*set a lifecycle rule on the
+
+    	/*set a lifecycle rule on the
          * bucket to permanently delete objects 1 day after each object's
          * creation date.
          */
@@ -70,7 +67,7 @@ public class AwsS3Config {
 
     }
     
-    @Bean
+    @Bean("AmazonSQS")
     public AmazonSQS amazonSQS(AmazonS3 s3) {
     	awsCreds = new BasicAWSCredentials(
       		  awsAccessKey,
