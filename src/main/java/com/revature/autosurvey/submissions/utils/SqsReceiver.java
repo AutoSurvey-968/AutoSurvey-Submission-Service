@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.json.JSONException;
@@ -11,12 +12,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
-
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
-import com.amazonaws.services.sqs.AmazonSQSAsync;
-import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
@@ -103,27 +101,28 @@ public class SqsReceiver {
 		String batch = "";
 		String date = "";
 		String surveyUuid = "";
-		Flux<Response> res = Flux.empty();
+		Flux<Response> res;
 		Date startDate = null;
 
 		try {
 			JSONObject obj = new JSONObject(payload);
 			System.out.println("Response batch received: " + obj.getString("batch"));
-			batch = obj.getString("batch");
+			batch = obj.getString("batch").equals("null") ? null : obj.getString("batch");
 			System.out.println("Response date received: " + obj.getString("date"));
-			date = obj.getString("date");
+			date = obj.getString("date").equals("null") ? null : obj.getString("date");
 			System.out.println("Response surveyUuid received: " + obj.getString("surveyUuid"));
-			surveyUuid = obj.getString("surveyUuid");
+			surveyUuid = obj.getString("surveyUuid").equals("null") ? null : obj.getString("surveyUuid");
 		} catch (JSONException e1) {
 			log.error(e1);
 		}
-		/*
+		
 		if(surveyUuid!=null) {
 			res = repository.findAllBySurveyUuid(UUID.fromString(surveyUuid));
 			sqsSender.sendResponse(res, UUID.fromString(req_header));
 			return;
 		}
 		
+		/*		
 		if(!("").equals(batch) && !("").equals(date)) {
 			try {
 				startDate = dateTimeFormat.parse(date);

@@ -40,22 +40,20 @@ public class SqsSender {
 		log.trace("Response received by Sender");
 		System.out.println("Response received by Sender");
 		List<Response> list = new ArrayList<Response>();
-		response.flatMap(r -> {
+		response.map(r -> {
 			list.add(r);
-			//System.out.println(r);
-			return Flux.fromIterable(list);
+			return r;
 		}).blockLast();
-		System.out.println(list);
-		//Message<String> message = MessageBuilder.withPayload(Jackson.toJsonString(list)).build();
-		//message.getHeaders().put("MessageId", id);
-		/*
-		this.queueMessagingTemplate.send(this.queueName,     
-			     MessageBuilder.withPayload(list)
-			     .setHeader("MessageId", id.toString())
-			     .build());
-		 */
-		//this.queueMessagingTemplate.send(queueName, message);
-		log.trace("Message sent." + list);
-		System.out.println("Message sent: " + list);
+		System.out.println("Message to be sent: " + list);
+
+		// Build response from list and send to Analytics Service
+//		Message<String> message = MessageBuilder.withPayload(Jackson.toJsonString(list)).build();
+//		queueMessagingTemplate.send(this.queueName,     
+//			     MessageBuilder.withPayload(list)
+//			     .setHeader("MessageId", id.toString())
+//			     .build());
+//		queueMessagingTemplate.send(queueName, message);
+//		log.trace("Message sent." + list);
+//		System.out.println("Message sent: " + list);
 	}
 }
