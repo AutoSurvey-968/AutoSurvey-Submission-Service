@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
-import com.amazonaws.services.sqs.model.GetQueueUrlResult;
 import com.revature.autosurvey.submissions.beans.Response;
 
 import lombok.Data;
@@ -60,7 +59,6 @@ public class SqsSender {
 		Message<String> message = MessageBuilder.withPayload(list.toString())
 				.setHeader("MessageId", id.toString())
 				.build();
-//		queueMessagingTemplate.send(queueName, message);
 		
 		try {
 			queueMessagingTemplate.send(this.queueName, message);
@@ -73,14 +71,8 @@ public class SqsSender {
 		
 		// Send Message to S3 instead
 	    // Create a message queue for this example.
-	    GetQueueUrlResult qUrl = null;
 	    String qUrlString = "";
 	    String qName = "AnalyticsQueue";
-	    try {
-	    	qUrl = sqsExtended.getQueueUrl(qName);
-	    } catch (Exception e) {
-	    	log.warn("Attempt to get existing queue URL failed\nIt may not exist");
-	    }
 	    
 	    if(!("").equals(qUrlString))
 	    	qUrlString = sqsExtended.getQueueUrl(qName).toString();
@@ -97,9 +89,6 @@ public class SqsSender {
 	    System.out.println("QueueUrl retrieved: " + qUrlString);
 	    // Send the message.
 	    sqsExtended.sendMessage(qUrlString, list.toString());
-//	    final SendMessageRequest msgOverload =
-//	            new SendMessageRequest(qUrl, list.toString());
-//	    sqsExtended.sendMessage(msgOverload);
 	    System.out.println("Sent the message: " + list);
 	}
 }

@@ -30,7 +30,7 @@ import reactor.core.publisher.Flux;
 @Component
 public class SqsReceiver {
 	public final static String qname = SQSNames.SUBMISSIONS_QUEUE;
-	private String destQname = "https://sqs.us-east-1.amazonaws.com/855430746673/AnalyticsQueue";
+	private String destQname = SQSNames.ANALYTICS_QUEUE;
 	private Message<String> lastReceived;
 	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
 
@@ -83,6 +83,7 @@ public class SqsReceiver {
 
 	@SqsListener(value = qname, deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
 	public void queueListener(Message<String> message) {
+		
 		log.debug("Survey Queue listener invoked");
 		System.out.println("Survey Queue listener invoked");
 
@@ -120,13 +121,11 @@ public class SqsReceiver {
 			sqsSender.sendResponse(res, UUID.fromString(req_header));
 			return;
 		}
-		
-		/*		
-		if(!("").equals(batch) && !("").equals(date)) {
+				
+		if((!("").equals(batch) && !("").equals(date)) || (batch!=null && date!=null)) {
 			try {
 				startDate = dateTimeFormat.parse(date);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
     		Calendar endCal = Calendar.getInstance();
@@ -139,9 +138,8 @@ public class SqsReceiver {
     		System.out.println("Response retrieved by Batch and Week");
     		sqsSender.sendResponse(res, UUID.fromString(req_header));
     	}
-    	*/
     	
-    	if(!("").equals(batch)) {
+    	if(!("").equals(batch) || batch!=null) {
     		res = repository.findAllByBatch(batch);
     		log.trace("Response retrieved by Batch name.");
     		System.out.println("Response retrieved by Batch name: " + batch);
@@ -149,11 +147,10 @@ public class SqsReceiver {
     		return;
     	}
     	
-    	if(!("").equals(date)) {
+    	if(!("").equals(date) || date!=null) {
 			try {
 				startDate = dateTimeFormat.parse(date);
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
     		Calendar endCal = Calendar.getInstance();
@@ -166,16 +163,5 @@ public class SqsReceiver {
     		System.out.println("Response retrieved by Week");
     		sqsSender.sendResponse(res, UUID.fromString(req_header));
     	}
-    	
-    	/*
-    	{
-    		  "uuid": null,
-    		  "batch": null,
-    		  "date": null,
-    		  "surveyUuid": "12345678-1234-1234-1234-123456789abc",
-    		  "responses": null
-    		}
-    	 */
-		
 	}
 }
