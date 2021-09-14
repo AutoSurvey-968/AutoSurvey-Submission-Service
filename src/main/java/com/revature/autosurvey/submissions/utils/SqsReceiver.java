@@ -85,17 +85,14 @@ public class SqsReceiver {
 	public void queueListener(Message<String> message) {
 		
 		log.debug("Survey Queue listener invoked");
-		System.out.println("Survey Queue listener invoked");
 
 		log.debug("Headers received: {}", message.getHeaders());
-		System.out.println("Headers received: " + message.getHeaders());
+		
 		String req_header = message.getHeaders().get("MessageId").toString();
 		log.debug("Message ID Received: {}", req_header);
-		System.out.println("Message ID Received: " + req_header);
 
 		String payload = message.getPayload();
 		log.debug("Payload received: ", payload);
-		System.out.println("Payload received: " + payload);
 
 		// Parse JSON payload and extract target survey ID from message
 		String batch = "";
@@ -106,11 +103,11 @@ public class SqsReceiver {
 
 		try {
 			JSONObject obj = new JSONObject(payload);
-			System.out.println("Response batch received: " + obj.getString("batch"));
+			log.trace("Response batch received: " + obj.getString("batch"));
 			batch = obj.getString("batch").equals("null") ? null : obj.getString("batch");
-			System.out.println("Response date received: " + obj.getString("date"));
+			log.trace("Response date received: " + obj.getString("date"));
 			date = obj.getString("date").equals("null") ? null : obj.getString("date");
-			System.out.println("Response surveyUuid received: " + obj.getString("surveyUuid"));
+			log.trace("Response surveyUuid received: " + obj.getString("surveyUuid"));
 			surveyUuid = obj.getString("surveyUuid").equals("null") ? null : obj.getString("surveyUuid");
 		} catch (JSONException e1) {
 			log.error(e1);
@@ -126,7 +123,7 @@ public class SqsReceiver {
 			try {
 				startDate = dateTimeFormat.parse(date);
 			} catch (ParseException e) {
-				e.printStackTrace();
+				log.error(e);
 			}
     		Calendar endCal = Calendar.getInstance();
     		endCal.setTime(startDate);
@@ -135,14 +132,12 @@ public class SqsReceiver {
     		
     		res = repository.findAllByBatchAndWeek(batch, startDate, endDate);
     		log.trace("Response retrieved by Batch and Week");
-    		System.out.println("Response retrieved by Batch and Week");
     		sqsSender.sendResponse(res, UUID.fromString(req_header));
     	}
     	
     	if(!("").equals(batch) || batch!=null) {
     		res = repository.findAllByBatch(batch);
     		log.trace("Response retrieved by Batch name.");
-    		System.out.println("Response retrieved by Batch name: " + batch);
     		sqsSender.sendResponse(res, UUID.fromString(req_header));
     		return;
     	}
@@ -151,7 +146,7 @@ public class SqsReceiver {
 			try {
 				startDate = dateTimeFormat.parse(date);
 			} catch (ParseException e) {
-				e.printStackTrace();
+				log.error(e);
 			}
     		Calendar endCal = Calendar.getInstance();
     		endCal.setTime(startDate);
@@ -160,7 +155,6 @@ public class SqsReceiver {
     		
     		res = repository.findAllByWeek(startDate, endDate);
     		log.trace("Response retrieved by Week");
-    		System.out.println("Response retrieved by Week");
     		sqsSender.sendResponse(res, UUID.fromString(req_header));
     	}
 	}

@@ -47,13 +47,13 @@ public class SqsSender {
 
 	public void sendResponse(Flux<Response> response, UUID id) {
 		log.trace("Response received by Sender");
-		System.out.println("Response received by Sender");
+		//Response received by Sender
 		List<Response> list = new ArrayList<Response>();
 		response.map(r -> {
 			list.add(r);
 			return r;
 		}).blockLast();
-		System.out.println("Message to be sent: " + list);
+		log.trace("Message to be sent: " + list);
 
 		// Build response from list and send to Analytics Service
 		Message<String> message = MessageBuilder.withPayload(list.toString())
@@ -63,8 +63,6 @@ public class SqsSender {
 		try {
 			queueMessagingTemplate.send(this.queueName, message);
 			log.trace("Message sent." + list);
-			
-			System.out.println("Message sent: " + list);
 		}	catch (Exception e) {
 			log.error("Payload too large. Posting message to S3 instead: " + e);
 		}
@@ -80,15 +78,13 @@ public class SqsSender {
 	    	// Queue doesn't exist, create new one
 		    final CreateQueueRequest createQueueRequest =
 		            new CreateQueueRequest(qName);
-		    qUrlString = sqsExtended
-		            .createQueue(createQueueRequest).getQueueUrl();
+		    qUrlString = sqsExtended.createQueue(createQueueRequest).getQueueUrl();
 		    System.out.println("Queue created.");
-
 	    }
 	    
-	    System.out.println("QueueUrl retrieved: " + qUrlString);
+	    log.trace("QueueUrl retrieved: " + qUrlString);
 	    // Send the message.
 	    sqsExtended.sendMessage(qUrlString, list.toString());
-	    System.out.println("Sent the message: " + list);
+	    log.trace("Sent the message: " + list);
 	}
 }
