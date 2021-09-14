@@ -73,15 +73,12 @@ public class SqsReceiver {
 	}
 
 	@SqsListener(value = QUEUE_NAME, deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
-	public void receiveMessage(Message<String> message) {
+	public void receiveMessage(Message<String> message) throws ParseException {
 		
 		log.debug("Survey Queue listener invoked");
-
 		log.debug("Headers received: {}", message.getHeaders());
-		
 		String reqHeader = message.getHeaders().get("MessageId").toString();
 		log.debug("Message ID Received: {}", reqHeader);
-
 		String payload = message.getPayload();
 		log.debug("Payload received: ", payload);
 
@@ -114,11 +111,7 @@ public class SqsReceiver {
 		}
 				
 		if((!("").equals(batch) && !("").equals(date)) || (batch!=null && date!=null)) {
-			try {
-				startDate = dateTimeFormat.parse(date);
-			} catch (ParseException e) {
-				log.error(e);
-			}
+			startDate = dateTimeFormat.parse(date);
     		Calendar endCal = Calendar.getInstance();
     		endCal.setTime(startDate);
     		endCal.add(Calendar.DATE, 7);
@@ -136,12 +129,8 @@ public class SqsReceiver {
     		return;
     	}
     	
-    	if(!("").equals(date) || date!=null) {
-			try {
-				startDate = dateTimeFormat.parse(date);
-			} catch (ParseException e) {
-				log.error(e);
-			}
+    	if(!("").equals(date)) {
+			startDate = dateTimeFormat.parse(date);
     		Calendar endCal = Calendar.getInstance();
     		endCal.setTime(startDate);
     		endCal.add(Calendar.DATE, 7);
