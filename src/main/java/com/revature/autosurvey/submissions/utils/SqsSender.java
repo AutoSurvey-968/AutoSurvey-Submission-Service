@@ -48,7 +48,7 @@ public class SqsSender {
 	public void sendResponse(Flux<Response> response, UUID id) {
 		log.trace("Response received by Sender");
 		//Response received by Sender
-		List<Response> list = new ArrayList<Response>();
+		List<Response> list = new ArrayList<>();
 		response.map(r -> {
 			list.add(r);
 			return r;
@@ -79,7 +79,7 @@ public class SqsSender {
 		    final CreateQueueRequest createQueueRequest =
 		            new CreateQueueRequest(qName);
 		    qUrlString = sqsExtended.createQueue(createQueueRequest).getQueueUrl();
-		    System.out.println("Queue created.");
+		    log.trace("Queue created.");
 	    }
 	    
 	    log.trace("QueueUrl retrieved: " + qUrlString);

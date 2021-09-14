@@ -29,12 +29,12 @@ import reactor.core.publisher.Flux;
 @Log4j2
 @Component
 public class SqsReceiver {
-	public final static String QUEUE_NAME = SQSNames.SUBMISSIONS_QUEUE;
+	public static final String QUEUE_NAME = SQSNames.SUBMISSIONS_QUEUE;
 	private Message<String> lastReceived;
 	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
 
-	public ResponseRepository repository;
-	public ObjectMapper mapper;
+	private ResponseRepository repository;
+	private ObjectMapper mapper;
 	private SqsSender sqsSender;
 
 	public SqsReceiver() {
@@ -93,13 +93,16 @@ public class SqsReceiver {
 		Date startDate = null;
 
 		try {
+			String batchCons = "batch";
 			JSONObject obj = new JSONObject(payload);
-			log.trace("Response batch received: " + obj.getString("batch"));
-			batch = obj.getString("batch").equals("null") ? null : obj.getString("batch");
-			log.trace("Response date received: " + obj.getString("date"));
-			date = obj.getString("date").equals("null") ? null : obj.getString("date");
-			log.trace("Response surveyUuid received: " + obj.getString("surveyUuid"));
-			surveyUuid = obj.getString("surveyUuid").equals("null") ? null : obj.getString("surveyUuid");
+			log.trace("Response batch received: " + obj.getString(batchCons));
+			batch = obj.getString(batchCons).equals("null") ? null : obj.getString(batchCons);
+			String dateCons = "date";
+			log.trace("Response date received: " + obj.getString(dateCons));
+			date = obj.getString(dateCons).equals("null") ? null : obj.getString(dateCons);
+			String surveyUuidCons = "surveyUuid";
+			log.trace("Response surveyUuid received: " + obj.getString(surveyUuidCons));
+			surveyUuid = obj.getString(surveyUuidCons).equals("null") ? null : obj.getString(surveyUuidCons);
 		} catch (JSONException e1) {
 			log.error(e1);
 		}
@@ -126,7 +129,7 @@ public class SqsReceiver {
     		sqsSender.sendResponse(res, UUID.fromString(reqHeader));
     	}
     	
-    	if(!("").equals(batch) || batch!=null) {
+    	if(!("").equals(batch)) {
     		res = repository.findAllByBatch(batch);
     		log.trace("Response retrieved by Batch name.");
     		sqsSender.sendResponse(res, UUID.fromString(reqHeader));
