@@ -20,7 +20,7 @@ import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 public class AwsS3Config {
 
 	@Value("${cloud.aws.credentials.s3-bucket}")
-	private String BUCKET_NAME;
+	private String bucketName;
 	
 	@Value("${cloud.aws.credentials.s3-access-key}")
     private String awsAccessKey;
@@ -54,13 +54,11 @@ public class AwsS3Config {
                 .build();
         
         // Create S3 bucket if it does not exist
-        if(!s3.doesBucketExistV2(BUCKET_NAME)) {
-            System.out.println("S3 Bucket with give name not found.\n"
-              + "Creating one..");
-            s3.createBucket(BUCKET_NAME);
+        if(!s3.doesBucketExistV2(bucketName)) {
+            s3.createBucket(bucketName);
         }
         
-        s3.setBucketLifecycleConfiguration(BUCKET_NAME, lifecycleConfig);
+        s3.setBucketLifecycleConfiguration(bucketName, lifecycleConfig);
         
         return s3;
 
@@ -75,17 +73,14 @@ public class AwsS3Config {
     	
        final ExtendedClientConfiguration extendedClientConfig =
     	            new ExtendedClientConfiguration()
-    	            .withPayloadSupportEnabled(s3, BUCKET_NAME);
+    	            .withPayloadSupportEnabled(s3, bucketName);
 
        AmazonSQS sqs = AmazonSQSClientBuilder.standard()
                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                .withRegion(Regions.US_EAST_2)
                .build();
        
-    	    AmazonSQSExtendedClient sqsExtended =
-    	            new AmazonSQSExtendedClient(sqs, extendedClientConfig);
-    	    
-    	    return sqsExtended;
+    	return new AmazonSQSExtendedClient(sqs, extendedClientConfig);
     }
 
 }

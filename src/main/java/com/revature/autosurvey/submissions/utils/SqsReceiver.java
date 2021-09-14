@@ -29,8 +29,7 @@ import reactor.core.publisher.Flux;
 @Log4j2
 @Component
 public class SqsReceiver {
-	public final static String qname = SQSNames.SUBMISSIONS_QUEUE;
-	private String destQname = SQSNames.ANALYTICS_QUEUE;
+	public final static String QUEUE_NAME = SQSNames.SUBMISSIONS_QUEUE;
 	private Message<String> lastReceived;
 	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
 
@@ -61,14 +60,6 @@ public class SqsReceiver {
 		this.mapper = mapper;
 	}
 
-	public String getDestQname() {
-		return destQname;
-	}
-
-	public void setDestQname(String destQname) {
-		this.destQname = destQname;
-	}
-
 	public Message<String> getLastReceived() {
 		return lastReceived;
 	}
@@ -81,15 +72,15 @@ public class SqsReceiver {
 		return mapper;
 	}
 
-	@SqsListener(value = qname, deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
-	public void queueListener(Message<String> message) {
+	@SqsListener(value = QUEUE_NAME, deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
+	public void receiveMessage(Message<String> message) {
 		
 		log.debug("Survey Queue listener invoked");
 
 		log.debug("Headers received: {}", message.getHeaders());
 		
-		String req_header = message.getHeaders().get("MessageId").toString();
-		log.debug("Message ID Received: {}", req_header);
+		String reqHeader = message.getHeaders().get("MessageId").toString();
+		log.debug("Message ID Received: {}", reqHeader);
 
 		String payload = message.getPayload();
 		log.debug("Payload received: ", payload);
@@ -115,7 +106,7 @@ public class SqsReceiver {
 		
 		if(surveyUuid!=null) {
 			res = repository.findAllBySurveyUuid(UUID.fromString(surveyUuid));
-			sqsSender.sendResponse(res, UUID.fromString(req_header));
+			sqsSender.sendResponse(res, UUID.fromString(reqHeader));
 			return;
 		}
 				
@@ -132,13 +123,13 @@ public class SqsReceiver {
     		
     		res = repository.findAllByBatchAndWeek(batch, startDate, endDate);
     		log.trace("Response retrieved by Batch and Week");
-    		sqsSender.sendResponse(res, UUID.fromString(req_header));
+    		sqsSender.sendResponse(res, UUID.fromString(reqHeader));
     	}
     	
     	if(!("").equals(batch) || batch!=null) {
     		res = repository.findAllByBatch(batch);
     		log.trace("Response retrieved by Batch name.");
-    		sqsSender.sendResponse(res, UUID.fromString(req_header));
+    		sqsSender.sendResponse(res, UUID.fromString(reqHeader));
     		return;
     	}
     	
@@ -155,7 +146,7 @@ public class SqsReceiver {
     		
     		res = repository.findAllByWeek(startDate, endDate);
     		log.trace("Response retrieved by Week");
-    		sqsSender.sendResponse(res, UUID.fromString(req_header));
+    		sqsSender.sendResponse(res, UUID.fromString(reqHeader));
     	}
 	}
 }
