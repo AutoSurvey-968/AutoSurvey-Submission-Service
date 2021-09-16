@@ -16,11 +16,14 @@ import com.amazonaws.services.s3.model.BucketLifecycleConfiguration;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @Configuration
 public class AwsS3Config {
 
 	@Value("${cloud.aws.credentials.s3-bucket}")
-	private String S3_BUCKET_NAME;
+	private String s3BucketName;
 	
 	@Value("${cloud.aws.credentials.s3-access-key}")
     private String awsAccessKey;
@@ -29,15 +32,12 @@ public class AwsS3Config {
     private String awsSecretKey;
     
 	private AWSCredentials awsCreds;  
-	
-    @Bean
+
+	@Bean("AmazonS3")
     public AmazonS3 s3Client() {
     	awsCreds = new BasicAWSCredentials(
       		  awsAccessKey,
       		  awsSecretKey);
-    	System.out.println("AWS Creds:");
-    	System.out.println("Access ID: " + awsAccessKey);
-    	System.out.println("Secret Key: " + awsSecretKey);
         /*set a lifecycle rule on the
          * bucket to permanently delete objects 1 day after each object's
          * creation date.
@@ -56,38 +56,35 @@ public class AwsS3Config {
                 .build();
         
         // Create S3 bucket if it does not exist
-        if(!s3.doesBucketExistV2(S3_BUCKET_NAME)) {
-            System.out.println("S3 Bucket with give name not found.\n"
+        if(!s3.doesBucketExistV2(s3BucketName)) {
+            log.debug("S3 Bucket with give name not found.\n"
               + "Creating one..");
-            s3.createBucket(S3_BUCKET_NAME);
+            s3.createBucket(s3BucketName);
         }
         
-        s3.setBucketLifecycleConfiguration(S3_BUCKET_NAME, lifecycleConfig);
+        s3.setBucketLifecycleConfiguration(s3BucketName, lifecycleConfig);
         
         return s3;
 
     }
     
-    @Bean
+	@Bean("AmazonSQS")
     public AmazonSQS amazonSQS(AmazonS3 s3) {
     	awsCreds = new BasicAWSCredentials(
       		  awsAccessKey,
       		  awsSecretKey);
-       // Build AmazonSQS client with extended configuration
     	
+       // Build AmazonSQS client with extended configuration
        final ExtendedClientConfiguration extendedClientConfig =
     	            new ExtendedClientConfiguration()
-    	            .withPayloadSupportEnabled(s3, S3_BUCKET_NAME);
+    	            .withPayloadSupportEnabled(s3, s3BucketName);
 
        AmazonSQS sqs = AmazonSQSClientBuilder.standard()
                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                .withRegion(Regions.US_EAST_2)
                .build();
        
-    	    AmazonSQSExtendedClient sqsExtended =
-    	            new AmazonSQSExtendedClient(sqs, extendedClientConfig);
-    	    
-    	    return sqsExtended;
+    	    return new AmazonSQSExtendedClient(sqs, extendedClientConfig);  
     }
 
 }

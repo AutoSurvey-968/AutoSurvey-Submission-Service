@@ -81,7 +81,7 @@ public class SqsReceiver {
 		String messageId = null;
 		
 		if(reqHeader != null) {
-			 messageId = (String) reqHeader.toString();
+			 messageId = reqHeader.toString();
 		}
 		log.debug("Message ID Received: ", messageId);
 
