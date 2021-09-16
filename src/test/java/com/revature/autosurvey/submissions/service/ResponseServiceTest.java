@@ -98,6 +98,16 @@ class ResponseServiceTest {
 		// I do not know how to generate a Flux<FilePart> so I gotta figure that out to
 		// write this test
 	}
+	
+	@Test
+	void addResponses() {
+		Response testResponse = new Response();
+		when(responseRepository.saveAll(Mockito.any(Flux.class))).thenReturn(Flux.just(testResponse));
+		
+		Flux<Response> flux = responseService.addResponses(Flux.just(testResponse));
+		
+		StepVerifier.create(flux).expectNext(testResponse).verifyComplete();
+	}
 
 	@Test
 	void testGetResponse() {
