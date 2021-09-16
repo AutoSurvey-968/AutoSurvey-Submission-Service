@@ -31,7 +31,7 @@ import reactor.core.publisher.Flux;
 public class SqsReceiver {
 	public static final String QUEUE_NAME = SQSNames.SUBMISSIONS_QUEUE;
 	private Message<String> lastReceived;
-	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyy-MM-dd");
+	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-mm-dd");
 
 	private ResponseRepository repository;
 	private ObjectMapper mapper;
@@ -74,14 +74,14 @@ public class SqsReceiver {
 
 	@SqsListener(value = QUEUE_NAME, deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
 	public void receiveMessage(Message<String> message) throws ParseException {
-		
+
 		log.debug("Survey Queue listener invoked");
 		log.debug("Headers received: ", message.getHeaders());
 		Object reqHeader = message.getHeaders().get("MessageId");
 		String messageId = null;
-		
-		if(reqHeader != null) {
-			 messageId = reqHeader.toString();
+
+		if (reqHeader != null) {
+			messageId = reqHeader.toString();
 		}
 		log.debug("Message ID Received: ", messageId);
 
@@ -109,45 +109,45 @@ public class SqsReceiver {
 		} catch (JSONException e1) {
 			log.error(e1);
 		}
-		
-		if(surveyUuid!=null) {
+
+		if (surveyUuid != null) {
 			res = repository.findAllBySurveyUuid(UUID.fromString(surveyUuid));
 			sqsSender.sendResponse(res, UUID.fromString(messageId));
 
 			return;
 		}
-				
-		if((!("").equals(batch) && !("").equals(date)) || (batch!=null && date!=null)) {
-			startDate = dateTimeFormat.parse(date);
-    		Calendar endCal = Calendar.getInstance();
-    		endCal.setTime(startDate);
-    		endCal.add(Calendar.DATE, 7);
-    		Date endDate = endCal.getTime();
-    		
-    		res = repository.findAllByBatchAndWeek(batch, startDate, endDate);
-    		log.trace("Response retrieved by Batch and Week");
-    		sqsSender.sendResponse(res, UUID.fromString(messageId));
 
-    	}
-    	
-    	if(!("").equals(batch)) {
-    		res = repository.findAllByBatch(batch);
-    		log.trace("Response retrieved by Batch name.");
-    		sqsSender.sendResponse(res, UUID.fromString(messageId));
-    		return;
-    	}
-    	
-    	if(!("").equals(date)) {
+		if ((!("").equals(batch) && !("").equals(date)) || (batch != null && date != null)) {
 			startDate = dateTimeFormat.parse(date);
-    		Calendar endCal = Calendar.getInstance();
-    		endCal.setTime(startDate);
-    		endCal.add(Calendar.DATE, 7);
-    		Date endDate = endCal.getTime();
-    		
-    		res = repository.findAllByWeek(startDate, endDate);
-    		log.trace("Response retrieved by Week");
-    		sqsSender.sendResponse(res, UUID.fromString(messageId));
+			Calendar endCal = Calendar.getInstance();
+			endCal.setTime(startDate);
+			endCal.add(Calendar.DATE, 7);
+			Date endDate = endCal.getTime();
 
-    	}
+			res = repository.findAllByBatchAndWeek(batch, startDate, endDate);
+			log.trace("Response retrieved by Batch and Week");
+			sqsSender.sendResponse(res, UUID.fromString(messageId));
+
+		}
+
+		if (!("").equals(batch)) {
+			res = repository.findAllByBatch(batch);
+			log.trace("Response retrieved by Batch name.");
+			sqsSender.sendResponse(res, UUID.fromString(messageId));
+			return;
+		}
+
+		if (!("").equals(date)) {
+			startDate = dateTimeFormat.parse(date);
+			Calendar endCal = Calendar.getInstance();
+			endCal.setTime(startDate);
+			endCal.add(Calendar.DATE, 7);
+			Date endDate = endCal.getTime();
+
+			res = repository.findAllByWeek(startDate, endDate);
+			log.trace("Response retrieved by Week");
+			sqsSender.sendResponse(res, UUID.fromString(messageId));
+
+		}
 	}
 }
