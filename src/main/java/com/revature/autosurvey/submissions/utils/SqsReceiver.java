@@ -76,10 +76,16 @@ public class SqsReceiver {
 	public void receiveMessage(Message<String> message) throws ParseException {
 		
 		log.debug("Survey Queue listener invoked");
-		log.debug("Headers received: {}", message.getHeaders());
-		String reqHeader = message.getHeaders().get("MessageId").toString();
-		log.debug("Message ID Received: {}", reqHeader);
-		String payload = message.getPayload();
+		log.debug("Headers received: ", message.getHeaders());
+		Object reqHeader = message.getHeaders().get("MessageId");
+		String messageId = null;
+		
+		if(reqHeader != null) {
+			 messageId = (String) reqHeader.toString();
+		}
+		log.debug("Message ID Received: ", messageId);
+
+		String payload = message.getPayload().replace("\"", "");
 		log.debug("Payload received: ", payload);
 
 		// Parse JSON payload and extract target survey ID from message
@@ -106,7 +112,8 @@ public class SqsReceiver {
 		
 		if(surveyUuid!=null) {
 			res = repository.findAllBySurveyUuid(UUID.fromString(surveyUuid));
-			sqsSender.sendResponse(res, UUID.fromString(reqHeader));
+			sqsSender.sendResponse(res, UUID.fromString(messageId));
+
 			return;
 		}
 				
@@ -119,13 +126,14 @@ public class SqsReceiver {
     		
     		res = repository.findAllByBatchAndWeek(batch, startDate, endDate);
     		log.trace("Response retrieved by Batch and Week");
-    		sqsSender.sendResponse(res, UUID.fromString(reqHeader));
+    		sqsSender.sendResponse(res, UUID.fromString(messageId));
+
     	}
     	
     	if(!("").equals(batch)) {
     		res = repository.findAllByBatch(batch);
     		log.trace("Response retrieved by Batch name.");
-    		sqsSender.sendResponse(res, UUID.fromString(reqHeader));
+    		sqsSender.sendResponse(res, UUID.fromString(messageId));
     		return;
     	}
     	
@@ -138,7 +146,8 @@ public class SqsReceiver {
     		
     		res = repository.findAllByWeek(startDate, endDate);
     		log.trace("Response retrieved by Week");
-    		sqsSender.sendResponse(res, UUID.fromString(reqHeader));
+    		sqsSender.sendResponse(res, UUID.fromString(messageId));
+
     	}
 	}
 }

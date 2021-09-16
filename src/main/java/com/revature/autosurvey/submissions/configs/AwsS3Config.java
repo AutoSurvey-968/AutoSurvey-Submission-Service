@@ -20,7 +20,7 @@ import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 public class AwsS3Config {
 
 	@Value("${cloud.aws.credentials.s3-bucket}")
-	private String bucketName;
+	private String S3_BUCKET_NAME;
 	
 	@Value("${cloud.aws.credentials.s3-access-key}")
     private String awsAccessKey;
@@ -35,8 +35,10 @@ public class AwsS3Config {
     	awsCreds = new BasicAWSCredentials(
       		  awsAccessKey,
       		  awsSecretKey);
-
-    	/*set a lifecycle rule on the
+    	System.out.println("AWS Creds:");
+    	System.out.println("Access ID: " + awsAccessKey);
+    	System.out.println("Secret Key: " + awsSecretKey);
+        /*set a lifecycle rule on the
          * bucket to permanently delete objects 1 day after each object's
          * creation date.
          */
@@ -54,17 +56,19 @@ public class AwsS3Config {
                 .build();
         
         // Create S3 bucket if it does not exist
-        if(!s3.doesBucketExistV2(bucketName)) {
-            s3.createBucket(bucketName);
+        if(!s3.doesBucketExistV2(S3_BUCKET_NAME)) {
+            System.out.println("S3 Bucket with give name not found.\n"
+              + "Creating one..");
+            s3.createBucket(S3_BUCKET_NAME);
         }
         
-        s3.setBucketLifecycleConfiguration(bucketName, lifecycleConfig);
+        s3.setBucketLifecycleConfiguration(S3_BUCKET_NAME, lifecycleConfig);
         
         return s3;
 
     }
     
-    @Bean("AmazonSQS")
+    @Bean
     public AmazonSQS amazonSQS(AmazonS3 s3) {
     	awsCreds = new BasicAWSCredentials(
       		  awsAccessKey,
@@ -73,14 +77,17 @@ public class AwsS3Config {
     	
        final ExtendedClientConfiguration extendedClientConfig =
     	            new ExtendedClientConfiguration()
-    	            .withPayloadSupportEnabled(s3, bucketName);
+    	            .withPayloadSupportEnabled(s3, S3_BUCKET_NAME);
 
        AmazonSQS sqs = AmazonSQSClientBuilder.standard()
                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                .withRegion(Regions.US_EAST_2)
                .build();
        
-    	return new AmazonSQSExtendedClient(sqs, extendedClientConfig);
+    	    AmazonSQSExtendedClient sqsExtended =
+    	            new AmazonSQSExtendedClient(sqs, extendedClientConfig);
+    	    
+    	    return sqsExtended;
     }
 
 }

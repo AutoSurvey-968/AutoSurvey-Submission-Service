@@ -67,7 +67,7 @@ public class SqsSender {
 			log.error("Payload too large. Posting message to S3 instead: " + e);
 		}
 		
-		// Send Message to S3 instead
+		// File size too large, send Message to S3 instead
 	    // Create a message queue for this example.
 	    String qUrlString = "";
 	    String qName = "AnalyticsQueue";
@@ -83,8 +83,9 @@ public class SqsSender {
 	    }
 	    
 	    log.trace("QueueUrl retrieved: " + qUrlString);
-	    // Send the message.
+	    
+	    // Send message to S3
 	    sqsExtended.sendMessage(qUrlString, list.toString());
-	    log.trace("Sent the message: " + list);
+	    log.trace("Sent message to AWS S3: " + list);
 	}
 }
