@@ -271,5 +271,36 @@ class ResponseControllerTest {
 		StepVerifier.create(responseController.getResponses(Optional.empty(), Optional.empty(), Optional.empty()))
 				.expectNextCount(1L);
 	}
+	
+	@Test
+	void addResponsesFromFile() {
+		UUID id = UUID.randomUUID();
+		FilePart filePart = Mockito.mock(FilePart.class);
+		Response testResponse = new Response();
+		
+		when(responseService.addResponsesFromFile(Flux.just(filePart), id)).thenReturn(Flux.just(testResponse));
+		
+		Mono<ResponseEntity<Flux<Response>>> monoResponse = responseController.addResponses(Flux.just(filePart), id.toString());
+		
+		StepVerifier.create(monoResponse).expectNextMatches(res -> res.getStatusCodeValue() == 200).verifyComplete();
+	}
+	
+	@Test
+	void addResponsesFromFileNullFile() {
+		UUID id = UUID.randomUUID();
+		
+		Mono<ResponseEntity<Flux<Response>>> monoResponse = responseController.addResponses(null, id.toString());
+		
+		StepVerifier.create(monoResponse).expectNextMatches(res -> res.getStatusCodeValue() == 400).verifyComplete();
+	}
+	
+	@Test
+	void addResponsesFromFileNullId() {
+		FilePart filePart = Mockito.mock(FilePart.class);
+		
+		Mono<ResponseEntity<Flux<Response>>> monoResponse = responseController.addResponses(Flux.just(filePart), null);
+		
+		StepVerifier.create(monoResponse).expectNextMatches(res -> res.getStatusCodeValue() == 400).verifyComplete();
+	}
 
 }
