@@ -82,12 +82,6 @@ public class SqsSenderTest {
         {
             e.printStackTrace();
         }
-        
-//        StaticApplicationContext applicationContext = new StaticApplicationContext();
-//        applicationContext.registerSingleton("outgoingMessageHandler", SqsSender.class);
-//        applicationContext.refresh();    
-//        
-//        SqsSender messageHandler = applicationContext.getBean(SqsSender.class);
 
         SqsSender messageHandler = Mockito.mock(SqsSender.class);
         messageHandler.setQueueMessagingTemplate(queueMessagingTemplate);
@@ -104,8 +98,6 @@ public class SqsSenderTest {
 		assertNotNull(requestHeader);
 		assertNotNull(message.getPayload());
 		
-		verify(messageHandler, times(1)).sendResponseToS3(oversizedPayload);
-		
-//		applicationContext.close();
+		verify(messageHandler, times(1)).sendResponseToS3(oversizedPayload);		
 	}
 }

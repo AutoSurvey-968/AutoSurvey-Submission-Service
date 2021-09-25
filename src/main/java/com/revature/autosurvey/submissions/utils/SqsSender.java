@@ -24,17 +24,12 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @Data
 @Component
-public class SqsSender {
+class SqsSender {
 
 	private QueueMessagingTemplate queueMessagingTemplate;
 	private String queueName = SQSNames.SUBMISSIONS_QUEUE;
 	private AmazonSQS sqsExtended;
 
-	
-	public SqsSender() {
-		this.queueMessagingTemplate = null;
-	}
-	
 	@Autowired
 	public SqsSender(AmazonSQSAsync sqs) {
 		this.queueMessagingTemplate = new QueueMessagingTemplate(sqs);

@@ -28,6 +28,7 @@ import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class SqsReceiverTest {
 
@@ -43,14 +44,17 @@ public class SqsReceiverTest {
 	private SqsSender sqsSender;
 	
 	private String requestHeader = UUID.randomUUID().toString();
-	private String validId;
-	private String validUuid;
-	private String invalidId;
+	private String validSID;
+	private String invalidSID;
+	private String validRID;
+	private String invalidRID;
 	private String validBatch;
-	private String invalidBatch;
+	
 	private String payload;
+	private String errMessage;
 	
 	private List<Response> responses;
+	private Response emptyResponse;
 	
 	private Date validDate;
 	private Calendar cal = Calendar.getInstance();
@@ -60,58 +64,110 @@ public class SqsReceiverTest {
 	@BeforeEach
 	void beforeEach() {
 		MockitoAnnotations.openMocks(this);
+		responses = new ArrayList<>();
+        emptyResponse = new Response();
+
 	}
 	
-//	@Test
-//	void testReceiverValidResponseId() throws ParseException {
-//		// Valid Response ID in payload
-//		payload = "{\n"
-//				+ "  \"uuid\": \"46af76a0-9927-11ea-8080-808080808080\",\n"
-//				+ "  \"batch\": null,\n"
-//				+ "  \"date\": null,\n"
-//				+ "  \"surveyUuid\": null,\n"
-//				+ "}";
-//
-//		String responseUUID = "";
-//		message = MessageBuilder.withPayload(payload)
-//				.setHeader("MessageId", requestHeader).build();
-//		validUuid = "46af76a0-9927-11ea-8080-808080808080";
-//		
-//        StaticApplicationContext applicationContext = new StaticApplicationContext();
-//        applicationContext.registerSingleton("incomingMessageHandler", SqsReceiver.class);
-//        applicationContext.refresh();      
-//
-//        SqsReceiver messageHandler = applicationContext.getBean(SqsReceiver.class);
-//		
-//        messageHandler.setResponseRepo(repository); 
-//        messageHandler.setSqsSender(sqsSender);
-//        
-//        Response r = new Response();
-//		  
-//		Mockito.when(messageHandler.getRepository().findByUuid(UUID.fromString(validUuid)))
-//		.thenReturn(Mono.just(r));
-//		
-////		Flux<Response> res = Flux.just(r);
-//		  
-//		Mockito.doNothing().when(messageHandler.getSqsSender()).sendResponse(res, UUID.fromString(requestHeader));
-//
-//		messageHandler.receiveMessage(message);
-//		
-//		try {
-//			JSONObject obj = new JSONObject(message.getPayload());
-//			responseUUID = obj.getString("uuid");	
-//		} catch (JSONException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		assertEquals(validUuid, responseUUID, "The Response UUID parsed from message payload"
-//				+ " is the same one we entered");
-//		Mockito.verify(messageHandler.getRepository()).findByUuid(UUID.fromString(responseUUID));
-//		verify(messageHandler.getSqsSender(), times(0)).sendResponse(Mockito.any(), Mockito.any());
-////		verify(messageHandler.getSqsSender(), times(1)).sendResponse(res, UUID.fromString(requestHeader));
-//
-//		applicationContext.close();
-//	}
+	@Test
+	void testReceiverValidResponseId() throws ParseException {
+		// Valid Response ID in payload
+		payload = "{\n"
+				+ "  \"uuid\": \"46af76a0-9927-11ea-8080-808080808080\",\n"
+				+ "  \"batch\": null,\n"
+				+ "  \"date\": null,\n"
+				+ "  \"surveyUuid\": null\n"
+				+ "}";
+
+		String responseUUID = "";
+		message = MessageBuilder.withPayload(payload)
+				.setHeader("MessageId", requestHeader).build();
+		validRID = "46af76a0-9927-11ea-8080-808080808080";
+		emptyResponse.setUuid(UUID.fromString(validRID));
+		responses.add(emptyResponse);
+		
+        StaticApplicationContext applicationContext = new StaticApplicationContext();
+        applicationContext.registerSingleton("incomingMessageHandler", SqsReceiver.class);
+        applicationContext.refresh();      
+
+        SqsReceiver messageHandler = applicationContext.getBean(SqsReceiver.class);
+		
+        messageHandler.setResponseRepo(repository); 
+        messageHandler.setSqsSender(sqsSender);
+        
+		  
+		Mockito.when(messageHandler.getRepository().findByUuid(UUID.fromString(validRID)))
+		.thenReturn(Mono.just(emptyResponse));
+				  
+		Mockito.doNothing().when(messageHandler.getSqsSender())
+		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
+
+		messageHandler.receiveMessage(message);
+		
+		try {
+			JSONObject obj = new JSONObject(message.getPayload());
+			responseUUID = obj.getString("uuid");	
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		assertEquals(validRID, responseUUID, "The Response UUID parsed from message payload"
+				+ " is the same one we entered");
+		
+		Mockito.verify(messageHandler.getRepository())
+		.findByUuid(UUID.fromString(responseUUID));
+		
+		verify(messageHandler.getSqsSender(), times(1))
+		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
+
+		applicationContext.close();
+	}
+	
+	@Test
+	void testReceiverInvalidResponseId() throws ParseException {
+		// Invalid Response ID in payload
+		payload = "{\n"
+				+ "  \"uuid\": \"46af76a0-9927-11ea-8080\",\n"
+				+ "  \"batch\": null,\n"
+				+ "  \"date\": null,\n"
+				+ "  \"surveyUuid\": null\n"
+				+ "}";
+
+		String responseUUID = "";
+		invalidRID = "46af76a0-9927-11ea-8080";
+		errMessage = "Invalid format for UUID, unable to parse message";
+		message = MessageBuilder.withPayload(payload)
+				.setHeader("MessageId", requestHeader).build();
+		
+        StaticApplicationContext applicationContext = new StaticApplicationContext();
+        applicationContext.registerSingleton("incomingMessageHandler", SqsReceiver.class);
+        applicationContext.refresh();      
+
+        SqsReceiver messageHandler = applicationContext.getBean(SqsReceiver.class);
+		
+        messageHandler.setResponseRepo(repository); 
+        messageHandler.setSqsSender(sqsSender);
+        		 
+		messageHandler.receiveMessage(message);
+		
+		try {
+			JSONObject obj = new JSONObject(message.getPayload());
+			responseUUID = obj.getString("uuid");	
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		
+		assertEquals(invalidRID, responseUUID, "The Response UUID parsed from message payload"
+				+ " is the same one we entered");
+		
+		Mockito.verifyNoInteractions(messageHandler.getRepository());
+		
+		verify(messageHandler.getSqsSender(), times(1))
+		.sendResponse(errMessage, UUID.fromString(requestHeader));
+
+		applicationContext.close();
+	}
 	
 	@Test
 	void testReceiverValidSurveyId() throws ParseException {
@@ -126,7 +182,7 @@ public class SqsReceiverTest {
 		String messageSID = "";
 		message = MessageBuilder.withPayload(payload)
 				.setHeader("MessageId", requestHeader).build();
-		validId = "d50ca970-14ac-11ec-a00f-df792d7e6b27";
+		validSID = "d50ca970-14ac-11ec-a00f-df792d7e6b27";
 		
         StaticApplicationContext applicationContext = new StaticApplicationContext();
         applicationContext.registerSingleton("incomingMessageHandler", SqsReceiver.class);
@@ -136,14 +192,11 @@ public class SqsReceiverTest {
 		
         messageHandler.setResponseRepo(repository); 
         messageHandler.setSqsSender(sqsSender);
-        
-        Response r = new Response();
-		  
-		Mockito.when(messageHandler.getRepository().findAllBySurveyUuid(UUID.fromString(validId)))
-		.thenReturn(Flux.just(r));
+        		  
+		Mockito.when(messageHandler.getRepository().findAllBySurveyUuid(UUID.fromString(validSID)))
+		.thenReturn(Flux.just(emptyResponse));
 		
-		responses = new ArrayList<>();
-		responses.add(r);
+		responses.add(emptyResponse);
 		  
 		Mockito.doNothing().when(messageHandler.getSqsSender())
 		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
@@ -157,12 +210,13 @@ public class SqsReceiverTest {
 			e.printStackTrace();
 		}
 		
-		assertEquals(validId, messageSID, "The surveyId parsed from message payload"
+		assertEquals(validSID, messageSID, "The surveyId parsed from message payload"
 				+ " is the same one we entered");
-		Mockito.verify(messageHandler.getRepository()).findAllBySurveyUuid(UUID.fromString(messageSID));
+		Mockito.verify(messageHandler.getRepository())
+		.findAllBySurveyUuid(UUID.fromString(messageSID));
+		
 		verify(messageHandler.getSqsSender(), times(1))
 		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
-//		verify(messageHandler.getSqsSender(), times(1)).sendResponse(res, UUID.fromString(requestHeader));
 
 		applicationContext.close();
 	}
@@ -181,7 +235,7 @@ public class SqsReceiverTest {
 		String errMessage = "Invalid format for UUID, unable to parse message";
 		message = MessageBuilder.withPayload(payload)
 				.setHeader("MessageId", requestHeader).build();
-		invalidId = "d50ca970-14ac-11ec-a00f";
+		invalidSID = "d50ca970-14ac-11ec-a00f";
 		
         StaticApplicationContext applicationContext = new StaticApplicationContext();
         applicationContext.registerSingleton("incomingMessageHandler", SqsReceiver.class);
@@ -201,10 +255,11 @@ public class SqsReceiverTest {
 			e.printStackTrace();
 		}
 		
-		assertEquals(invalidId, messageSID, "The surveyId parsed from message payload"
+		assertEquals(invalidSID, messageSID, "The surveyId parsed from message payload"
 				+ " is the same one we entered");
 
 		Mockito.verifyNoInteractions(messageHandler.getRepository());
+		
 		verify(messageHandler.getSqsSender(), times(1))
 		.sendResponse(errMessage, UUID.fromString(requestHeader));
 
@@ -237,12 +292,10 @@ public class SqsReceiverTest {
         messageHandler.setResponseRepo(repository); 
         messageHandler.setSqsSender(sqsSender);
         
-        Response r = new Response();
-        responses = new ArrayList<>();
-        responses.add(r);
+        responses.add(emptyResponse);
         
 		Mockito.when(messageHandler.getRepository().findAllByBatch(validBatch))
-		.thenReturn(Flux.just(r));
+		.thenReturn(Flux.just(emptyResponse));
 				  
 		Mockito.doNothing().when(messageHandler.getSqsSender())
 		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
@@ -267,17 +320,15 @@ public class SqsReceiverTest {
 
 	@Test
 	void testReceiverInvalidBatch() throws ParseException {
-		// Invalid batch in payload
+		// Invalid JSON payload for batch request
 		payload = "{\n"
 				+ "  \"uuid\": null,\n"
-				+ "  \"batch\": \"Invalid Batch\",\n"
+				+ "  \"batch\": \"Invalid Batch\"\n"
 				+ "  \"date\": null,\n"
 				+ "  \"surveyUuid\": null\n"
 				+ "}";
-		
-		invalidBatch = "Invalid Batch";
-		String messageBatch = "";
-		
+				
+		errMessage = "Invalid parameters, unable to parse JSON message";
 		message = MessageBuilder.withPayload(payload)
 				.setHeader("MessageId", requestHeader).build();
 		
@@ -290,28 +341,16 @@ public class SqsReceiverTest {
 		
         messageHandler.setResponseRepo(repository); 
         messageHandler.setSqsSender(sqsSender);
-        		  
-		Mockito.when(messageHandler.getRepository().findAllByBatch(invalidBatch))
-		.thenReturn(Flux.empty());
 		
-		responses = new ArrayList<>();
 		Mockito.doNothing().when(messageHandler.getSqsSender())
-		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
+		.sendResponse(errMessage, UUID.fromString(requestHeader));
 
 		messageHandler.receiveMessage(message);
 		
-		try {
-			JSONObject obj = new JSONObject(message.getPayload());
-			messageBatch = obj.getString("batch");	
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+		Mockito.verifyNoInteractions(messageHandler.getRepository());
 		
-		assertEquals(invalidBatch, messageBatch, "The batch parsed from message payload"
-				+ " is the same one we entered");
-		Mockito.verify(messageHandler.getRepository()).findAllByBatch(invalidBatch);
 		verify(messageHandler.getSqsSender(), times(1))
-		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
+		.sendResponse(errMessage, UUID.fromString(requestHeader));
 
 		applicationContext.close();
 	}
@@ -352,12 +391,10 @@ public class SqsReceiverTest {
         messageHandler.setResponseRepo(repository); 
         messageHandler.setSqsSender(sqsSender);
         
-        Response r = new Response();
-        responses = new ArrayList<>();
-        responses.add(r);
+        responses.add(emptyResponse);
         
 		Mockito.when(messageHandler.getRepository().findAllByWeek(messageDate, endDate))
-		.thenReturn(Flux.just(r));
+		.thenReturn(Flux.just(emptyResponse));
 				  
 		Mockito.doNothing().when(messageHandler.getSqsSender())
 		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
@@ -367,6 +404,7 @@ public class SqsReceiverTest {
 		assertEquals(validDate, messageDate, "The date parsed from message payload"
 				+ " is the same one we entered");
 		Mockito.verify(messageHandler.getRepository()).findAllByWeek(messageDate, endDate);
+		
 		verify(messageHandler.getSqsSender(), times(1))
 		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
 
@@ -409,9 +447,12 @@ public class SqsReceiverTest {
         
 		messageHandler.receiveMessage(message);
 		
+		
 		assertEquals(invalidDate, messageDate, "The date parsed from message payload"
 				+ " is the same one we entered");
+		
 		Mockito.verifyNoInteractions(messageHandler.getRepository());
+		
 		verify(messageHandler.getSqsSender(), times(1))
 		.sendResponse(errMessage, UUID.fromString(requestHeader));
 

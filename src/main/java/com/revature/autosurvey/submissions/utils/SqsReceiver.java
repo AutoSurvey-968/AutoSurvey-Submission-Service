@@ -30,7 +30,7 @@ import reactor.core.publisher.Mono;
 
 @Log4j2
 @Component
-public class SqsReceiver {
+class SqsReceiver {
 	public static final String QUEUE_NAME = SQSNames.SUBMISSIONS_QUEUE;
 	private Message<String> lastReceived;
 	private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-mm-dd");
@@ -77,7 +77,7 @@ public class SqsReceiver {
 	public ObjectMapper getMapper() {
 		return mapper;
 	}
-
+	
 	@SqsListener(value = QUEUE_NAME, deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
 	public void receiveMessage(Message<String> message) throws ParseException {
 
@@ -85,13 +85,12 @@ public class SqsReceiver {
 		log.debug("Headers received: ", message.getHeaders());
 		Object reqHeader = message.getHeaders().get("MessageId");
 		String messageId = null;
-
-		if (reqHeader != null) {
+		if(reqHeader != null) {
 			messageId = reqHeader.toString();
 		}
+
 		log.debug("Message ID Received: ", messageId);
 
-//		String payload = message.getPayload().replace("\"", "");
 		String payload = message.getPayload();
 		log.debug("Payload received: ", payload);
 
@@ -100,7 +99,7 @@ public class SqsReceiver {
 		UUID surveyUuid = null;
 		String batch = "";
 		String date = "";
-		List<Response> response = new ArrayList<>();
+		List<Response> responses = new ArrayList<>();
 		Date startDate = null;
 		String errResponse;
 
@@ -150,98 +149,83 @@ public class SqsReceiver {
 		System.out.println("Batch received: " + batch);
 		System.out.println("Date received: " + date);
 			
-		if (uuid != null) {
-			System.out.println("Querying DB with UUID");
-			if(repository.findByUuid(uuid) == null) {
-				System.out.println("Method call producing null value");
+		if (uuid != null) {				
+			Response response = repository.findByUuid(uuid).switchIfEmpty(Mono.just(new Response())).block();
+			System.out.println("Response received from UUID query: " + response);
+			
+			if(!response.getUuid().equals(uuid)) {
+				String reply = "No Response found with UUID :" + uuid;
+				System.out.println(reply + "\nSent reply to Analytics Queue");
+				sqsSender.sendResponse(reply, UUID.fromString(messageId));
 				return;
 			}
-				
-			Response r = repository.findByUuid(uuid).switchIfEmpty(Mono.just(new Response())).block();
-			System.out.println("Response received from UUID query: " + r);
 			
-//			if(r.getUuid() != uuid) {
-//				res = Flux.empty();
-//			}
-//			else {
-//				res = Flux.just(r);
-//			}
-			
-			sqsSender.sendResponse(r.toString(), UUID.fromString(messageId));
+			responses.add(response);
+			sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
 			return;
 		}
 		
 		if (surveyUuid != null) {
 			repository.findAllBySurveyUuid(surveyUuid).map(r -> {
-				response.add(r);
-				return response;
+				responses.add(r);
+				return responses;
 			}).blockLast();
 			
-			System.out.println("Response List: " + response);
-			sqsSender.sendResponse(response.toString(), UUID.fromString(messageId));
-			return;
-		}
-
-		if (batch != null && date != null) {
-			
-			try {
-				startDate = dateTimeFormat.parse(date);
-			} catch (ParseException e) {
-				e.printStackTrace();
-				
-				System.out.println("Invalid date in message payload");
-				errResponse = "Invalid date format, unable to parse date parameter";
-				sqsSender.sendResponse(errResponse, UUID.fromString(messageId));
-
-				return;
-			}
-			
-			Calendar endCal = Calendar.getInstance();
-			endCal.setTime(startDate);
-			endCal.add(Calendar.DATE, 7);
-			Date endDate = endCal.getTime();
-
-			repository.findAllByBatchAndWeek(batch, startDate, endDate).map(r -> {
-				response.add(r);
-				return response;
-			}).blockLast();
-			sqsSender.sendResponse(response.toString(), UUID.fromString(messageId));;
-			log.trace("Response retrieved by Batch and Week");
-		}
-		
-		if (batch != null) {
-			repository.findAllByBatch(batch).map(r -> {
-				response.add(r);
-				return response;
-			}).blockLast();
-			sqsSender.sendResponse(response.toString(), UUID.fromString(messageId));;
-			log.trace("Response retrieved by Batch name.");
+			System.out.println("Response List: " + responses);
+			sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
 			return;
 		}
 
 		if (date != null) {
+			
 			try {
 				startDate = dateTimeFormat.parse(date);
 			} catch (ParseException e) {
-				e.printStackTrace();
+				log.error(e);
 				
 				System.out.println("Invalid date in message payload");
 				errResponse = "Invalid date format, unable to parse date parameter";
 				sqsSender.sendResponse(errResponse, UUID.fromString(messageId));
-
 				return;
 			}
+			
 			Calendar endCal = Calendar.getInstance();
 			endCal.setTime(startDate);
 			endCal.add(Calendar.DATE, 7);
 			Date endDate = endCal.getTime();
-
+			
+			// If batch and date are provided as parameters
+			if(batch != null) {
+				repository.findAllByBatchAndWeek(batch, startDate, endDate).map(r -> {
+					responses.add(r);
+					return responses;
+				}).blockLast();
+				
+				sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
+				log.trace("Response retrieved by Batch and Week");
+				return;
+			}
+			
+			// Else only date was given
 			repository.findAllByWeek(startDate, endDate).map(r -> {
-				response.add(r);
-				return response;
+				responses.add(r);
+				return responses;
 			}).blockLast();
-			sqsSender.sendResponse(response.toString(), UUID.fromString(messageId));;
-			log.trace("Response retrieved by Week");
+			
+			sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
+			log.trace("Response retrieved by Week");		
+			return;
+		}
+		
+		if (batch != null) {
+			repository.findAllByBatch(batch).map(r -> {
+				responses.add(r);
+				return responses;
+			}).blockLast();
+			
+			sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
+			log.trace("Response retrieved by Batch name.");
+			return;
 		}
 	}
 }
