@@ -38,9 +38,4 @@ public class Response {
 	@Column
 	private Map<String, String> responses;
 	
-	public Response() {
-		super();
-		uuid = UUID.randomUUID();
-	}
-
 }

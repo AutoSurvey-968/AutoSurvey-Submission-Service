@@ -188,7 +188,7 @@ class SqsReceiver {
 				.switchIfEmpty(Mono.just(new Response())).block();
 		System.out.println("Response received from UUID query: " + response);
 		
-		if(!response.getUuid().equals(uuid)) {
+		if(response.getUuid() == null || !response.getUuid().equals(uuid)) {
 			String reply = "No Response found with UUID :" + uuid;
 			System.out.println(reply + "\nSent reply to Analytics Queue");
 			sqsSender.sendResponse(reply, messageId);
