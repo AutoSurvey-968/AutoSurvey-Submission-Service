@@ -457,67 +457,7 @@ public class SqsReceiverTest {
 	
 	@Test
 	void testReceiverValidDateAndBatch() throws ParseException {
-		// Valid date and batch in payload
-		payload = "{\n"
-				+ "  \"uuid\": null,\n"
-				+ "  \"batch\": \"Mock Batch 42\",\n"
-				+ "  \"date\": \"2020-04-27\",\n"
-				+ "  \"surveyUuid\": null\n"
-				+ "}";
-				
-		message = MessageBuilder.withPayload(payload)
-				.setHeader("MessageId", requestHeader).build();
 		
-		validDate = dateTimeFormat.parse("2020-04-27");
-		validBatch =  "Mock Batch 42";
-		Date messageDate = null;
-		Date endDate = null;
-		String messageBatch = "";
-
-		try {
-			JSONObject obj = new JSONObject(message.getPayload());
-			messageDate = dateTimeFormat.parse(obj.getString("date"));	
-			cal.setTime(messageDate);
-			cal.add(Calendar.DATE, 7);
-			endDate = cal.getTime();
-			
-			messageBatch = obj.getString("batch");	
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-        StaticApplicationContext applicationContext = new StaticApplicationContext();
-        applicationContext.registerSingleton("incomingMessageHandler", SqsReceiver.class);
-        applicationContext.refresh();     
-
-        SqsReceiver messageHandler = applicationContext.getBean(SqsReceiver.class);
-		
-        messageHandler.setResponseRepo(repository); 
-        messageHandler.setSqsSender(sqsSender);
-        
-        responses.add(emptyResponse);
-        
-		Mockito.when(messageHandler.getRepository()
-				.findAllByBatchAndWeek(messageBatch, messageDate, endDate))
-		.thenReturn(Flux.just(emptyResponse));
-				  
-		Mockito.doNothing().when(messageHandler.getSqsSender())
-		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
-
-		messageHandler.receiveMessage(message);
-		
-		assertEquals(validDate, messageDate, "The date parsed from message payload"
-				+ " is the same one we entered");
-		assertEquals(validBatch, messageBatch, "The date parsed from message payload"
-				+ " is the same one we entered");
-		
-		Mockito.verify(messageHandler.getRepository())
-		.findAllByBatchAndWeek(messageBatch, messageDate, endDate);
-		
-		verify(messageHandler.getSqsSender(), times(1))
-		.sendResponse(responses.toString(), UUID.fromString(requestHeader));
-
-		applicationContext.close();
 	}
 	
 	@Test
