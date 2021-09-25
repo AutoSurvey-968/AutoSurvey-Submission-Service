@@ -45,47 +45,41 @@ public class SqsSender {
 		this.queueMessagingTemplate = new QueueMessagingTemplate(sqs);
 	}
 
-	public void sendResponse(Flux<Response> response, UUID id) {
+	public void sendResponse(String response, UUID id) {
 		log.trace("Response received by Sender");
-		//Response received by Sender
-		List<Response> list = new ArrayList<>();
-		response.map(r -> {
-			list.add(r);
-			return r;
-		}).blockLast();
-		log.trace("Message to be sent: " + list);
 
 		// Build response from list and send to Analytics Service
-		Message<String> message = MessageBuilder.withPayload(list.toString())
+		Message<String> message = MessageBuilder.withPayload(response)
 				.setHeader("MessageId", id.toString())
 				.build();
+		System.out.println(response);
 		
 		try {
-			queueMessagingTemplate.send(this.queueName, message);
-			log.trace("Message sent." + list);
+			queueMessagingTemplate.send(SQSNames.ANALYTICS_QUEUE, message);
+			log.trace("Message sent." + response);
+			System.out.println("Message sent." + response);
 		}	catch (Exception e) {
 			log.error("Payload too large. Posting message to S3 instead: " + e);
+			sendResponseToS3(response.toString());
 		}
 		
+	}
+	
+	public void sendResponseToS3(String payload) {
 		// File size too large, send Message to S3 instead
-	    // Create a message queue for this example.
-	    String qUrlString = "";
-	    String qName = "AnalyticsQueue";
-	    
-	    if(!("").equals(qUrlString))
-	    	qUrlString = sqsExtended.getQueueUrl(qName).toString();
-	    else {		
-	    	// Queue doesn't exist, create new one
-		    final CreateQueueRequest createQueueRequest =
-		            new CreateQueueRequest(qName);
-		    qUrlString = sqsExtended.createQueue(createQueueRequest).getQueueUrl();
-		    log.trace("Queue created.");
-	    }
-	    
+	    // Create a message queue in S3
+		
+	    String qName = "AnalyticsQueue";  
+	    String qUrlString = sqsExtended.getQueueUrl(qName).toString();
+
+	    final CreateQueueRequest createQueueRequest = new CreateQueueRequest(qName);
+	    qUrlString = sqsExtended.createQueue(createQueueRequest).getQueueUrl();
+	    log.trace("Queue created.");	    
 	    log.trace("QueueUrl retrieved: " + qUrlString);
 	    
 	    // Send message to S3
-	    sqsExtended.sendMessage(qUrlString, list.toString());
-	    log.trace("Sent message to AWS S3: " + list);
+	    sqsExtended.sendMessage(qUrlString, payload);
+	    log.trace("Sent message to AWS S3: " + payload);
+	    System.out.println("Sent message to S3: " + payload);
 	}
 }
