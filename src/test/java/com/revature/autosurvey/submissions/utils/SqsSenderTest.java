@@ -1,6 +1,7 @@
 package com.revature.autosurvey.submissions.utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -22,16 +23,18 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.revature.autosurvey.submissions.beans.Response;
 
 
 public class SqsSenderTest {
 
-	@Mock
 	private QueueMessagingTemplate queueMessagingTemplate;
 	@Mock
 	private AmazonSQS sqsExtended;
-	private String queueName = SQSNames.SUBMISSIONS_QUEUE;
+	@Mock
+	private AmazonSQSAsync sqs;
+	private String queueName = SQSNames.ANALYTICS_QUEUE;
 	private Message<String> message;
 	private String payload;
 	private String requestHeader = UUID.randomUUID().toString();
@@ -45,17 +48,18 @@ public class SqsSenderTest {
 	void testSendResponseSmallPayload() {
 		SqsSender mockSender = Mockito.mock(SqsSender.class);
 		
-		List<Response> response = new ArrayList<>();
-		response.add(new Response());
+		List<Response> responses = new ArrayList<>();
+		responses.add(new Response());
 		
-		payload = response.toString();
+		payload = responses.toString();
 		message = MessageBuilder.withPayload(payload)
 				.setHeader("MessageId", requestHeader)
 				.build();
 		
-		mockSender.sendResponse(Mockito.any(), Mockito.any());
+		mockSender.sendResponse(responses.toString(), UUID.fromString(requestHeader));
 		
 		assertNotNull(queueName);
+		assertNotNull(requestHeader);
 		assertNotNull(message.getPayload());
 		
 		verify(mockSender, times(1)).sendResponse(Mockito.any(), Mockito.any());
@@ -65,9 +69,10 @@ public class SqsSenderTest {
 	void testSendResponseOversizedPayload() {
 		// Get absolute file path to oversize payload file
 		// (might have to include .txt extension if you're getting NoSuchFileException
-		String filePathOm = "oversizeS3message_sqsTestFile_submissions.txt";
-		Path pathToFile = Paths.get(filePathOm).toAbsolutePath();
+		String filePath = "oversizeS3message_sqsTestFile_submissions";
+		Path pathToFile = Paths.get(filePath).toAbsolutePath();
 		String oversizedPayload = "";
+		queueMessagingTemplate = new QueueMessagingTemplate(sqs);
 		 
         try
         {
@@ -78,7 +83,29 @@ public class SqsSenderTest {
             e.printStackTrace();
         }
         
-        System.out.println(oversizedPayload);
- //       System.out.println(pathToFile.toAbsolutePath());
+//        StaticApplicationContext applicationContext = new StaticApplicationContext();
+//        applicationContext.registerSingleton("outgoingMessageHandler", SqsSender.class);
+//        applicationContext.refresh();    
+//        
+//        SqsSender messageHandler = applicationContext.getBean(SqsSender.class);
+
+        SqsSender messageHandler = Mockito.mock(SqsSender.class);
+        messageHandler.setQueueMessagingTemplate(queueMessagingTemplate);
+        
+        Message<String> message = MessageBuilder.withPayload(oversizedPayload)
+        		.setHeader("MessageId", requestHeader).build();
+        
+        doCallRealMethod().when(messageHandler).sendResponse(oversizedPayload, UUID.fromString(requestHeader));        
+        Mockito.doNothing().when(messageHandler).sendResponseToS3(oversizedPayload);
+
+        messageHandler.sendResponse(oversizedPayload, UUID.fromString(requestHeader));
+        
+		assertNotNull(queueName);
+		assertNotNull(requestHeader);
+		assertNotNull(message.getPayload());
+		
+		verify(messageHandler, times(1)).sendResponseToS3(oversizedPayload);
+		
+//		applicationContext.close();
 	}
 }

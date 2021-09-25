@@ -1,7 +1,5 @@
 package com.revature.autosurvey.submissions.utils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +12,9 @@ import org.springframework.stereotype.Component;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.model.CreateQueueRequest;
-import com.revature.autosurvey.submissions.beans.Response;
 
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
-import reactor.core.publisher.Flux;
 
 /**
  * @author Jasmine
@@ -30,19 +26,28 @@ import reactor.core.publisher.Flux;
 @Component
 public class SqsSender {
 
-	private final QueueMessagingTemplate queueMessagingTemplate;
+	private QueueMessagingTemplate queueMessagingTemplate;
 	private String queueName = SQSNames.SUBMISSIONS_QUEUE;
 	private AmazonSQS sqsExtended;
 
+	
+	public SqsSender() {
+		this.queueMessagingTemplate = null;
+	}
+	
+	@Autowired
+	public SqsSender(AmazonSQSAsync sqs) {
+		this.queueMessagingTemplate = new QueueMessagingTemplate(sqs);
+	}
+	
 	@Autowired
 	@Qualifier("AmazonSQS")
 	public void setAmazonSQS(AmazonSQS sqsExt) {
 		sqsExtended = sqsExt;
 	}
 	
-	@Autowired
-	public SqsSender(AmazonSQSAsync sqs) {
-		this.queueMessagingTemplate = new QueueMessagingTemplate(sqs);
+	public void setQueueMessagingTemplate(QueueMessagingTemplate qmt) {
+		this.queueMessagingTemplate = qmt;
 	}
 
 	public void sendResponse(String response, UUID id) {
