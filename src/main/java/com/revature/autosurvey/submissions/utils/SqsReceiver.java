@@ -21,6 +21,7 @@ import com.revature.autosurvey.submissions.beans.Response;
 import com.revature.autosurvey.submissions.data.ResponseRepository;
 
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -99,9 +100,10 @@ class SqsReceiver {
 		UUID surveyUuid = null;
 		String batch = "";
 		String date = "";
-		List<Response> responses = new ArrayList<>();
 		Date startDate = null;
-		String errResponse;
+		
+		List<Response> responses = new ArrayList<>();
+		String errResponse = "";
 
 		try {
 			JSONObject obj = new JSONObject(payload);
@@ -150,29 +152,12 @@ class SqsReceiver {
 		System.out.println("Date received: " + date);
 			
 		if (uuid != null) {				
-			Response response = repository.findByUuid(uuid).switchIfEmpty(Mono.just(new Response())).block();
-			System.out.println("Response received from UUID query: " + response);
-			
-			if(!response.getUuid().equals(uuid)) {
-				String reply = "No Response found with UUID :" + uuid;
-				System.out.println(reply + "\nSent reply to Analytics Queue");
-				sqsSender.sendResponse(reply, UUID.fromString(messageId));
-				return;
-			}
-			
-			responses.add(response);
-			sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
+			getResponseByUuid(uuid, UUID.fromString(messageId), responses);
 			return;
 		}
 		
 		if (surveyUuid != null) {
-			repository.findAllBySurveyUuid(surveyUuid).map(r -> {
-				responses.add(r);
-				return responses;
-			}).blockLast();
-			
-			System.out.println("Response List: " + responses);
-			sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
+			getResponseBySurveyId(surveyUuid, UUID.fromString(messageId), responses);
 			return;
 		}
 
@@ -189,43 +174,129 @@ class SqsReceiver {
 				return;
 			}
 			
-			Calendar endCal = Calendar.getInstance();
-			endCal.setTime(startDate);
-			endCal.add(Calendar.DATE, 7);
-			Date endDate = endCal.getTime();
-			
-			// If batch and date are provided as parameters
-			if(batch != null) {
-				repository.findAllByBatchAndWeek(batch, startDate, endDate).map(r -> {
-					responses.add(r);
-					return responses;
-				}).blockLast();
-				
-				sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
-				log.trace("Response retrieved by Batch and Week");
-				return;
-			}
-			
-			// Else only date was given
-			repository.findAllByWeek(startDate, endDate).map(r -> {
-				responses.add(r);
-				return responses;
-			}).blockLast();
-			
-			sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
-			log.trace("Response retrieved by Week");		
+			getResponseByDateAndBatch(startDate, batch, UUID.fromString(messageId), responses);
 			return;
 		}
 		
 		if (batch != null) {
-			repository.findAllByBatch(batch).map(r -> {
-				responses.add(r);
-				return responses;
-			}).blockLast();
-			
-			sqsSender.sendResponse(responses.toString(), UUID.fromString(messageId));
-			log.trace("Response retrieved by Batch name.");
+			getResponseByBatch(batch, UUID.fromString(messageId), responses);
+		}
+	}
+	
+	private void getResponseByUuid(UUID uuid, UUID messageId, List<Response> responses) {
+		Response response = repository.findByUuid(uuid)
+				.switchIfEmpty(Mono.just(new Response())).block();
+		System.out.println("Response received from UUID query: " + response);
+		
+		if(!response.getUuid().equals(uuid)) {
+			String reply = "No Response found with UUID :" + uuid;
+			System.out.println(reply + "\nSent reply to Analytics Queue");
+			sqsSender.sendResponse(reply, messageId);
 			return;
 		}
+		
+		responses.add(response);
+		sqsSender.sendResponse(responses.toString(), messageId);
+		return;
+	}
+	
+	private void getResponseBySurveyId(UUID surveyId, UUID messageId, List<Response> responses) {
+		repository.findAllBySurveyUuid(surveyId)
+		.switchIfEmpty(Flux.just(new Response()))
+		.map(r -> {
+			responses.add(r);
+			return responses;
+		}).blockLast();
+		
+		if(responses.size() == 1 && responses.get(0).getSurveyUuid() == null) {
+			String reply = "No Responses found for Query by SurveyID :" + surveyId;
+			sqsSender.sendResponse(responses.toString(), messageId);
+			System.out.println("Response sent to Analytics:\n" + reply);
+			return;
+		}
+		
+		System.out.println("Response List: " + responses);
+		sqsSender.sendResponse(responses.toString(), messageId);
+		return;
+	}
+	
+	private void getResponseByDateAndBatch(Date startDate, String batch, UUID messageId,
+			List<Response> responses) {
+		
+		Calendar endCal = Calendar.getInstance();
+		endCal.setTime(startDate);
+		endCal.add(Calendar.DATE, 7);
+		Date endDate = endCal.getTime();
+		
+		// If batch and date are provided as parameters
+		if(batch != null) {
+			System.out.println("Batch: " + batch);
+			System.out.println("startDate: " + startDate);
+			System.out.println("endDate: " + endDate);
+			
+			repository.findAllByBatchAndWeek(batch, startDate, endDate)
+			.switchIfEmpty(Flux.just(new Response()))
+			.map(r -> {
+				responses.add(r);
+				return responses;
+			})
+			.blockLast();
+			
+			// If empty Response, reply with no results found
+			if(responses.size() == 1 && responses.get(0).getBatch() == null) {
+				String reply = "No Responses found for Batch and Date Query :" +
+						"\nBatch: " + batch + "\nDate: " + startDate;
+				sqsSender.sendResponse(responses.toString(), messageId);
+				System.out.println("Response sent to Analytics:\n" + reply);
+				return;
+			}
+			
+			sqsSender.sendResponse(responses.toString(), messageId);
+			log.trace("Responses retrieved by Batch and Week");
+			return;
+		}
+		
+		// Else only date was given
+		repository.findAllByWeek(startDate, endDate)
+		.switchIfEmpty(Flux.just(new Response()))
+		.map(r -> {
+			responses.add(r);
+			return responses;
+		})
+		.blockLast();
+		
+		// If empty Response, reply with no results found
+		if(responses.size() == 1 && responses.get(0).getDate() == null) {
+			String reply = "No Responses found for Query by Date: " + startDate;
+			sqsSender.sendResponse(responses.toString(), messageId);
+			System.out.println("Response sent to Analytics:\n" + reply);
+			return;
+		}
+		
+		sqsSender.sendResponse(responses.toString(), messageId);
+		log.trace("Response retrieved by Week");		
+		return;
+	}
+	
+	private void getResponseByBatch(String batch, UUID messageId, List<Response> responses) {
+		repository.findAllByBatch(batch)
+		.switchIfEmpty(Flux.just(new Response()))
+		.map(r -> {
+			responses.add(r);
+			return responses;
+		})
+		.blockLast();
+		
+		// If empty Response, reply with no results found
+		if(responses.size() == 1 && responses.get(0).getBatch() == null) {
+			String reply = "No Response found for Query by Batch: " + batch;
+			sqsSender.sendResponse(responses.toString(), messageId);
+			System.out.println("Response sent to Analytics:\n" + reply);
+			return;
+		}
+		
+		sqsSender.sendResponse(responses.toString(), messageId);
+		log.trace("Response retrieved by Batch name.");
+		return;
 	}
 }
