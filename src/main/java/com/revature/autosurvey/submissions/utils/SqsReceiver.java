@@ -184,11 +184,10 @@ class SqsReceiver {
 	}
 	
 	private void getResponseByUuid(UUID uuid, UUID messageId, List<Response> responses) {
-		Response response = repository.findByUuid(uuid)
-				.switchIfEmpty(Mono.just(new Response())).block();
+		Response response = repository.findByUuid(uuid).block();
 		System.out.println("Response received from UUID query: " + response);
 		
-		if(response.getUuid() == null || !response.getUuid().equals(uuid)) {
+		if(response == null || !response.getUuid().equals(uuid)) {
 			String reply = "No Response found with UUID :" + uuid;
 			System.out.println(reply + "\nSent reply to Analytics Queue");
 			sqsSender.sendResponse(reply, messageId);
