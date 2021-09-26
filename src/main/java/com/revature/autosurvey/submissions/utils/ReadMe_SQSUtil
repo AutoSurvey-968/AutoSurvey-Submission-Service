@@ -1,0 +1,36 @@
+### Messaging Queues for Submissions SQS ###
+Used for decoupling interactions between Analytics --> Surveys & Submissions with
+DB access.
+
+## Features and Usage (Backend) ##
+* Analytics can initiate a request to Submissions by wrapping UUID, 
+batch and date parameters in a JSON message then sending to the Submissions Queue 
+on AWS (https://sqs.us-east-1.amazonaws.com/855430746673/SubmissionQueue).
+* Submissions queue listener receives the message (when service is up) and 
+queries the database on behalf of analytics. 
+* Submissions service sends a response back to the Analytics queue on 
+AWS (https://sqs.us-east-1.amazonaws.com/855430746673/AnalyticsQueue) as a list 
+of responses to all surveys found from DB query:
+
+## S3 Exception ##
+If the message payload of compiled responses exceeds 256KB, the message will have
+to be stored in S3 for retrieval at the later date. Review 
+com.revature.autosurvey.submissions.util/MessageSender.java and 
+com.revature.autosurvey.submissions.config/AwsS3Config.java
+
+
+## Environment Variables Required ##
+* AWS_PASS
+* AWS_S3_BUCKET
+* AWS_S3_ID
+* AWS_S3_SECRET
+* AWS_USER
+* CREDENTIALS_JSON
+* FIREBASE_API_KEY
+* SERVICE_ACCOUNT_ID
+* SQS_PASS
+* SQS_USER
+* TRUSTSTORE_PASS
+
+Notes by: Stephen G (2107 Reactive Batch)
+Date: 9/15/2021

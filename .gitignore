@@ -29,6 +29,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### MacOs Folder Attributes ###
+.DS_Store
+
 ### VS Code ###
 .vscode/
 

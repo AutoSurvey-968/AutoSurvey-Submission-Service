@@ -37,5 +37,5 @@ public class Response {
 	private UUID surveyUuid;
 	@Column
 	private Map<String, String> responses;
-
+	
 }

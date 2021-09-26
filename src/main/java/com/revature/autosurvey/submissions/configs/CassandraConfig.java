@@ -20,6 +20,8 @@ import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 @Configuration
 @EnableCassandraRepositories(basePackages = { "com.revature.autosurvey.submissions.data" })
 public class CassandraConfig {
+	
+	
 	@Bean
 	public CqlSessionFactoryBean session() {
 		CqlSessionFactoryBean factory = new CqlSessionFactoryBean();
@@ -55,4 +57,5 @@ public class CassandraConfig {
 	public CassandraOperations cassandraTemplate(SessionFactory sessionFactory, CassandraConverter converter) {
 		return new CassandraTemplate(sessionFactory, converter);
 	}
+	
 }
