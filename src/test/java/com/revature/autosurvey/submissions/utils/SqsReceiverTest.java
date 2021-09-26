@@ -30,7 +30,7 @@ import com.revature.autosurvey.submissions.data.ResponseRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class SqsReceiverTest {
+class SqsReceiverTest {
 
 	public static final String QUEUE_NAME = SQSNames.SUBMISSIONS_QUEUE;
 	private Message<String> message;

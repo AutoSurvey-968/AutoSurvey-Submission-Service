@@ -60,7 +60,7 @@ class SqsSender {
 			System.out.println("Message sent." + response);
 		}	catch (Exception e) {
 			log.error("Payload too large. Posting message to S3 instead: " + e);
-			sendResponseToS3(response.toString());
+			sendResponseToS3(response);
 		}
 		
 	}
@@ -70,10 +70,9 @@ class SqsSender {
 	    // Create a message queue in S3
 		
 	    String qName = "AnalyticsQueue";  
-	    String qUrlString = sqsExtended.getQueueUrl(qName).toString();
-
+	    
 	    final CreateQueueRequest createQueueRequest = new CreateQueueRequest(qName);
-	    qUrlString = sqsExtended.createQueue(createQueueRequest).getQueueUrl();
+	    String qUrlString = sqsExtended.createQueue(createQueueRequest).getQueueUrl();
 	    log.trace("Queue created.");	    
 	    log.trace("QueueUrl retrieved: " + qUrlString);
 	    

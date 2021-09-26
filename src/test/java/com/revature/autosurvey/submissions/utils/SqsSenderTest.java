@@ -27,7 +27,7 @@ import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.revature.autosurvey.submissions.beans.Response;
 
 
-public class SqsSenderTest {
+class SqsSenderTest {
 
 	private QueueMessagingTemplate queueMessagingTemplate;
 	@Mock

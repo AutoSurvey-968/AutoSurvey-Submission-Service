@@ -197,7 +197,6 @@ class SqsReceiver {
 		
 		responses.add(response);
 		sqsSender.sendResponse(responses.toString(), messageId);
-		return;
 	}
 	
 	private void getResponseBySurveyId(UUID surveyId, UUID messageId, List<Response> responses) {
@@ -217,7 +216,6 @@ class SqsReceiver {
 		
 		System.out.println("Response List: " + responses);
 		sqsSender.sendResponse(responses.toString(), messageId);
-		return;
 	}
 	
 	private void getResponseByDateAndBatch(Date startDate, String batch, UUID messageId,
@@ -275,7 +273,6 @@ class SqsReceiver {
 		
 		sqsSender.sendResponse(responses.toString(), messageId);
 		log.trace("Response retrieved by Week");		
-		return;
 	}
 	
 	private void getResponseByBatch(String batch, UUID messageId, List<Response> responses) {
@@ -297,6 +294,5 @@ class SqsReceiver {
 		
 		sqsSender.sendResponse(responses.toString(), messageId);
 		log.trace("Response retrieved by Batch name.");
-		return;
 	}
 }
